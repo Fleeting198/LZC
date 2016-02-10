@@ -1,0 +1,3 @@
+SQLALCHEMY_DATABASE_URI = "mysql://root:root@127.0.0.1:3306/witcampus"
+SQLALCHEMY_TRACK_MODIFICATIONS = True
+

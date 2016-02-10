@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block chart %}
+    <!--在此页中显示输入框，图表作为输出-->
+    <form name="form-expenditure" action="/expenditure" method="get">
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon">工号</span>
+                <input class="form-control" name="user_id" type="text" maxlength="8" value="PPQZXPXU" >
+            </div>
+        </div>
+        <div class="form-group">
+            <input type="submit" >
+        </div>
+    </form>
+    <div id="chart-expenditure" style="width: 600px; height: 400px;"></div>
+
+    <script>
+        var chart_expenditure = echarts.init(document.getElementById('chart-expenditure'));
+        var option_expenditure = {
+            title: {text: '消费趋势'},
+            tooltip: {},
+            legend: {data: ['消费']},
+            xAxis: [{
+                type: 'category',
+                boundaryGap: false,
+                data: []
+            }],
+            yAxis: [{
+                type: 'value'
+            }],
+            series: [{
+                name: '消费',
+                type: 'line',
+                data: []
+            }]
+        }
+        chart_expenditure.setOption(option_expenditure);
+
+    </script>
+
+{% endblock %}

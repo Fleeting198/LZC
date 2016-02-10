@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+	<head>
+		<meta charset="UTF-8">
+		<title>Does this unit have a soul?</title>
+        <link href="{{ url_for('static', filename='Bootstrap/css/bootstrap.min.css') }}" rel="stylesheet"/>
+        <link href="{{ url_for('static', filename='Bootstrap/css/bootstrap-theme.min.css') }}" rel="stylesheet"/>
+
+        <script src="{{url_for('static', filename='jquery-1.11.3.min.js')}}"></script>
+		<script src="{{url_for('static', filename='echarts.min.js')}}"></script>
+		<script src="{{url_for('static', filename='Bootstrap/js/bootstrap.min.js')}}"></script>
+	</head>
+	<body>
+		<div id="header">
+			This is header.
+		</div>
+
+            <div class="col-xs-2">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <input type="button" value="消费趋势" onclick="window.location.href='/expenditure'"/>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-xs-10">
+                {% block chart %}
+                {% endblock %}
+            </div>
+
+        </br>
+		<div id="footer">
+			This is footer.
+		</div>
+	</body>
+</html>
