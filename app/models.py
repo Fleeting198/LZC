@@ -14,10 +14,13 @@ class ACRec(db.Model):
     node_des = db.Column(db.String(40))
     ac_datetime = db.Column(db.DateTime)
 
+class testModel(db.Model):
+    testid = db.Column(db.Integer, primary_key=True)
+
 class consumption(db.Model):
     user_id = db.Column(db.String(8), primary_key=True)
     dev_id = db.Column(db.String(10))
-    con_datetime = db.Column(db.DateTime)
+    con_datetime = db.Column(db.DateTime, primary_key=True)
     amount = db.Column(db.DECIMAL(5, 2))
 
     def __init__(self, user_id, dev_id, con_datetime, amount):
