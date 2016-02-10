@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block chart %}
     <!--在此页中显示输入框，图表作为输出-->
-    <form name="form-expenditure" action="/expenditure" method="get">
+    <form id="form-expenditure" action="/expenditure" method="get">
         <div class="form-group">
             <div class="input-group">
                 <span class="input-group-addon">工号</span>
@@ -9,12 +9,13 @@
             </div>
         </div>
         <div class="form-group">
-            <input type="submit" >
+            <input type="button" value="提交" onclick="refresh_chart()">
         </div>
     </form>
     <div id="chart-expenditure" style="width: 600px; height: 400px;"></div>
 
     <script>
+    	// 图表初始化。
         var chart_expenditure = echarts.init(document.getElementById('chart-expenditure'));
         var option_expenditure = {
             title: {text: '消费趋势'},
@@ -36,14 +37,23 @@
         }
         chart_expenditure.setOption(option_expenditure);
 
-        document.ready(function(){
-            var json_response = {{ json_response }};
-            alert(json_response);
-{#            chart_expenditure.setOption({#}
-{#                xAxis: {data: {{  }} }#}
-{#            })#}
-        })
+		// get向后端请求json刷新图表。
+        refresh_chart = function(){
+            $.get('/expenditure/refresh?'+$("#form-expenditure").serialize(), function(json_response){
+                var mdates = json_response.mdates;
+                var mamounts = json_response.mamounts;
 
+                chart_expenditure.setOption({
+                    xAxis: [{
+                        data: mdates
+                    }],
+                    series: [{
+                        data: mamounts
+                    }]
+                })
+
+            },'json');
+        }
     </script>
 
 {% endblock %}
