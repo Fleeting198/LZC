@@ -36,6 +36,14 @@
         }
         chart_expenditure.setOption(option_expenditure);
 
+        document.ready(function(){
+            var json_response = {{ json_response }};
+            alert(json_response);
+{#            chart_expenditure.setOption({#}
+{#                xAxis: {data: {{  }} }#}
+{#            })#}
+        })
+
     </script>
 
 {% endblock %}

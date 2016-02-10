@@ -29,6 +29,6 @@ class consumption(db.Model):
         self.con_datetime = con_datetime
         self.amount = amount
 
-    def __repr__(self):
-        return '<ID: %r; Device: %r; Date: %r; Amount: %r>' \
-               % (self.user_id, self.dev_id, self.con_datetime, self.amount)
+    # def __repr__(self):
+    #     return '<ID: %r; Device: %r; Date: %r; Amount: %r>' \
+    #            % (self.user_id, self.dev_id, self.con_datetime, self.amount)
