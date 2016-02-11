@@ -1,21 +1,22 @@
 from app import db
 
+
 class Device(db.Model):
     dev_id = db.Column(db.String(10), primary_key=True)
     location = db.Column(db.String(40))
+
 
 class Individual(db.Model):
     user_id = db.Column(db.String(8), primary_key=True)
     role = db.Column(db.String(3))
     grade = db.Column(db.String(2))
 
+
 class ACRec(db.Model):
     node_id = db.Column(db.Integer, primary_key=True)
     node_des = db.Column(db.String(40))
     ac_datetime = db.Column(db.DateTime)
 
-class testModel(db.Model):
-    testid = db.Column(db.Integer, primary_key=True)
 
 class consumption(db.Model):
     user_id = db.Column(db.String(8), primary_key=True)

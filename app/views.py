@@ -6,8 +6,8 @@ from app import app
 from flask import render_template, request, jsonify
 from app.models import *
 
-import json
-# 在view中处理业务逻辑？
+from sqlalchemy import and_
+
 
 @app.route('/')
 def index():
@@ -25,6 +25,8 @@ def chart_expenditure():
 @app.route('/expenditure/refresh', methods=['GET'])
 def data_expenditure():
 
+    from datetime import datetime
+
     # 获取参数
     user_id = request.args.get('user_id')   # 工号
     mode_date = int(request.args.get('mode_date'))  # 日期模式：周、月、季、年
@@ -37,15 +39,26 @@ def data_expenditure():
     if user_id and len(user_id) == 8:  # 检查参数合法
         # 查询
         # print "Query:" + user_id
-        results = consumption.query.filter(consumption.user_id==user_id).order_by(consumption.con_datetime).all()
-        # print len(results)
+        # 根据传入的起止日期组合4 种情况
+        if len(startDate) != 0 and len(endDate) != 0 and \
+                (datetime.strptime(startDate, "%Y-%m-%d") > datetime.strptime(endDate, "%Y-%m-%d")):
+            results = consumption.query.filter(
+                and_(consumption.user_id == user_id, consumption.con_datetime >= startDate,
+                     consumption.con_datetime <= endDate)).order_by(consumption.con_datetime).all()
+        elif len(startDate) != 0 and len(endDate) == 0:
+            results = consumption.query.filter(
+                and_(consumption.user_id == user_id, consumption.con_datetime >= startDate))\
+                .order_by(consumption.con_datetime).all()
+        elif len(startDate) == 0 and len(endDate) != 0:
+            results = consumption.query.filter(
+                and_(consumption.user_id == user_id, consumption.con_datetime <= endDate))\
+                .order_by(consumption.con_datetime).all()
+        else:
+            results = consumption.query.filter(consumption.user_id == user_id)\
+                .order_by(consumption.con_datetime).all()
 
-        # 构造日期数组作为图表x轴标记
-        mdates = [result.con_datetime for result in results]
-
-        # 构造对应的消费值
-        # data = [float(Decimal(result.amount).to_eng_string()) for result in results]
-        mamounts = [result.amount for result in results]
+        mdates = [result.con_datetime for result in results]  # 构造日期数组作为图表x轴标记
+        mamounts = [result.amount for result in results]   # 构造对应的消费值
 
         # 调用处理模块处理原始数据
         from app.dataProcess import expenditure
@@ -59,8 +72,6 @@ def data_expenditure():
 
         # 构造返回json
         try:
-            # str_response = {"date": mdates, "data": mamounts}
-            # json_response = jsonify(str_response)
             json_response = jsonify(mdates=mdates, mamounts=mamounts)
         except Exception,e:
             print e
