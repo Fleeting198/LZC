@@ -1,3 +1,6 @@
+<!-- 02-09 Built by 陈骏杰  -->
+<!-- 02-11 增加起止日期、日期模式输入 by 陈骏杰 -->
+
 {% extends "base.html" %}
 {% block chart %}
     <!--在此页中显示输入框，图表作为输出-->
@@ -5,8 +8,26 @@
         <div class="form-group">
             <div class="input-group">
                 <span class="input-group-addon">工号</span>
-                <input class="form-control" name="user_id" type="text" maxlength="8" value="PPQZXPXU" >
+                <input class="form-control" name="user_id" type="text" maxlength="8" value="PPQZXPXU" />
             </div>
+            <div class="input-group">
+                <span class="input-group-addon">起始日期</span>
+                <input class="form-control" id="ipt-startDate" name="startDate" type="text" readonly="readonly" />
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">结束日期</span>
+                <input class="form-control" id="ipt-endDate" name="endDate" type="text" readonly="readonly" />
+            </div>
+           	<div class="input-group">
+				<span class="input-group-addon">模式</span>
+				<select class="form-control" name="mode_date" >
+					<option value="0" selected="selected">天</option>
+					<option value="1" >周</option>
+					<option value="2" >月</option>
+					<option value="3" >季</option>
+                    <option value="4" >年</option>
+				</select>
+			</div>
         </div>
         <div class="form-group">
             <input type="button" value="提交" onclick="refresh_chart()">
@@ -15,6 +36,21 @@
     <div id="chart-expenditure" style="width: 600px; height: 400px;"></div>
 
     <script>
+    
+    	// datetimepicker初始化
+    	$("#ipt-startDate").datetimepicker({
+           format: 'yyyy-mm-dd',
+           
+            autoclose: true,
+            minView: 2
+        });
+        $("#ipt-endDate").datetimepicker({
+           format: 'yyyy-mm-dd',
+       
+            autoclose: true,
+            minView: 2
+        });
+        
     	// 图表初始化。
         var chart_expenditure = echarts.init(document.getElementById('chart-expenditure'));
         var option_expenditure = {

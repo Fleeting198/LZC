@@ -1,4 +1,7 @@
 # coding:utf-8
+# 02-09 Built by 陈骏杰
+# 02-11 将数据处理交给dataProcess中脚本 by 陈骏杰
+
 from app import app
 from flask import render_template, request, jsonify
 from app.models import *
@@ -23,8 +26,10 @@ def chart_expenditure():
 def data_expenditure():
 
     # 获取参数
-    user_id = request.args.get('user_id')
-    # mode_date = request.args.get('mode_date')
+    user_id = request.args.get('user_id')   # 工号
+    mode_date = int(request.args.get('mode_date'))  # 日期模式：周、月、季、年
+    startDate = request.args.get('startDate')  # 起始时间
+    endDate = request.args.get('endDate')   # 结束时间
 
     # 定义回传变量
     json_response = 0
@@ -40,11 +45,21 @@ def data_expenditure():
 
         # 构造对应的消费值
         # data = [float(Decimal(result.amount).to_eng_string()) for result in results]
-        mamounts = [float(result.amount) for result in results]
+        mamounts = [result.amount for result in results]
+
+        # 调用处理模块处理原始数据
+        from app.dataProcess import expenditure
+        mdates, mamounts = expenditure.main(mdates, mamounts, mode_date)
+
+        mdates = map(lambda x: str(x), mdates)
+        mamounts = map(lambda x: float(x), mamounts)
+
+        # print mdates
+        # print mamounts
 
         # 构造返回json
         try:
-            str_response = {"date": mdates, "data": mamounts}
+            # str_response = {"date": mdates, "data": mamounts}
             # json_response = jsonify(str_response)
             json_response = jsonify(mdates=mdates, mamounts=mamounts)
         except Exception,e:
