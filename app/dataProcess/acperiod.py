@@ -30,7 +30,7 @@ def main(mdates):
 
     for i in range(len(mcounts)):
         mcounts[i] = float(mcounts[i])
-        mcounts[i] /=len_mdates
+        mcounts[i] = mcounts[i]/len_mdates if len_mdates != 0 else 0
         mcounts[i] = round(mcounts[i], 2)
 
     mperiods = ('23点~5点', '5点~12点', '12点~20点', '20点~23点')

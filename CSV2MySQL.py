@@ -131,14 +131,11 @@ class Cvs2MySQL:
         with codecs.open(self.path_consumption) as csvfile:
             reader = csv.reader(csvfile)
             reader.next()  # Jump first line.
-            strsql = """insert ignore into consumption(user_id,dev_id,datetime,amount,role,grade) values(%s,%s,%s,%s,%s,%s);"""
+            strsql = """insert ignore into consumption(user_id,dev_id,con_datetime,amount) values(%s,%s,%s,%s);"""
             list_data = []
             count = 0
 
             for STUEMPNO, TRANSDATE, TRANSTIME, DEVPHYID, AMOUNT, ROLE, GRADE in reader:
-
-                # 去掉原文件中各项外包括的括号
-                STUEMPNO = STUEMPNO
 
                 # 合并TRANSDATE,TRANSTIME "YYYY-mm-dd hh:mm:ss"
                 TRANSDATE = TRANSDATE[:6] + '-' + TRANSDATE[6:]
@@ -147,9 +144,7 @@ class Cvs2MySQL:
                 TRANSTIME = TRANSTIME[:2] + ':' + TRANSTIME[2:]
                 DATETIME = TRANSDATE + ' ' + TRANSTIME
 
-                # Insert
-                data = (STUEMPNO, DEVPHYID, DATETIME, AMOUNT, ROLE, GRADE)
-
+                data = (STUEMPNO, DEVPHYID, DATETIME, AMOUNT)
                 list_data.append(data)
                 count += 1
 

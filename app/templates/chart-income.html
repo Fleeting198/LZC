@@ -1,10 +1,10 @@
-
 {% extends "base.html" %}
 {% block chart %}
+    <!--在此页中显示输入框，图表作为输出-->
     <form id="form-ipt" method="get">
         <div class="form-group">
-            <label class="control-label">工号</label>
-            <input class="form-control" name="user_id" type="text" maxlength="8" value="PPTTTPNQ"/>
+            <label class="control-label">设备号</label>
+            <input class="form-control" name="dev_id" type="text" maxlength="10" value="YQSH1826"/>
         </div>
         <div class="form-group">
             <label class="control-label">起始日期</label>
@@ -21,6 +21,19 @@
                 <span class="input-group-btn"><input type="button" class="btn btn-default" onclick="clear_picker(2)"
                                                      value="清除"/></span>
             </div>
+        </div>
+        <div class="form-group">
+            <span>模式</span>
+            <label class="checkbox-inline">
+                <input type="radio" name="mode_date" value="0" checked>日</label>
+            <label class="checkbox-inline">
+                <input type="radio" name="mode_date" value="1">周</label>
+            <label class="checkbox-inline">
+                <input type="radio" name="mode_date" value="2">月</label>
+            <label class="checkbox-inline">
+                <input type="radio" name="mode_date" value="3">季</label>
+            <label class="checkbox-inline">
+                <input type="radio" name="mode_date" value="4">年</label>
         </div>
         <div class="form-group">
             <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
@@ -46,7 +59,7 @@
         // 图表初始化。
         var chart = echarts.init(document.getElementById('chart'));
         var option = {
-            title: {text: '活动时间段分布'},
+            title: {text: '收入趋势'},
             tooltip: {trigger: 'axis'},
             toolbox: {
                 show: true,
@@ -58,36 +71,69 @@
                     saveAsImage: {show: true}
                 }
             },
-            legend: {data: ['门禁平均计数']},
+            legend: {data: ['累积收入', '节点收入']},
             xAxis: {
                 type: 'category',
                 boundaryGap: true,
                 data: []
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                name: '收入',
+                axisLabel: {
+                    formatter: '{value} 元'
+                }
             },
-            series: [{
-                name: '门禁平均计数',
-                type: 'bar',
-                data: []
-            }]
+            dataZoom: [
+                {
+                    type: 'inside',
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 100
+                },
+                {
+                    type: 'slider',
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 100
+                }
+            ],
+            series: [
+                {
+                    name: '累积收入',
+                    type: 'line',
+                    data: []
+                },
+                {
+                    name: '节点收入',
+                    type: 'bar',
+                    data: []
+                }
+            ]
         }
         chart.setOption(option);
 
         // get向后端请求json刷新图表。
         refresh_chart = function () {
-            $.get('/acperiod/refresh?' + $("#form-ipt").serialize(), function (json_response) {
-                var mcounts = json_response.mcounts;
-                var mperiods = json_response.mperiods;
+            $.get('/income/refresh?' + $("#form-ipt").serialize(), function (json_response) {
+                var mdates = json_response.mdates;
+                var mamounts = json_response.mamounts;
+                var mamounts_point = json_response.mamounts_point;
 
                 chart.setOption({
                     xAxis: [{
-                        data: mperiods
+                        data: mdates
                     }],
-                    series: [{
-                        data: mcounts
-                    }]
+                    series: [
+                        {
+                            name: '累积收入',
+                            data: mamounts
+                        },
+                        {
+                            name: '节点收入',
+                            data: mamounts_point
+                        }
+                    ]
                 })
 
             }, 'json');

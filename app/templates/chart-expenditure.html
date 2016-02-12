@@ -1,9 +1,8 @@
-<!-- 02-11 增加起止日期、日期模式输入 by 陈骏杰 -->
 
 {% extends "base.html" %}
 {% block chart %}
     <!--在此页中显示输入框，图表作为输出-->
-    <form id="form-expenditure" action="/expenditure" method="get">
+    <form id="form-ipt" method="get">
         <div class="form-group">
             <label class="control-label">工号</label>
             <input class="form-control" name="user_id" type="text" maxlength="8" value="PPQZXPXU" />
@@ -40,7 +39,7 @@
         </div>
     </form>
     
-    <div id="chart-expenditure" style="width: 600px; height: 400px;"></div>
+    <div id="chart" style="width: 1000px; height: 600px;"></div>
 
     <script>
 
@@ -57,8 +56,8 @@
         });
 
         // 图表初始化。
-        var chart_expenditure = echarts.init(document.getElementById('chart-expenditure'));
-        var option_expenditure = {
+        var chart = echarts.init(document.getElementById('chart'));
+        var option = {
             title: {text: '支出趋势'},
             tooltip: {trigger: 'axis'},
             toolbox: {
@@ -71,7 +70,7 @@
                     saveAsImage: {show: true}
                 }
             },
-            legend: {data: ['支出消费']},
+            legend: {data: ['累积支出','节点支出']},
             xAxis: {
                 type: 'category',
                 boundaryGap: true,
@@ -111,16 +110,16 @@
                 }
             ]
         }
-        chart_expenditure.setOption(option_expenditure);
+        chart.setOption(option);
 
         // get向后端请求json刷新图表。
         refresh_chart = function(){
-            $.get('/expenditure/refresh?'+$("#form-expenditure").serialize(), function(json_response){
+            $.get('/expenditure/refresh?'+$("#form-ipt").serialize(), function(json_response){
                 var mdates = json_response.mdates;
                 var mamounts = json_response.mamounts;
                 var mamounts_point = json_response.mamounts_point;
 
-                chart_expenditure.setOption({
+                chart.setOption({
                     xAxis: [{
                         data: mdates
                     }],
