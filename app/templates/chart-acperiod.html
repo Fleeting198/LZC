@@ -1,0 +1,110 @@
+
+{% extends "base.html" %}
+{% block chart %}
+    <form id="form-expenditure" action="/expenditure" method="get">
+        <div class="form-group">
+            <label class="control-label">工号</label>
+            <input class="form-control" name="user_id" type="text" maxlength="8" value="PPTTTPNQ"/>
+        </div>
+        <div class="form-group">
+            <label class="control-label">起始日期</label>
+            <div class="input-group">
+                <input class="form-control" id="ipt-startDate" name="startDate" type="text" readonly="readonly"/>
+                <span class="input-group-btn"><input type="button" class="btn btn-default" onclick="clear_picker(1)"
+                                                     value="清除"/></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label">结束日期</label>
+            <div class="input-group">
+                <input class="form-control" id="ipt-endDate" name="endDate" type="text" readonly="readonly"/>
+                <span class="input-group-btn"><input type="button" class="btn btn-default" onclick="clear_picker(2)"
+                                                     value="清除"/></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
+        </div>
+    </form>
+
+    <div id="chart-period" style="width: 600px; height: 400px;"></div>
+
+    <script>
+
+        // datetimepicker初始化
+        $("#ipt-startDate").datetimepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            minView: 2
+        });
+        $("#ipt-endDate").datetimepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            minView: 2
+        });
+
+        // 图表初始化。
+        var chart_expenditure = echarts.init(document.getElementById('chart-period'));
+        var option_expenditure = {
+            title: {text: '活动时间段分布'},
+            tooltip: {trigger: 'axis'},
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: {show: true},
+                    dataView: {show: true, readOnly: false},
+                    magicType: {show: true, type: ['line', 'bar']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            legend: {data: ['门禁平均计数']},
+            xAxis: {
+                type: 'category',
+                boundaryGap: true,
+                data: []
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                name: '门禁平均计数',
+                type: 'bar',
+                data: []
+            }]
+        }
+        chart_expenditure.setOption(option_expenditure);
+
+        // get向后端请求json刷新图表。
+        refresh_chart = function () {
+            $.get('/acperiod/refresh?' + $("#form-expenditure").serialize(), function (json_response) {
+                var mcounts = json_response.mcounts;
+                var mperiods = json_response.mperiods;
+
+                chart_expenditure.setOption({
+                    xAxis: [{
+                        data: mperiods
+                    }],
+                    series: [{
+                        data: mcounts
+                    }]
+                })
+
+            }, 'json');
+        }
+
+        // 清空datetimepicker
+        clear_picker = function (pid) {
+            switch (pid) {
+                case 0:
+                    $("#ipt-startDate").val('');
+                    $("#ipt-endDate").val('');
+                case 1:
+                    $("#ipt-startDate").val('');
+                case 2:
+                    $("#ipt-endDate").val('');
+            }
+        }
+    </script>
+
+{% endblock %}

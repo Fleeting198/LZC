@@ -1,4 +1,3 @@
-<!-- 02-09 Built by 陈骏杰  -->
 <!-- 02-11 增加起止日期、日期模式输入 by 陈骏杰 -->
 
 {% extends "base.html" %}
@@ -60,29 +59,57 @@
         // 图表初始化。
         var chart_expenditure = echarts.init(document.getElementById('chart-expenditure'));
         var option_expenditure = {
-            title: {text: '消费趋势'},
-            tooltip: {},
-            legend: {data: ['消费']},
+            title: {text: '支出趋势'},
+            tooltip: {trigger: 'axis'},
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: {show: true},
+                    dataView: {show: true, readOnly: false},
+                    magicType: {show: true, type: ['line', 'bar']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            legend: {data: ['支出消费']},
             xAxis: {
                 type: 'category',
-                boundaryGap: false,
+                boundaryGap: true,
                 data: []
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                name: '支出',
+                axisLabel: {
+                    formatter: '{value} 元'
+                }
             },
             dataZoom: [
-				{
-					type: 'slider',
-					start: 0,
-					end: 100
-				}
+                {
+                    type: 'inside',
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 100
+                },
+                {
+                    type: 'slider',
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 100
+                }
             ],
-            series: [{
-                name: '消费',
-                type: 'line',
-                data: []
-            }]
+            series: [
+                {
+                    name: '累积支出',
+                    type: 'line',
+                    data: []
+                },
+                {
+                    name: '节点支出',
+                    type: 'bar',
+                    data: []
+                }
+            ]
         }
         chart_expenditure.setOption(option_expenditure);
 
@@ -91,14 +118,22 @@
             $.get('/expenditure/refresh?'+$("#form-expenditure").serialize(), function(json_response){
                 var mdates = json_response.mdates;
                 var mamounts = json_response.mamounts;
+                var mamounts_point = json_response.mamounts_point;
 
                 chart_expenditure.setOption({
                     xAxis: [{
                         data: mdates
                     }],
-                    series: [{
-                        data: mamounts
-                    }]
+                    series: [
+                        {
+                            name: '累积支出',
+                            data: mamounts
+                        },
+                        {
+                            name: '节点支出',
+                            data: mamounts_point
+                        }
+                    ]
                 })
 
             },'json');
