@@ -7,78 +7,74 @@
 from app import app
 from flask import render_template, request, jsonify
 from app.models import *
+from app.forms import *
 
 from sqlalchemy import and_
 from datetime import datetime
 
 @app.route('/')
-def index():
-    return render_template('base.html')  # 模版路径名一定要写全
+def show_index():
+    return render_template('index.html')
 
 
-# 仅仅加载图表，json传递由js发起。
-@app.route('/expenditure')
-def chart_expenditure():
-    return render_template('chart-expenditure.html')
+@app.route('/charts')
+def show_charts():
+    return render_template('charts.html')
 
 
-# 传给前端的数据格式：
-# 'data':[消费金额按时间顺序],
-@app.route('/expenditure/refresh', methods=['GET'])
-def refresh_expenditure():
+@app.route('/charts/expenditure')
+def show_chart_expenditure():
+    form = form_expenditure()
+    return render_template('chart-expenditure.html', form=form)
 
-    user_id = request.args.get('user_id')
-    mode_date = int(request.args.get('mode_date'))  # 日期模式：周、月、季、年
-    startDate = request.args.get('startDate')
-    endDate = request.args.get('endDate')
 
-    json_response = jsonify(valid=0)  # 定义回传变量
+@app.route('/charts/expenditure/getData', methods=['GET'])
+def refresh_chart_expenditure():
+    form = form_expenditure()
+    json_response = jsonify(valid=0)
 
-    if not(user_id and len(user_id) == 8):
-        return json_response
+    print form.errors
 
-    # 查询
-    # 根据传入的起止日期组合4 种情况
-    # 太长了啊能不能优化下
-    if len(startDate) != 0 and len(endDate) != 0 and (datetime.strptime(startDate, "%Y-%m-%d") > datetime.strptime(endDate, "%Y-%m-%d")):
-        results = Consumption.query.filter(
-            and_(Consumption.user_id == user_id, Consumption.con_datetime >= startDate, Consumption.con_datetime <= endDate)).order_by(Consumption.con_datetime).all()
-    elif len(startDate) != 0 and len(endDate) == 0:
-        results = Consumption.query.filter(
-            and_(Consumption.user_id == user_id, Consumption.con_datetime >= startDate)).order_by(Consumption.con_datetime).all()
-    elif len(startDate) == 0 and len(endDate) != 0:
-        results = Consumption.query.filter(
-            and_(Consumption.user_id == user_id, Consumption.con_datetime <= endDate)).order_by(Consumption.con_datetime).all()
-    else:
-        results = Consumption.query.filter(Consumption.user_id == user_id).order_by(Consumption.con_datetime).all()
+    if form.validate():
+        user_id = form.user_id
+        mode_date = form.mode_date
+        startDate = form.startDate
+        endDate = form.endDate
 
-    mdates = [result.con_datetime for result in results]  # 构造日期数组作为图表x轴标记
-    mamounts = [result.amount for result in results]   # 构造对应的消费值
+        # 查询
+        recordQuery = consumption.query.filter(consumption.user_id == user_id).order_by(consumption.con_datetime)
 
-    # 调用处理模块
-    from app.dataProcess import expenditure
-    mdates, mamounts, mamounts_point = expenditure.main(mdates, mamounts, mode_date)
+        if len(startDate) != 0 and len(endDate) != 0 and (
+                    datetime.strptime(startDate, "%Y-%m-%d") > datetime.strptime(endDate, "%Y-%m-%d")):
+            recordQuery = recordQuery.filter(
+                and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
+        elif len(startDate) != 0 and len(endDate) == 0:
+            recordQuery = recordQuery.filter(consumption.con_datetime >= startDate)
+        elif len(startDate) == 0 and len(endDate) != 0:
+            recordQuery = recordQuery.filter(consumption.con_datetime <= endDate)
 
-    mdates = map(lambda x: str(x), mdates)
-    mamounts = map(lambda x: float(x), mamounts)
-    mamounts_point = map(lambda x: float(x), mamounts_point)
+        results = recordQuery.all()
 
-    # 构造返回json
-    try:
+        mdates = [result.con_datetime for result in results]  # 构造日期数组作为图表x轴标记
+        mamounts = [result.amount for result in results]  # 构造对应的消费值
+
+        # 调用处理模块
+        from app.controlls import expenditure
+        mdates, mamounts, mamounts_point = expenditure.main(mdates, mamounts, mode_date)
+
+        # 构造返回json
         json_response = jsonify(valid=1, mdates=mdates, mamounts=mamounts, mamounts_point=mamounts_point)
-    except Exception,e:
-        print e
 
     return json_response
 
 
-@app.route('/acperiod')
-def chart_acperiod():
+@app.route('/charts/acperiod')
+def show_chart_acperiod():
     return render_template('chart-acperiod.html')
 
 
-@app.route('/acperiod/refresh', methods=['GET'])
-def refresh_acperiod():
+@app.route('/charts/acperiod/refresh', methods=['GET'])
+def refresh_chart_acperiod():
     json_response = jsonify(valid=0)
 
     user_id = request.args.get('user_id')
@@ -88,40 +84,37 @@ def refresh_acperiod():
     if not (user_id and len(user_id) == 8):
         return json_response
 
+    recordQuery = acrec.query.filter(acrec.user_id == user_id).order_by(acrec.ac_datetime)
+
     if len(startDate) != 0 and len(endDate) != 0 and (
         datetime.strptime(startDate, "%Y-%m-%d") > datetime.strptime(endDate, "%Y-%m-%d")):
-        results = acrec.query.filter(and_(acrec.user_id == user_id, acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate)).order_by(
-            acrec.ac_datetime).all()
+        recordQuery = recordQuery.filter(
+            and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
     elif len(startDate) != 0 and len(endDate) == 0:
-        results = acrec.query.filter(
-            and_(acrec.user_id == user_id, acrec.ac_datetime >= startDate)).order_by(acrec.ac_datetime).all()
+        recordQuery = recordQuery.filter(acrec.ac_datetime >= startDate)
     elif len(startDate) == 0 and len(endDate) != 0:
-        results = acrec.query.filter(
-            and_(acrec.user_id == user_id, acrec.ac_datetime <= endDate)).order_by(acrec.ac_datetime).all()
-    else:
-        results = acrec.query.filter(acrec.user_id == user_id).all()
+        recordQuery = recordQuery.filter(acrec.ac_datetime <= endDate)
+
+    results = recordQuery.all()
 
     mdates = [result.ac_datetime for result in results]
 
-    from app.dataProcess import acperiod
+    from app.controlls import acperiod
     mperiods, mcounts = acperiod.main(mdates)
 
     # 构造返回json
-    try:
-        json_response = jsonify(valid=1, mperiods=mperiods, mcounts=mcounts)
-    except Exception, e:
-        print e
+    json_response = jsonify(valid=1, mperiods=mperiods, mcounts=mcounts)
 
     return json_response
 
 
-@app.route('/income')
-def chart_income():
+@app.route('/charts/income')
+def show_chart_income():
     return render_template('chart-income.html')
 
 
-@app.route('/income/refresh', methods=['GET'])
-def refresh_income():
+@app.route('/charts/income/refresh', methods=['GET'])
+def refresh_chart_income():
 
     dev_id = request.args.get('dev_id')
     mode_date = int(request.args.get('mode_date'))  # 日期模式：周、月、季、年
@@ -134,27 +127,23 @@ def refresh_income():
         return json_response
 
     # 查询
+    recordQuery = consumption.query.filter(consumption.dev_id == dev_id).order_by(consumption.con_datetime)
     if len(startDate) != 0 and len(endDate) != 0 and (
         datetime.strptime(startDate, "%Y-%m-%d") > datetime.strptime(endDate, "%Y-%m-%d")):
-        results = Consumption.query.filter(and_(Consumption.dev_id == dev_id, Consumption.con_datetime >= startDate,
-                                                Consumption.con_datetime <= endDate)).order_by(
-            Consumption.con_datetime).all()
+        recordQuery = recordQuery.filter(
+            and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
     elif len(startDate) != 0 and len(endDate) == 0:
-        results = Consumption.query.filter(
-            and_(Consumption.dev_id == dev_id, Consumption.con_datetime >= startDate)).order_by(
-            Consumption.con_datetime).all()
+        recordQuery = recordQuery.filter(consumption.con_datetime >= startDate)
     elif len(startDate) == 0 and len(endDate) != 0:
-        results = Consumption.query.filter(
-            and_(Consumption.dev_id == dev_id, Consumption.con_datetime <= endDate)).order_by(
-            Consumption.con_datetime).all()
-    else:
-        results = Consumption.query.filter(Consumption.dev_id == dev_id).order_by(Consumption.con_datetime).all()
+        recordQuery = recordQuery.filter(consumption.con_datetime <= endDate)
+
+    results = recordQuery.all()
 
     mdates = [result.con_datetime for result in results]
     mamounts = [result.amount for result in results]
 
     # 调用处理模块
-    from app.dataProcess import income
+    from app.controlls import income
     mdates, mamounts, mamounts_point = income.main(mdates, mamounts, mode_date)
 
     mdates = map(lambda x: str(x), mdates)
@@ -162,9 +151,6 @@ def refresh_income():
     mamounts_point = map(lambda x: float(x), mamounts_point)
 
     # 构造返回json
-    try:
-        json_response = jsonify(valid=1, mdates=mdates, mamounts=mamounts, mamounts_point=mamounts_point)
-    except Exception, e:
-        print e
+    json_response = jsonify(valid=1, mdates=mdates, mamounts=mamounts, mamounts_point=mamounts_point)
 
     return json_response

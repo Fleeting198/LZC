@@ -1,50 +1,47 @@
+{% extends "charts.html" %}
+{% block chartField %}
 
-{% extends "base.html" %}
-{% block chart %}
-    <!--在此页中显示输入框，图表作为输出-->
     <form id="form-ipt" method="get">
+        {{ form.hidden_tag() }}
+
         <div class="form-group">
-            <label class="control-label">工号</label>
-            <input class="form-control" name="user_id" type="text" maxlength="8" value="PPQZXPXU" />
+            {{ form.user_id.label(class="control-label") }}
+            {{ form.user_id(class="form-control") }}
         </div>
         <div class="form-group">
-            <label class="control-label">起始日期</label>
+            {{ form.startDate.label }}
             <div class="input-group">
-	            <input class="form-control" id="ipt-startDate" name="startDate" type="text" readonly="readonly" />
-	            <span class="input-group-btn"><input type="button" class="btn btn-default" onclick="clear_picker(1)" value="清除" /></span>
+                <input class="form-control" id="ipt-startDate" name="startDate" type="text" readonly="readonly"/>
+                <span class="input-group-btn"><input type="button" class="btn btn-default" onclick="clear_picker(1)"
+                                                     value="清除"/></span>
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label">结束日期</label>
+            {{ form.endDate.label }}
             <div class="input-group">
-	            <input class="form-control" id="ipt-endDate" name="endDate" type="text" readonly="readonly" />
-	            <span class="input-group-btn"><input type="button" class="btn btn-default" onclick="clear_picker(2)" value="清除" /></span>
+                <input class="form-control" id="ipt-endDate" name="endDate" type="text" readonly="readonly"/>
+                <span class="input-group-btn"><input type="button" class="btn btn-default" onclick="clear_picker(2)"
+                                                     value="清除"/></span>
             </div>
         </div>
         <div class="form-group">
-			<span>模式</span>
-			<label class="checkbox-inline">
-  			<input type="radio" name="mode_date" value="0" checked>日</label>
-			<label class="checkbox-inline">
-  			<input type="radio" name="mode_date" value="1">周</label>
-  			<label class="checkbox-inline">
-  			<input type="radio" name="mode_date" value="2">月</label>
-  			<label class="checkbox-inline">
-  			<input type="radio" name="mode_date" value="3">季</label>
-  			<label class="checkbox-inline">
-  			<input type="radio" name="mode_date" value="4">年</label>
-		</div>
+            {{ form.mode_date.label }}
+            {% for subfield in form.mode_date %}
+                {{ subfield }}{{ subfield.label }}&nbsp;&nbsp;&nbsp;
+            {% endfor %}
+
+        </div>
         <div class="form-group">
-            <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()" />
+            <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
         </div>
     </form>
-    
-    <div id="chart" style="width: 1000px; height: 600px;"></div>
+
+    <div id="chart" style="width: 800px; height: 500px;"></div>
 
     <script>
 
         // datetimepicker初始化
-    	$("#ipt-startDate").datetimepicker({
+        $("#ipt-startDate").datetimepicker({
             format: 'yyyy-mm-dd',
             autoclose: true,
             minView: 2
@@ -109,47 +106,51 @@
                     data: []
                 }
             ]
-        }
+        };
         chart.setOption(option);
 
         // get向后端请求json刷新图表。
         refresh_chart = function(){
-            $.get('/expenditure/refresh?'+$("#form-ipt").serialize(), function(json_response){
-                var mdates = json_response.mdates;
-                var mamounts = json_response.mamounts;
-                var mamounts_point = json_response.mamounts_point;
+            $.get('/charts/expenditure/getData?'+$("#form-ipt").serialize(), function(json_response){
+                if(json_response.valid == 1){
+                    var mdates = json_response.mdates;
+                    var mamounts = json_response.mamounts;
+                    var mamounts_point = json_response.mamounts_point;
 
-                chart.setOption({
-                    xAxis: [{
-                        data: mdates
-                    }],
-                    series: [
-                        {
-                            name: '累积支出',
-                            data: mamounts
-                        },
-                        {
-                            name: '节点支出',
-                            data: mamounts_point
-                        }
-                    ]
-                })
+                    chart.setOption({
+                        xAxis: [{
+                            data: mdates
+                        }],
+                        series: [
+                            {
+                                name: '累积支出',
+                                data: mamounts
+                            },
+                            {
+                                name: '节点支出',
+                                data: mamounts_point
+                            }
+                        ]
+                    })
+                }
+                else{
 
-            },'json');
+                }
+            },'json')
         }
 
         // 清空datetimepicker
-        clear_picker = function(pid){
-            switch (pid){
+        clear_picker = function (pid) {
+            switch (pid) {
                 case 0:
                     $("#ipt-startDate").val('');
                     $("#ipt-endDate").val('');
                 case 1:
-                	$("#ipt-startDate").val('');
+                    $("#ipt-startDate").val('');
                 case 2:
-                	$("#ipt-endDate").val('');
+                    $("#ipt-endDate").val('');
             }
         }
-    </script>
 
+    </script>
 {% endblock %}

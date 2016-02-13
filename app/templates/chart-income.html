@@ -1,13 +1,13 @@
-{% extends "base.html" %}
-{% block chart %}
-    <!--在此页中显示输入框，图表作为输出-->
+{% extends "charts.html" %}
+{% block chartField %}
+
     <form id="form-ipt" method="get">
         <div class="form-group">
-            <label class="control-label">设备号</label>
-            <input class="form-control" name="dev_id" type="text" maxlength="10" value="YQSH1826"/>
+            {{ form.dev_id.label(class="control-label") }}
+            {{ form.dev_id(class="form-control",value="YQSH1826") }}
         </div>
         <div class="form-group">
-            <label class="control-label">起始日期</label>
+            {{ form.startDate.label }}
             <div class="input-group">
                 <input class="form-control" id="ipt-startDate" name="startDate" type="text" readonly="readonly"/>
                 <span class="input-group-btn"><input type="button" class="btn btn-default" onclick="clear_picker(1)"
@@ -15,7 +15,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="control-label">结束日期</label>
+            {{ form.endDate.label }}
             <div class="input-group">
                 <input class="form-control" id="ipt-endDate" name="endDate" type="text" readonly="readonly"/>
                 <span class="input-group-btn"><input type="button" class="btn btn-default" onclick="clear_picker(2)"
@@ -40,7 +40,7 @@
         </div>
     </form>
 
-    <div id="chart" style="width: 1000px; height: 600px;"></div>
+    <div id="chart" style="width: 800px; height: 500px;"></div>
 
     <script>
 

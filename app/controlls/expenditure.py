@@ -34,4 +34,8 @@ def main(mdates, mamounts, mode_date):
     for i in range(1, len(mamounts)):
         mamounts[i] += mamounts[i - 1]
 
+    mdates = map(lambda x: str(x), mdates)
+    mamounts = map(lambda x: float(x), mamounts)
+    mamounts_point = map(lambda x: float(x), mamounts_point)
+
     return mdates, mamounts, mamounts_point
