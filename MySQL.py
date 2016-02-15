@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-'''
+"""
 对MySQLdb常用函数进行封装的类
 
  整理者：兔大侠和他的朋友们（http://www.tudaxia.com）
@@ -10,7 +10,7 @@
 
  注意：使用这个类的前提是正确安装 MySQL-Python模块。
  官方网站：http://mysql-python.sourceforge.net/
-'''
+"""
 
 import MySQLdb
 import time
@@ -47,7 +47,7 @@ class MySQL:
                 interval = 5
                 self._timecount += interval
                 time.sleep(interval)
-                return self.__init__(self.default_config)
+                self.__init__(self)
             else:
                 raise Exception(error_msg)
 

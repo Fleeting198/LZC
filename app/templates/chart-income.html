@@ -1,49 +1,38 @@
 {% extends "charts.html" %}
 {% block chartField %}
 
-    <form id="form-ipt" method="get">
+    <form id="form-ipt" class="form-inline" method="get">
         <div class="form-group">
-            {{ form.dev_id.label(class="control-label") }}
-            {{ form.dev_id(class="form-control",value="YQSH1826") }}
+            {{ form.dev_id(class="form-control", maxlength='10', placeholder='设备号') }}
         </div>
         <div class="form-group">
-            {{ form.startDate.label }}
             <div class="input-group">
-                <input class="form-control" id="ipt-startDate" name="startDate" type="text" readonly="readonly"/>
+                {{ form.startDate(class="form-control",id="ipt-startDate",placeholder='开始日期',readonly="readonly" ) }}
                 <span class="input-group-btn"><input type="button" class="btn btn-default" onclick="clear_picker(1)"
                                                      value="清除"/></span>
             </div>
         </div>
         <div class="form-group">
-            {{ form.endDate.label }}
             <div class="input-group">
-                <input class="form-control" id="ipt-endDate" name="endDate" type="text" readonly="readonly"/>
+                {{ form.endDate(class="form-control",id="ipt-endDate",placeholder='结束日期',readonly="readonly" ) }}
                 <span class="input-group-btn"><input type="button" class="btn btn-default" onclick="clear_picker(2)"
                                                      value="清除"/></span>
             </div>
         </div>
         <div class="form-group">
-            <span>模式</span>
-            <label class="checkbox-inline">
-                <input type="radio" name="mode_date" value="0" checked>日</label>
-            <label class="checkbox-inline">
-                <input type="radio" name="mode_date" value="1">周</label>
-            <label class="checkbox-inline">
-                <input type="radio" name="mode_date" value="2">月</label>
-            <label class="checkbox-inline">
-                <input type="radio" name="mode_date" value="3">季</label>
-            <label class="checkbox-inline">
-                <input type="radio" name="mode_date" value="4">年</label>
+            {{ form.mode_date.label }}
+            {% for subfield in form.mode_date %}
+                {{ subfield }}{{ subfield.label }}
+                &nbsp;&nbsp;
+            {% endfor %}
         </div>
-        <div class="form-group">
-            <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
-        </div>
+        <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
     </form>
+
 
     <div id="chart" style="width: 800px; height: 500px;"></div>
 
     <script>
-
         // datetimepicker初始化
         $("#ipt-startDate").datetimepicker({
             format: 'yyyy-mm-dd',
@@ -110,12 +99,13 @@
                     data: []
                 }
             ]
-        }
+        };
         chart.setOption(option);
 
-        // get向后端请求json刷新图表。
         refresh_chart = function () {
-            $.get('/income/refresh?' + $("#form-ipt").serialize(), function (json_response) {
+            chart.showLoading();
+            $.get('/charts/income/getData?' + $("#form-ipt").serialize(), function (json_response) {
+                chart.hideLoading();
                 var mdates = json_response.mdates;
                 var mamounts = json_response.mamounts;
                 var mamounts_point = json_response.mamounts_point;
@@ -136,19 +126,18 @@
                     ]
                 })
 
-            }, 'json');
-        }
+            }, 'json')
+        };
 
         // 清空datetimepicker
         clear_picker = function (pid) {
             switch (pid) {
-                case 0:
-                    $("#ipt-startDate").val('');
-                    $("#ipt-endDate").val('');
                 case 1:
                     $("#ipt-startDate").val('');
+                    break;
                 case 2:
                     $("#ipt-endDate").val('');
+                    break;
             }
         }
     </script>
