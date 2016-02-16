@@ -138,12 +138,14 @@ def show_chart_income():
 
 @app.route('/charts/income/getData', methods=['GET'])
 def refresh_chart_income():
+    # 从GET获得表单值赋给wtform
     form = form_income()
     form.devID.data = request.args.get('devID')
-    form.dateRange.data = request.args.get('dateRange')
     form.modeDate.data = request.args.get('modeDate')
+    form.dateRange.data = request.args.get('dateRange')
 
     if form.validate():
+        # 赋值给变量
         devID = form.devID.data
         modeDate = int(form.modeDate.data)
         startDate = form.dateRange.data[:10]
@@ -151,6 +153,7 @@ def refresh_chart_income():
 
         # 查询
         recordQuery = consumption.query.filter(consumption.dev_id == devID).order_by(consumption.con_datetime)
+
         if len(startDate) != 0 and len(endDate) != 0:
             recordQuery = recordQuery.filter(
                 and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
@@ -161,15 +164,24 @@ def refresh_chart_income():
 
         results = recordQuery.all()
 
-        mdates = [result.con_datetime for result in results]
-        mamounts = [result.amount for result in results]
+        mdates = [result.con_datetime for result in results]  # 构造日期数组作为图表x轴标记
+        mamounts = [result.amount for result in results]  # 构造对应的消费值
 
-        # 调用处理模块
-        from app.controls import income
-        mdates, mamounts, mamounts_point = income.main(mdates, mamounts, modeDate)
+        # 调用Controls
+        from app.controls.DataProcess import DateTimeValueProcess
+        process = DateTimeValueProcess(mdates, mamounts)
 
-        # 构造返回json
-        json_response = jsonify(valid=1, mdates=mdates, mamounts=mamounts, mamounts_point=mamounts_point)
+        # 包装dateTrend 返回值
+        axisLables, accumulatedVals, pointVals = process.dateTrend(modeDate)
+        json_dateTrend = {'axisLables': axisLables, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
+
+        # timeDistribution 返回值
+        axisLables, vals = process.timeDistribution(toCountAxis=False)
+        json_timeDistribution = {'axisLables': axisLables, 'vals': vals}
+
+        # 没有错误就不传errMsg
+        json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
+
