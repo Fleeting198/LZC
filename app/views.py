@@ -34,7 +34,7 @@ def show_charts():
 
 @app.route('/charts/expenditure')
 def show_chart_expenditure():
-    form = form_expenditure(csrf_enabled=False)
+    form = form_expenditure()
     return render_template('chart-expenditure.html', form=form)
 
 
@@ -42,7 +42,7 @@ def show_chart_expenditure():
 def refresh_chart_expenditure():
 
     # 从GET获得表单值赋给wtform
-    form = form_expenditure(csrf_enabled=False)
+    form = form_expenditure()
     form.userID.data = request.args.get('userID')
     form.modeDate.data = request.args.get('modeDate')
     form.dateRange.data = request.args.get('dateRange')
@@ -83,13 +83,13 @@ def refresh_chart_expenditure():
 
 @app.route('/charts/acperiod')
 def show_chart_acperiod():
-    form = form_acperiod(csrf_enabled=False)
+    form = form_acperiod()
     return render_template('chart-acperiod.html', form=form)
 
 
 @app.route('/charts/acperiod/getData', methods=['GET'])
 def refresh_chart_acperiod():
-    form = form_acperiod(csrf_enabled=False)
+    form = form_acperiod()
     form.userID.data = request.args.get('userID')
     form.dateRange.data = request.args.get('dateRange')
 
@@ -121,13 +121,13 @@ def refresh_chart_acperiod():
 
 @app.route('/charts/income')
 def show_chart_income():
-    form = form_income(csrf_enabled=False)
+    form = form_income()
     return render_template('chart-income.html', form=form)
 
 
 @app.route('/charts/income/getData', methods=['GET'])
 def refresh_chart_income():
-    form = form_income(csrf_enabled=False)
+    form = form_income()
     form.devID.data = request.args.get('devID')
     form.dateRange.data = request.args.get('dateRange')
     form.modeDate.data = request.args.get('modeDate')

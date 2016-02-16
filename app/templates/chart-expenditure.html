@@ -1,7 +1,7 @@
 {% extends "charts.html" %}
 {% block chartField %}
 
-    <form id="form-ipt" class="form-inline" method="get">
+    <form id="form-ipt" class="form-inline" >
         {{ form.userID(class="form-control", maxlength='8', placeholder='工号') }}
         {{ form.dateRange.label }} {{ form.dateRange(class="form-control",size='23') }}
         {{ form.modeDate.label }}
@@ -15,18 +15,18 @@
     <div id="chart" style="width: 800px; height: 500px;"></div>
 
     <script>
-        $("input[name='dateRange']").daterangepicker({
+        var dateRangePicker = $("input[name='dateRange']");
+        dateRangePicker.daterangepicker({
             autoUpdateInput: false,
             locale: {
                 format: 'YYYY-MM-DD',
                 cancelLabel: 'Clear'
             }
         });
-        $('input[name="dateRange"]').on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('YYYY-MM-DD') +' ~ '+ picker.endDate.format('YYYY-MM-DD'));
+        dateRangePicker.on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' ~ ' + picker.endDate.format('YYYY-MM-DD'));
         });
-
-        $('input[name="dateRange"]').on('cancel.daterangepicker', function (ev, picker) {
+        dateRangePicker.on('cancel.daterangepicker', function (ev, picker) {
             $(this).val('');
         });
 
@@ -94,7 +94,7 @@
         // get向后端请求json刷新图表。
         refresh_chart = function(){
             chart.showLoading();
-            $.post('/charts/expenditure/getData?'+$("#form-ipt").serialize(), function(json_response){
+            $.get('/charts/expenditure/getData?'+$("#form-ipt").serialize(), function(json_response){
                 chart.hideLoading();
                 if(!json_response.errMsg){
                     mdates = json_response.mdates;
@@ -123,17 +123,5 @@
                 }
             },'json')
         };
-
-        // 清空datetimepicker
-        clear_picker = function (pid) {
-            switch (pid) {
-                case 1:
-                    $("#ipt-startDate").val('');
-                    break;
-                case 2:
-                    $("#ipt-endDate").val('');
-                    break;
-            }
-        }
     </script>
 {% endblock %}

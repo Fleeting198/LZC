@@ -1,7 +1,7 @@
 {% extends "charts.html" %}
 {% block chartField %}
 
-    <form id="form-ipt" class="form-inline" method="get">
+    <form id="form-ipt" class="form-inline" >
         {{ form.devID(class="form-control", maxlength='10', placeholder='设备号') }}
         {{ form.dateRange.label }} {{ form.dateRange(class="form-control",size='23') }}
         {{ form.modeDate.label }}
@@ -12,22 +12,21 @@
         <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
     </form>
 
-
     <div id="chart" style="width: 800px; height: 500px;"></div>
 
     <script>
-        $("input[name='dateRange']").daterangepicker({
+        var dateRangePicker = $("input[name='dateRange']");
+        dateRangePicker.daterangepicker({
             autoUpdateInput: false,
             locale: {
                 format: 'YYYY-MM-DD',
                 cancelLabel: 'Clear'
             }
         });
-        $('input[name="dateRange"]').on('apply.daterangepicker', function (ev, picker) {
+        dateRangePicker.on('apply.daterangepicker', function (ev, picker) {
             $(this).val(picker.startDate.format('YYYY-MM-DD') + ' ~ ' + picker.endDate.format('YYYY-MM-DD'));
         });
-
-        $('input[name="dateRange"]').on('cancel.daterangepicker', function (ev, picker) {
+        dateRangePicker.on('cancel.daterangepicker', function (ev, picker) {
             $(this).val('');
         });
 
@@ -120,18 +119,6 @@
                 }
             }, 'json')
         };
-
-        // 清空datetimepicker
-        clear_picker = function (pid) {
-            switch (pid) {
-                case 1:
-                    $("#ipt-startDate").val('');
-                    break;
-                case 2:
-                    $("#ipt-endDate").val('');
-                    break;
-            }
-        }
     </script>
 
 {% endblock %}
