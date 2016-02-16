@@ -1,7 +1,7 @@
-# coding:utf-8
-# 02-09 Built by 陈骏杰
-#   expenditure
-# 02-11 将数据处理交给dataProcess中脚本，日期查询筛选
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+# 02-09 Built -陈
+# 02-11 将数据处理交给controlls，日期查询筛选
 # 02-12 acperiod, income
 
 from app import app
@@ -12,9 +12,18 @@ from app.forms import *
 from sqlalchemy import and_
 from datetime import datetime
 
+import types
+
+
 @app.route('/')
 def show_index():
     return render_template('index.html')
+
+
+# Ignore this.
+@app.route('/test')
+def show_test():
+    return render_template('test.html')
 
 
 @app.route('/charts')
@@ -24,25 +33,29 @@ def show_charts():
 
 @app.route('/charts/expenditure')
 def show_chart_expenditure():
-    form = form_expenditure()
+    form = form_expenditure(csrf_enabled=False)
     return render_template('chart-expenditure.html', form=form)
 
 
-@app.route('/charts/expenditure/getData', methods=['GET'])
+@app.route('/charts/expenditure/getData', methods=('GET','POST'))
 def refresh_chart_expenditure():
-    form = form_expenditure()
-    json_response = jsonify(valid=0)
 
-    print form.errors
+    # 从GET获得表单值赋给wtform
+    form = form_expenditure(csrf_enabled=False)
+    form.userID.data = request.args.get('userID')
+    form.startDate.data = request.args.get('startDate')
+    form.endDate.data = request.args.get('endDate')
+    form.modeDate.data = request.args.get('modeDate')
 
     if form.validate():
-        user_id = form.user_id
-        mode_date = form.mode_date
-        startDate = form.startDate
-        endDate = form.endDate
+        # 赋值给变量
+        userID = form.userID.data
+        modeDate = int(form.modeDate.data)
+        startDate = str(form.startDate.data)
+        endDate = str(form.endDate.data)
 
         # 查询
-        recordQuery = consumption.query.filter(consumption.user_id == user_id).order_by(consumption.con_datetime)
+        recordQuery = consumption.query.filter(consumption.user_id == userID).order_by(consumption.con_datetime)
 
         if len(startDate) != 0 and len(endDate) != 0 and (
                     datetime.strptime(startDate, "%Y-%m-%d") > datetime.strptime(endDate, "%Y-%m-%d")):
@@ -58,99 +71,99 @@ def refresh_chart_expenditure():
         mdates = [result.con_datetime for result in results]  # 构造日期数组作为图表x轴标记
         mamounts = [result.amount for result in results]  # 构造对应的消费值
 
-        # 调用处理模块
-        from app.controlls import expenditure
-        mdates, mamounts, mamounts_point = expenditure.main(mdates, mamounts, mode_date)
+        # 调用Controls
+        from app.controls import expenditure
+        mdates, mamounts, mamounts_point = expenditure.main(mdates, mamounts, modeDate)
 
-        # 构造返回json
-        json_response = jsonify(valid=1, mdates=mdates, mamounts=mamounts, mamounts_point=mamounts_point)
-
+        # 没有错误就不传errMsg
+        json_response = jsonify(mdates=mdates, mamounts=mamounts, mamounts_point=mamounts_point)
+    else:
+        json_response = jsonify(errMsg=form.errors)
     return json_response
 
 
 @app.route('/charts/acperiod')
 def show_chart_acperiod():
-    return render_template('chart-acperiod.html')
+    form = form_acperiod(csrf_enabled=False)
+    return render_template('chart-acperiod.html', form=form)
 
 
-@app.route('/charts/acperiod/refresh', methods=['GET'])
+@app.route('/charts/acperiod/getData', methods=['GET'])
 def refresh_chart_acperiod():
-    json_response = jsonify(valid=0)
+    form = form_acperiod(csrf_enabled=False)
+    form.userID.data = request.args.get('userID')
+    form.startDate.data = request.args.get('startDate')
+    form.endDate.data = request.args.get('endDate')
 
-    user_id = request.args.get('user_id')
-    startDate = request.args.get('startDate')
-    endDate = request.args.get('endDate')
+    if form.validate():
+        userID = form.userID.data
+        startDate = str(form.startDate.data)
+        endDate = str(form.endDate.data)
 
-    if not (user_id and len(user_id) == 8):
-        return json_response
+        recordQuery = acrec.query.filter(acrec.user_id == userID).order_by(acrec.ac_datetime)
+        if len(startDate) != 0 and len(endDate) != 0 and (
+                    datetime.strptime(startDate, "%Y-%m-%d") > datetime.strptime(endDate, "%Y-%m-%d")):
+            recordQuery = recordQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
+        elif len(startDate) != 0 and len(endDate) == 0:
+            recordQuery = recordQuery.filter(acrec.ac_datetime >= startDate)
+        elif len(startDate) == 0 and len(endDate) != 0:
+            recordQuery = recordQuery.filter(acrec.ac_datetime <= endDate)
 
-    recordQuery = acrec.query.filter(acrec.user_id == user_id).order_by(acrec.ac_datetime)
+        results = recordQuery.all()
 
-    if len(startDate) != 0 and len(endDate) != 0 and (
-        datetime.strptime(startDate, "%Y-%m-%d") > datetime.strptime(endDate, "%Y-%m-%d")):
-        recordQuery = recordQuery.filter(
-            and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
-    elif len(startDate) != 0 and len(endDate) == 0:
-        recordQuery = recordQuery.filter(acrec.ac_datetime >= startDate)
-    elif len(startDate) == 0 and len(endDate) != 0:
-        recordQuery = recordQuery.filter(acrec.ac_datetime <= endDate)
+        mdates = [result.ac_datetime for result in results]
 
-    results = recordQuery.all()
+        from app.controls import acperiod
+        mperiods, mcounts = acperiod.main(mdates)
 
-    mdates = [result.ac_datetime for result in results]
-
-    from app.controlls import acperiod
-    mperiods, mcounts = acperiod.main(mdates)
-
-    # 构造返回json
-    json_response = jsonify(valid=1, mperiods=mperiods, mcounts=mcounts)
-
+        json_response = jsonify(mperiods=mperiods, mcounts=mcounts)
+    else:
+        json_response = jsonify(errMsg=form.errors)
     return json_response
 
 
 @app.route('/charts/income')
 def show_chart_income():
-    return render_template('chart-income.html')
+    form = form_income(csrf_enabled=False)
+    return render_template('chart-income.html', form=form)
 
 
-@app.route('/charts/income/refresh', methods=['GET'])
+@app.route('/charts/income/getData', methods=['GET'])
 def refresh_chart_income():
+    form = form_income(csrf_enabled=False)
+    form.devID.data = request.args.get('devID')
+    form.startDate.data = request.args.get('startDate')
+    form.endDate.data = request.args.get('endDate')
+    form.modeDate.data = request.args.get('modeDate')
 
-    dev_id = request.args.get('dev_id')
-    mode_date = int(request.args.get('mode_date'))  # 日期模式：周、月、季、年
-    startDate = request.args.get('startDate')
-    endDate = request.args.get('endDate')
+    if form.validate():
+        devID = form.devID.data
+        modeDate = int(form.modeDate.data)
+        startDate = str(form.startDate.data)
+        endDate = str(form.endDate.data)
 
-    json_response = jsonify(valid=0)
+        # 查询
+        recordQuery = consumption.query.filter(consumption.dev_id == devID).order_by(consumption.con_datetime)
+        if len(startDate) != 0 and len(endDate) != 0 and (
+            datetime.strptime(startDate, "%Y-%m-%d") > datetime.strptime(endDate, "%Y-%m-%d")):
+            recordQuery = recordQuery.filter(
+                and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
+        elif len(startDate) != 0 and len(endDate) == 0:
+            recordQuery = recordQuery.filter(consumption.con_datetime >= startDate)
+        elif len(startDate) == 0 and len(endDate) != 0:
+            recordQuery = recordQuery.filter(consumption.con_datetime <= endDate)
 
-    if not dev_id:
-        return json_response
+        results = recordQuery.all()
 
-    # 查询
-    recordQuery = consumption.query.filter(consumption.dev_id == dev_id).order_by(consumption.con_datetime)
-    if len(startDate) != 0 and len(endDate) != 0 and (
-        datetime.strptime(startDate, "%Y-%m-%d") > datetime.strptime(endDate, "%Y-%m-%d")):
-        recordQuery = recordQuery.filter(
-            and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
-    elif len(startDate) != 0 and len(endDate) == 0:
-        recordQuery = recordQuery.filter(consumption.con_datetime >= startDate)
-    elif len(startDate) == 0 and len(endDate) != 0:
-        recordQuery = recordQuery.filter(consumption.con_datetime <= endDate)
+        mdates = [result.con_datetime for result in results]
+        mamounts = [result.amount for result in results]
 
-    results = recordQuery.all()
+        # 调用处理模块
+        from app.controls import income
+        mdates, mamounts, mamounts_point = income.main(mdates, mamounts, modeDate)
 
-    mdates = [result.con_datetime for result in results]
-    mamounts = [result.amount for result in results]
-
-    # 调用处理模块
-    from app.controlls import income
-    mdates, mamounts, mamounts_point = income.main(mdates, mamounts, mode_date)
-
-    mdates = map(lambda x: str(x), mdates)
-    mamounts = map(lambda x: float(x), mamounts)
-    mamounts_point = map(lambda x: float(x), mamounts_point)
-
-    # 构造返回json
-    json_response = jsonify(valid=1, mdates=mdates, mamounts=mamounts, mamounts_point=mamounts_point)
-
+        # 构造返回json
+        json_response = jsonify(valid=1, mdates=mdates, mamounts=mamounts, mamounts_point=mamounts_point)
+    else:
+        json_response = jsonify(errMsg=form.errors)
     return json_response

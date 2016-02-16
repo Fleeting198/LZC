@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+    <script>
+        var a = {{ alpha|safe }};
+        $(document).ready(function () {
+            alert(a.aaa);
+        })
+    </script>
+{% endblock %}
