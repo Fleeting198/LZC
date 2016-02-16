@@ -6,6 +6,7 @@ devID = u'设备号'
 startDate = u'开始日期'
 endDate = u'结束日期'
 modeDate = u'日期模式'
+dateRange = u'日期范围'
 
 warn_userIDFill = u'工号不可为空'
 warn_userIDLength = u'工号长度应为8'

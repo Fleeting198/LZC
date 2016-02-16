@@ -3,6 +3,7 @@
 # 02-09 Built -陈
 # 02-11 将数据处理交给controlls，日期查询筛选
 # 02-12 acperiod, income
+# 02-16 Implementing dateRangePicker. Saved lots of code.
 
 from app import app
 from flask import render_template, request, jsonify
@@ -43,22 +44,20 @@ def refresh_chart_expenditure():
     # 从GET获得表单值赋给wtform
     form = form_expenditure(csrf_enabled=False)
     form.userID.data = request.args.get('userID')
-    form.startDate.data = request.args.get('startDate')
-    form.endDate.data = request.args.get('endDate')
     form.modeDate.data = request.args.get('modeDate')
+    form.dateRange.data = request.args.get('dateRange')
 
     if form.validate():
         # 赋值给变量
         userID = form.userID.data
         modeDate = int(form.modeDate.data)
-        startDate = str(form.startDate.data)
-        endDate = str(form.endDate.data)
+        startDate = form.dateRange.data[:10]
+        endDate = form.dateRange.data[-10:]
 
         # 查询
         recordQuery = consumption.query.filter(consumption.user_id == userID).order_by(consumption.con_datetime)
 
-        if len(startDate) != 0 and len(endDate) != 0 and (
-                    datetime.strptime(startDate, "%Y-%m-%d") > datetime.strptime(endDate, "%Y-%m-%d")):
+        if len(startDate) != 0 and len(endDate) != 0:
             recordQuery = recordQuery.filter(
                 and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
         elif len(startDate) != 0 and len(endDate) == 0:
@@ -92,17 +91,15 @@ def show_chart_acperiod():
 def refresh_chart_acperiod():
     form = form_acperiod(csrf_enabled=False)
     form.userID.data = request.args.get('userID')
-    form.startDate.data = request.args.get('startDate')
-    form.endDate.data = request.args.get('endDate')
+    form.dateRange.data = request.args.get('dateRange')
 
     if form.validate():
         userID = form.userID.data
-        startDate = str(form.startDate.data)
-        endDate = str(form.endDate.data)
+        startDate = form.dateRange.data[:10]
+        endDate = form.dateRange.data[-10:]
 
         recordQuery = acrec.query.filter(acrec.user_id == userID).order_by(acrec.ac_datetime)
-        if len(startDate) != 0 and len(endDate) != 0 and (
-                    datetime.strptime(startDate, "%Y-%m-%d") > datetime.strptime(endDate, "%Y-%m-%d")):
+        if len(startDate) != 0 and len(endDate) != 0:
             recordQuery = recordQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
         elif len(startDate) != 0 and len(endDate) == 0:
             recordQuery = recordQuery.filter(acrec.ac_datetime >= startDate)
@@ -132,20 +129,18 @@ def show_chart_income():
 def refresh_chart_income():
     form = form_income(csrf_enabled=False)
     form.devID.data = request.args.get('devID')
-    form.startDate.data = request.args.get('startDate')
-    form.endDate.data = request.args.get('endDate')
+    form.dateRange.data = request.args.get('dateRange')
     form.modeDate.data = request.args.get('modeDate')
 
     if form.validate():
         devID = form.devID.data
         modeDate = int(form.modeDate.data)
-        startDate = str(form.startDate.data)
-        endDate = str(form.endDate.data)
+        startDate = form.dateRange.data[:10]
+        endDate = form.dateRange.data[-10:]
 
         # 查询
         recordQuery = consumption.query.filter(consumption.dev_id == devID).order_by(consumption.con_datetime)
-        if len(startDate) != 0 and len(endDate) != 0 and (
-            datetime.strptime(startDate, "%Y-%m-%d") > datetime.strptime(endDate, "%Y-%m-%d")):
+        if len(startDate) != 0 and len(endDate) != 0:
             recordQuery = recordQuery.filter(
                 and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
         elif len(startDate) != 0 and len(endDate) == 0:
