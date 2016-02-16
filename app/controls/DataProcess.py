@@ -15,17 +15,17 @@ class DateTimeValueProcess():
     oriDate = []  # 日期
     oriValues = []  # 与日期对应的消费额
 
-    def __init__(self, dates, vals):
+    def __init__(self, dates, vals=None):
         self.oriDate = dates
-        self.oriValues = vals
+        if vals is None:
+            self.oriValues = [1] * len(dates)
+        else:
+            self.oriValues = vals
 
-    def set(self, dates, vals):
-        self.oriDate = dates
-        self.oriValues = vals
-
-    def dateTrend(self, modeDate):
+    def dateTrend(self, modeDate=2):
         """
         日期趋势，输入日期模式，输出合并后的日期、节点值和累积值。
+        默认日期模式为月
         """
         # Copy source data.
         axisLables = self.oriDate[:]
@@ -63,14 +63,13 @@ class DateTimeValueProcess():
 
         return axisLables, accumulatedVals, pointVals
 
-    def timeDistribution(self, toCountAxis):
+    def timeDistribution(self):
         """
         时间分布，输出各时间段总计数，目的在于对比。
-        输入toCountAxis = True: 记一条记录为一次。
         """
         # Copy source data.
         dates = self.oriDate[:]
-        values = map(lambda x: float(x), self.oriValues) if not toCountAxis else [1]*len(self.oriValues)
+        values = map(lambda x: float(x), self.oriValues)
 
         print type(values[1])
 
