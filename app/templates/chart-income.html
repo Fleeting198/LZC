@@ -2,30 +2,22 @@
 {% block chartField %}
 
     <form id="form-ipt" class="form-inline" method="get">
-        <div class="form-group">
-            {{ form.dev_id(class="form-control", maxlength='10', placeholder='设备号') }}
+        {{ form.devID(class="form-control", maxlength='10', placeholder='设备号') }}
+        <div class="input-group">
+            {{ form.startDate(class="form-control",id="ipt-startDate",placeholder='开始日期',readonly="readonly" ) }}
+            <span class="input-group-btn"><input type="button" class="btn btn-default" onclick="clear_picker(1)"
+                                                 value="清除"/></span>
         </div>
-        <div class="form-group">
-            <div class="input-group">
-                {{ form.startDate(class="form-control",id="ipt-startDate",placeholder='开始日期',readonly="readonly" ) }}
-                <span class="input-group-btn"><input type="button" class="btn btn-default" onclick="clear_picker(1)"
-                                                     value="清除"/></span>
-            </div>
+        <div class="input-group">
+            {{ form.endDate(class="form-control",id="ipt-endDate",placeholder='结束日期',readonly="readonly" ) }}
+            <span class="input-group-btn"><input type="button" class="btn btn-default" onclick="clear_picker(2)"
+                                                 value="清除"/></span>
         </div>
-        <div class="form-group">
-            <div class="input-group">
-                {{ form.endDate(class="form-control",id="ipt-endDate",placeholder='结束日期',readonly="readonly" ) }}
-                <span class="input-group-btn"><input type="button" class="btn btn-default" onclick="clear_picker(2)"
-                                                     value="清除"/></span>
-            </div>
-        </div>
-        <div class="form-group">
-            {{ form.mode_date.label }}
-            {% for subfield in form.mode_date %}
-                {{ subfield }}{{ subfield.label }}
-                &nbsp;&nbsp;
-            {% endfor %}
-        </div>
+        {{ form.modeDate.label }}
+        {% for subfield in form.modeDate %}
+            {{ subfield }}{{ subfield.label }}
+            &nbsp;&nbsp;
+        {% endfor %}
         <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
     </form>
 
@@ -106,26 +98,32 @@
             chart.showLoading();
             $.get('/charts/income/getData?' + $("#form-ipt").serialize(), function (json_response) {
                 chart.hideLoading();
-                var mdates = json_response.mdates;
-                var mamounts = json_response.mamounts;
-                var mamounts_point = json_response.mamounts_point;
 
-                chart.setOption({
-                    xAxis: [{
-                        data: mdates
-                    }],
-                    series: [
-                        {
-                            name: '累积收入',
-                            data: mamounts
-                        },
-                        {
-                            name: '节点收入',
-                            data: mamounts_point
-                        }
-                    ]
-                })
+                if (!json_response.errMsg) {
+                    var mdates = json_response.mdates;
+                    var mamounts = json_response.mamounts;
+                    var mamounts_point = json_response.mamounts_point;
 
+                    chart.setOption({
+                        xAxis: [{
+                            data: mdates
+                        }],
+                        series: [
+                            {
+                                name: '累积收入',
+                                data: mamounts
+                            },
+                            {
+                                name: '节点收入',
+                                data: mamounts_point
+                            }
+                        ]
+                    });
+                } else {
+                    for (err in json_response.errMsg) {
+                        alert(json_response.errMsg[err]);
+                    }
+                }
             }, 'json')
         };
 
