@@ -12,6 +12,7 @@ from app.forms import *
 
 from sqlalchemy import and_
 from datetime import datetime
+import json
 
 import types
 
@@ -24,7 +25,7 @@ def show_index():
 # Ignore this.
 @app.route('/test')
 def show_test():
-    return render_template('test.html')
+    return app.config['SQLALCHEMY_DATABASE_URI']
 
 
 @app.route('/charts')
@@ -38,7 +39,7 @@ def show_chart_expenditure():
     return render_template('chart-expenditure.html', form=form)
 
 
-@app.route('/charts/expenditure/getData', methods=('GET','POST'))
+@app.route('/charts/expenditure/getData', methods=['GET'])
 def refresh_chart_expenditure():
 
     # 从GET获得表单值赋给wtform
@@ -71,11 +72,21 @@ def refresh_chart_expenditure():
         mamounts = [result.amount for result in results]  # 构造对应的消费值
 
         # 调用Controls
-        from app.controls import expenditure
-        mdates, mamounts, mamounts_point = expenditure.main(mdates, mamounts, modeDate)
+        from app.controls.DataProcess import DateTimeValueProcess
+        process = DateTimeValueProcess(mdates, mamounts)
+
+        # 包装dateTrend 返回值
+        axisLables, accumulatedVals, pointVals = process.dateTrend(modeDate)
+        json_dateTrend = {'axisLables': axisLables, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
+        # json_dateTrend = jsonify(axisLables=axisLables, accumulatedVals=accumulatedVals, pointVals=pointVals)
+
+        # timeDistribution 返回值
+        axisLables, vals = process.timeDistribution(toCountAxis=False)
+        json_timeDistribution = {'axisLables': axisLables, 'vals':vals}
+        # json_timeDistribution = jsonify(axisLables=axisLables, vals=vals)
 
         # 没有错误就不传errMsg
-        json_response = jsonify(mdates=mdates, mamounts=mamounts, mamounts_point=mamounts_point)
+        json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response

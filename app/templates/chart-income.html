@@ -3,7 +3,7 @@
 
     <form id="form-ipt" class="form-inline" >
         {{ form.devID(class="form-control", maxlength='10', placeholder='设备号') }}
-        {{ form.dateRange.label }} {{ form.dateRange(class="form-control",size='23') }}
+        {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
         {{ form.modeDate.label }}
         {% for subfield in form.modeDate %}
             {{ subfield }}{{ subfield.label }}

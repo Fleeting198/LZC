@@ -7,9 +7,10 @@
 #
 #   模式：日0，周1，月2，季3，年4。
 #   完成了日、月、年，未做周、季。
-
+import types
 
 def main(mdates, mamounts, mode_date):
+
     # 日期降维，仅用字符串切片处理年、月。
     if mode_date == 0:
         mdates = map(lambda d: d.date(), mdates)

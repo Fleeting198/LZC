@@ -1,32 +1,35 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-#
-# 02-11 Built by 陈骏杰
-#   输入：日期和对应消费增量，日期模式。
-#   输出：符合对应模式的日期、连续总计支出（初始量0 + 增量）、节点支出
-#
-#   模式：日0，周1，月2，季3，年4。
-#   完成了日、月、年，未做周、季。
+
+# 02-16 Created -C
+
 
 from datetime import time
 import types
 
 
-class Expenditure():
-    dates = []  # 日期
-    amounts = []  # 与日期对应的消费额
+class DateTimeValueProcess():
+    """
+    输入坐标（日期，可重复）与对应值，对其进行统计。
+    """
+    oriDate = []  # 日期
+    oriValues = []  # 与日期对应的消费额
 
-    def __init__(self, dates, amounts):
-        self.dates = dates
-        self.amounts = amounts
+    def __init__(self, dates, vals):
+        self.oriDate = dates
+        self.oriValues = vals
+
+    def set(self, dates, vals):
+        self.oriDate = dates
+        self.oriValues = vals
 
     def dateTrend(self, modeDate):
         """
         日期趋势，输入日期模式，输出合并后的日期、节点值和累积值。
         """
         # Copy source data.
-        axisLables = self.dates[:]
-        accumulatedVals = self.amounts[:]
+        axisLables = self.oriDate[:]
+        accumulatedVals = self.oriValues[:]
 
         # 日期降维，仅用字符串切片处理年、月。
         if modeDate == 0:
@@ -60,41 +63,39 @@ class Expenditure():
 
         return axisLables, accumulatedVals, pointVals
 
-    def timeDistribution(self):
+    def timeDistribution(self, toCountAxis):
         """
         时间分布，输出各时间段总计数，目的在于对比。
+        输入toCountAxis = True: 记一条记录为一次。
         """
         # Copy source data.
-        lDates = self.dates[:]
-        lAmounts = self.amounts[:]
+        dates = self.oriDate[:]
+        values = map(lambda x: float(x), self.oriValues) if not toCountAxis else [1]*len(self.oriValues)
 
-        print type(lAmounts[1])
+        print type(values[1])
 
         # Time periods：
         # 23~5 5~12 12~20 20~23
         period = (time(5), time(12), time(20), time(23))
         axisLables = ('23点~5点', '5点~12点', '12点~20点', '20点~23点')
 
-        # Init vals
-        vals = []
-        for i in range(len(period)):
-            vals[i] = float(0)
+        vals = [float(0)]*len(period)  # Init vals
 
-        lTimes = map(lambda d: d.time(), lDates)  # Keep time.
+        lTimes = map(lambda d: d.time(), dates)  # Keep time.
 
-        # lDates = map(lambda d: d.date(), lDates)
-        # len_mdates = len(list(set(lDates)))  # Day count to divide.
+        # dates = map(lambda d: d.date(), dates)
+        # len_mdates = len(list(set(dates)))  # Day count to divide.
 
         # Add to total vals.
         for i in range(len(lTimes)):
             if period[0] <= lTimes[i] < period[1]:
-                vals[1] += lAmounts[i]
+                vals[1] += values[i]
             elif period[1] <= lTimes[i] < period[2]:
-                vals[2] += lAmounts[i]
+                vals[2] += values[i]
             elif period[2] <= lTimes[i] < period[3]:
-                vals[3] += lAmounts[i]
+                vals[3] += values[i]
             else:
-                vals[0] += lAmounts[i]
+                vals[0] += values[i]
 
         for i in range(len(vals)):
             # vals[i] = vals[i] / len_mdates if len_mdates != 0 else 0
