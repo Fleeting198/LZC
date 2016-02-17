@@ -3,8 +3,7 @@
 
 # 02-16 Created -C
 
-
-from datetime import time
+from datetime import time, datetime
 import types
 
 
@@ -17,10 +16,7 @@ class DateTimeValueProcess():
 
     def __init__(self, dates, vals=None):
         self.oriDate = dates
-        if vals is None:
-            self.oriValues = [1] * len(dates)
-        else:
-            self.oriValues = vals
+        self.oriValues = [1] * len(dates) if vals is None else vals  # 若不传值列表则设次数为 1
 
     def dateTrend(self, modeDate=2):
         """
@@ -39,14 +35,22 @@ class DateTimeValueProcess():
         elif modeDate == 4:
             axisLables = map(lambda d: str(d.date())[:4], axisLables)
 
+        # TODO: 生成按星期和季度分的数据，考虑到交互性可能由前端JS负责？
+        elif modeDate == 1:
+            # 输出周
+            # for strdate in axisLables:
+            #     print strdate.strftime('%w')
+            pass
+        elif modeDate == 3:
+            pass
+
+        # 遍历日期，合并相同日期以及对应的值
         i = 1
-        while i < len(axisLables):  # 每轮循环都要获取长度
-            # 取当前和前一个记录的日期（天）
-            # 若日期相同，合并日期和对应增量
+        while i < len(axisLables):  # 每轮循环都要获取长度，用以遍历这个动态改变长度的列表
             if axisLables[i] == axisLables[i - 1]:
-                axisLables = axisLables[:i - 1] + axisLables[i:]  # 日期去除
-                accumulatedVals[i] += accumulatedVals[i - 1]  # 增量合并
-                accumulatedVals = accumulatedVals[:i - 1] + accumulatedVals[i:]  # 增量去除
+                axisLables = axisLables[:i - 1] + axisLables[i:]  # 去除日期
+                accumulatedVals[i] += accumulatedVals[i - 1]  # 合并值
+                accumulatedVals = accumulatedVals[:i - 1] + accumulatedVals[i:]  # 去除值
             else:
                 i += 1
 
@@ -70,8 +74,6 @@ class DateTimeValueProcess():
         # Copy source data.
         dates = self.oriDate[:]
         values = map(lambda x: float(x), self.oriValues)
-
-        print type(values[1])
 
         # Time periods：
         # 23~5 5~12 12~20 20~23

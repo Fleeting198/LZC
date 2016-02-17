@@ -81,7 +81,7 @@ def refresh_chart_expenditure():
         # json_dateTrend = jsonify(axisLables=axisLables, accumulatedVals=accumulatedVals, pointVals=pointVals)
 
         # timeDistribution 返回值
-        axisLables, vals = process.timeDistribution(toCountAxis=False)
+        axisLables, vals = process.timeDistribution()
         json_timeDistribution = {'axisLables': axisLables, 'vals':vals}
         # json_timeDistribution = jsonify(axisLables=axisLables, vals=vals)
 
@@ -163,7 +163,6 @@ def refresh_chart_income():
 
         # 查询
         strQuery = consumption.query.filter(consumption.dev_id == devID).order_by(consumption.con_datetime)
-
         if len(startDate) != 0 and len(endDate) != 0:
             strQuery = strQuery.filter(
                 and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
@@ -186,7 +185,7 @@ def refresh_chart_income():
         json_dateTrend = {'axisLables': axisLables, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
 
         # timeDistribution 返回值
-        axisLables, vals = process.timeDistribution(toCountAxis=False)
+        axisLables, vals = process.timeDistribution()
         json_timeDistribution = {'axisLables': axisLables, 'vals': vals}
 
         # 没有错误就不传errMsg
@@ -195,3 +194,11 @@ def refresh_chart_income():
         json_response = jsonify(errMsg=form.errors)
     return json_response
 
+@app.route('/charts/newChart')
+def show_new():
+
+    strQuery = consumption.query
+    results = strQuery.all()
+    print results
+
+    return render_template('chart-test.html')
