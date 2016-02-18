@@ -2,8 +2,9 @@
 # -*- coding: UTF-8 -*-
 
 # 02-16 Created -C
+# 02-18 Weekly done.
 
-from datetime import time, datetime
+from datetime import time, datetime, timedelta, date
 import types
 
 
@@ -27,20 +28,33 @@ class DateTimeValueProcess():
         axisLables = self.oriDate[:]
         accumulatedVals = self.oriValues[:]
 
-        # 日期降维，仅用字符串切片处理年、月。
-        if modeDate == 0:
-            axisLables = map(lambda d: d.date(), axisLables)
-        elif modeDate == 2:
-            axisLables = map(lambda d: str(d.date())[:7], axisLables)
-        elif modeDate == 4:
-            axisLables = map(lambda d: str(d.date())[:4], axisLables)
+        # Keep only date.
+        axisLables = map(lambda x: x.date(), axisLables)
 
-        # TODO: 生成按星期和季度分的数据，考虑到交互性可能由前端JS负责？
-        elif modeDate == 1:
-            # 输出周
-            # for strdate in axisLables:
-            #     print strdate.strftime('%w')
+        # 补全没有记录的日期，值为0。
+        # 遍历日期，若当前日期大于前一个日期超过1天，插入后一天日期。
+        # 有插入的情况下
+        i = 1
+        while i < len(axisLables):
+            if axisLables[i] - axisLables[i-1] > timedelta(days=1):
+                axisLables.insert(i, axisLables[i - 1] + timedelta(days=1))
+                accumulatedVals.insert(i, 0)
+            else:
+                i += 1
+
+        # 日期降维。
+        # TODO: 日级别数据处理返回是否必要，流量消耗太大。
+        if modeDate == 0:
             pass
+        elif modeDate == 2:
+            axisLables = map(lambda d: str(d)[:7], axisLables)
+        elif modeDate == 4:
+            axisLables = map(lambda d: str(d)[:4], axisLables)
+        elif modeDate == 1:
+            # 遍历日期，转变为一周"起始年月日~结束月日"，date-weekday 就为周起始，date + 6-weekday为周结束。
+            # datetime.weekday() 周一为0，周日为6
+            axisLables = map(lambda d: str(d - timedelta(d.weekday()))+' ~ '+(d+ timedelta(days=6) - timedelta(d.weekday())).strftime(format='%m-%d'), axisLables)
+        # TODO: 生成按季度分的数据，考虑到交互性可能由前端JS负责？
         elif modeDate == 3:
             pass
 
@@ -48,9 +62,13 @@ class DateTimeValueProcess():
         i = 1
         while i < len(axisLables):  # 每轮循环都要获取长度，用以遍历这个动态改变长度的列表
             if axisLables[i] == axisLables[i - 1]:
-                axisLables = axisLables[:i - 1] + axisLables[i:]  # 去除日期
+                # 去除 下标i-1  或i ?
+                del axisLables[i - 1]  # 去除日期
                 accumulatedVals[i] += accumulatedVals[i - 1]  # 合并值
-                accumulatedVals = accumulatedVals[:i - 1] + accumulatedVals[i:]  # 去除值
+                del accumulatedVals[i - 1]  # 去除值
+
+                # axisLables = axisLables[:i - 1] + axisLables[i:]
+                # accumulatedVals = accumulatedVals[:i - 1] + accumulatedVals[i:]
             else:
                 i += 1
 
