@@ -1,6 +1,7 @@
 Flask
-Flask-SQLAlchemy
-Flask-wtf
-Flask-admin
 Jinja
 Werkzeug
+Flask-SQLAlchemy
+Flask-wtf
+wtforms
+

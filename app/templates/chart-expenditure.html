@@ -3,7 +3,7 @@
 
     <form id="form-ipt" class="form-inline" >
         {{ form.userID(class="form-control", maxlength='8', placeholder='工号') }}
-        {{ form.dateRange.label }} {{ form.dateRange(class="form-control",size='23') }}
+        {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
         {{ form.modeDate.label }}
         {% for subfield in form.modeDate %}
             {{ subfield }}{{ subfield.label }}
@@ -12,7 +12,8 @@
         <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
     </form>
 
-    <div id="chart" style="width: 800px; height: 500px;"></div>
+    <div id="chartDateTrend" style="width: inherit; height: 350px;"></div>
+    <div id="chartTimeDistribution" style="width: inherit; height: 350px;"></div>
 
     <script>
         var dateRangePicker = $("input[name='dateRange']");
@@ -31,8 +32,10 @@
         });
 
         // 图表初始化。
-        var chart = echarts.init(document.getElementById('chart'));
-        var option = {
+        var chartDateTrend = echarts.init(document.getElementById('chartDateTrend'));
+        var chartTimeDistribution = echarts.init(document.getElementById('chartTimeDistribution'));
+
+        var optionChartDate = {
             title: {text: '支出趋势'},
             tooltip: {trigger: 'axis'},
             toolbox: {
@@ -85,37 +88,92 @@
                 }
             ]
         };
-        chart.setOption(option);
+        var optionChartTime = {
+            title: {text: '消费时间段分布'},
+            tooltip: {trigger: 'axis'},
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: {show: true},
+                    dataView: {show: true, readOnly: false},
+                    magicType: {show: true, type: ['line', 'bar']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            legend: {data: ['消费总额']},
+            xAxis: {
+                type: 'category',
+                boundaryGap: true,
+                data: []
+            },
+            yAxis: {
+                type: 'value',
+                name: '支出',
+                axisLabel: {
+                    formatter: '{value} 元'
+                }
+            },
+            series: [{
+                name: '消费总额',
+                type: 'bar',
+                data: []
+            }]
+        };
 
-        var mdates;
-        var mamounts;
-        var mamounts_point;
+        chartDateTrend.setOption(optionChartDate);
+        chartTimeDistribution.setOption(optionChartTime);
+
+{#        包装dateTrend#}
+{#        axisLables, accumulatedVals, pointVals = process.dateTrend(modeDate)#}
+{#        json_dateTrend = jsonify(axisLables = axisLables, accumulatedVals = accumulatedVals, pointVals = pointVals)#}
+{##}
+{#        timeDistribution#}
+{#        axisLables, vals = process.timeDistribution(toCountAxis = False)#}
+{#        json_timeDistribution = jsonify(axisLables = axisLables, vals = vals)#}
+{##}
+{#        没有错误就不传errMsg#}
+{#        json_response = jsonify(json_dateTrend = json_dateTrend, json_timeDistribution = json_timeDistribution)#}
+
+        var json_dateTrend;
+        var json_timeDistribution;
 
         // get向后端请求json刷新图表。
         refresh_chart = function(){
-            chart.showLoading();
+            chartDateTrend.showLoading();
+            chartTimeDistribution.showLoading();
             $.get('/charts/expenditure/getData?'+$("#form-ipt").serialize(), function(json_response){
-                chart.hideLoading();
-                if(!json_response.errMsg){
-                    mdates = json_response.mdates;
-                    mamounts = json_response.mamounts;
-                    mamounts_point = json_response.mamounts_point;
+                json_dateTrend = json_response.json_dateTrend;
+                json_timeDistribution = json_response.json_timeDistribution;
 
-                    chart.setOption({
+                chartDateTrend.hideLoading();
+                chartTimeDistribution.hideLoading();
+
+                if(!json_response.errMsg){
+                    chartDateTrend.setOption({
                         xAxis: [{
-                            data: mdates
+                            data: json_dateTrend.axisLables
                         }],
                         series: [
                             {
                                 name: '累积支出',
-                                data: mamounts
+                                data: json_dateTrend.accumulatedVals
                             },
                             {
                                 name: '节点支出',
-                                data: mamounts_point
+                                data: json_dateTrend.pointVals
                             }
                         ]
                     });
+                    chartTimeDistribution.setOption({
+                        xAxis: [{
+                            data: json_timeDistribution.axisLables
+                        }],
+                        series: [{
+                            data: json_timeDistribution.vals
+                        }]
+                    });
+
                 }else{
                     for(err in json_response.errMsg){
                         alert(json_response.errMsg[err]);

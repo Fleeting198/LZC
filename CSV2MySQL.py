@@ -175,5 +175,3 @@ class Cvs2MySQL:
             self._mysql.commit()
 
         print "消费表录入完成"
-
-

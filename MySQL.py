@@ -20,11 +20,9 @@ class MySQL:
     u'''对MySQLdb常用函数进行封装的类'''
 
     error_code = ''  # MySQL错误号码
-
     _instance = None  # 本类的实例
     _conn = None  # 数据库conn
     _cur = None  # 游标
-
     _TIMEOUT = 30  # 默认超时30秒
     _timecount = 0
 

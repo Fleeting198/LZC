@@ -12,6 +12,7 @@ from app.forms import *
 
 from sqlalchemy import and_
 from datetime import datetime
+import json
 
 import types
 
@@ -24,7 +25,7 @@ def show_index():
 # Ignore this.
 @app.route('/test')
 def show_test():
-    return render_template('test.html')
+    return app.config['SQLALCHEMY_DATABASE_URI']
 
 
 @app.route('/charts')
@@ -38,7 +39,7 @@ def show_chart_expenditure():
     return render_template('chart-expenditure.html', form=form)
 
 
-@app.route('/charts/expenditure/getData', methods=('GET','POST'))
+@app.route('/charts/expenditure/getData', methods=['GET'])
 def refresh_chart_expenditure():
 
     # 从GET获得表单值赋给wtform
@@ -55,27 +56,37 @@ def refresh_chart_expenditure():
         endDate = form.dateRange.data[-10:]
 
         # 查询
-        recordQuery = consumption.query.filter(consumption.user_id == userID).order_by(consumption.con_datetime)
+        strQuery = consumption.query.filter(consumption.user_id == userID).order_by(consumption.con_datetime)
 
         if len(startDate) != 0 and len(endDate) != 0:
-            recordQuery = recordQuery.filter(
+            strQuery = strQuery.filter(
                 and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
         elif len(startDate) != 0 and len(endDate) == 0:
-            recordQuery = recordQuery.filter(consumption.con_datetime >= startDate)
+            strQuery = strQuery.filter(consumption.con_datetime >= startDate)
         elif len(startDate) == 0 and len(endDate) != 0:
-            recordQuery = recordQuery.filter(consumption.con_datetime <= endDate)
+            strQuery = strQuery.filter(consumption.con_datetime <= endDate)
 
-        results = recordQuery.all()
+        results = strQuery.all()
 
-        mdates = [result.con_datetime for result in results]  # 构造日期数组作为图表x轴标记
-        mamounts = [result.amount for result in results]  # 构造对应的消费值
+        # 取出需要的列
+        mdates = [result.con_datetime for result in results]
+        mamounts = [result.amount for result in results]
 
-        # 调用Controls
-        from app.controls import expenditure
-        mdates, mamounts, mamounts_point = expenditure.main(mdates, mamounts, modeDate)
+        from app.controls.DataProcess import DateTimeValueProcess
+        process = DateTimeValueProcess(mdates, mamounts)
+
+        # 包装dateTrend 返回值
+        axisLables, accumulatedVals, pointVals = process.dateTrend(modeDate)
+        json_dateTrend = {'axisLables': axisLables, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
+        # json_dateTrend = jsonify(axisLables=axisLables, accumulatedVals=accumulatedVals, pointVals=pointVals)
+
+        # timeDistribution 返回值
+        axisLables, vals = process.timeDistribution()
+        json_timeDistribution = {'axisLables': axisLables, 'vals':vals}
+        # json_timeDistribution = jsonify(axisLables=axisLables, vals=vals)
 
         # 没有错误就不传errMsg
-        json_response = jsonify(mdates=mdates, mamounts=mamounts, mamounts_point=mamounts_point)
+        json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -98,22 +109,32 @@ def refresh_chart_acperiod():
         startDate = form.dateRange.data[:10]
         endDate = form.dateRange.data[-10:]
 
-        recordQuery = acrec.query.filter(acrec.user_id == userID).order_by(acrec.ac_datetime)
+        # 查询
+        strQuery = acrec.query.filter(acrec.user_id == userID).order_by(acrec.ac_datetime)
         if len(startDate) != 0 and len(endDate) != 0:
-            recordQuery = recordQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
+            strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
         elif len(startDate) != 0 and len(endDate) == 0:
-            recordQuery = recordQuery.filter(acrec.ac_datetime >= startDate)
+            strQuery = strQuery.filter(acrec.ac_datetime >= startDate)
         elif len(startDate) == 0 and len(endDate) != 0:
-            recordQuery = recordQuery.filter(acrec.ac_datetime <= endDate)
+            strQuery = strQuery.filter(acrec.ac_datetime <= endDate)
 
-        results = recordQuery.all()
+        results = strQuery.all()
 
         mdates = [result.ac_datetime for result in results]
 
-        from app.controls import acperiod
-        mperiods, mcounts = acperiod.main(mdates)
+        from app.controls.DataProcess import DateTimeValueProcess
+        process = DateTimeValueProcess(mdates)
 
-        json_response = jsonify(mperiods=mperiods, mcounts=mcounts)
+        # 包装dateTrend 返回值
+        axisLables, accumulatedVals, pointVals = process.dateTrend(2)  # 暂时将日期模式直接设为月
+        # 没有记连续值的需要
+        json_dateTrend = {'axisLables': axisLables, 'pointVals': pointVals}
+
+        # timeDistribution 返回值
+        axisLables, vals = process.timeDistribution()
+        json_timeDistribution = {'axisLables': axisLables, 'vals': vals}
+
+        json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -127,38 +148,57 @@ def show_chart_income():
 
 @app.route('/charts/income/getData', methods=['GET'])
 def refresh_chart_income():
+    # 从GET获得表单值赋给wtform
     form = form_income()
     form.devID.data = request.args.get('devID')
-    form.dateRange.data = request.args.get('dateRange')
     form.modeDate.data = request.args.get('modeDate')
+    form.dateRange.data = request.args.get('dateRange')
 
     if form.validate():
+        # 赋值给变量
         devID = form.devID.data
         modeDate = int(form.modeDate.data)
         startDate = form.dateRange.data[:10]
         endDate = form.dateRange.data[-10:]
 
         # 查询
-        recordQuery = consumption.query.filter(consumption.dev_id == devID).order_by(consumption.con_datetime)
+        strQuery = consumption.query.filter(consumption.dev_id == devID).order_by(consumption.con_datetime)
         if len(startDate) != 0 and len(endDate) != 0:
-            recordQuery = recordQuery.filter(
+            strQuery = strQuery.filter(
                 and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
         elif len(startDate) != 0 and len(endDate) == 0:
-            recordQuery = recordQuery.filter(consumption.con_datetime >= startDate)
+            strQuery = strQuery.filter(consumption.con_datetime >= startDate)
         elif len(startDate) == 0 and len(endDate) != 0:
-            recordQuery = recordQuery.filter(consumption.con_datetime <= endDate)
+            strQuery = strQuery.filter(consumption.con_datetime <= endDate)
 
-        results = recordQuery.all()
+        results = strQuery.all()
 
+        # 取出需要的列
         mdates = [result.con_datetime for result in results]
         mamounts = [result.amount for result in results]
 
-        # 调用处理模块
-        from app.controls import income
-        mdates, mamounts, mamounts_point = income.main(mdates, mamounts, modeDate)
+        from app.controls.DataProcess import DateTimeValueProcess
+        process = DateTimeValueProcess(mdates, mamounts)
 
-        # 构造返回json
-        json_response = jsonify(valid=1, mdates=mdates, mamounts=mamounts, mamounts_point=mamounts_point)
+        # 包装dateTrend 返回值
+        axisLables, accumulatedVals, pointVals = process.dateTrend(modeDate)
+        json_dateTrend = {'axisLables': axisLables, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
+
+        # timeDistribution 返回值
+        axisLables, vals = process.timeDistribution()
+        json_timeDistribution = {'axisLables': axisLables, 'vals': vals}
+
+        # 没有错误就不传errMsg
+        json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
+
+@app.route('/charts/newChart')
+def show_new():
+
+    strQuery = consumption.query
+    results = strQuery.all()
+    print results
+
+    return render_template('chart-test.html')
