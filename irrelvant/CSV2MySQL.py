@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-import csv
-import MySQL
 import codecs
+import csv
+
+import MySQL
 
 """
 依赖 兔大侠和他的朋友们 的 对MySQLdb常用函数进行封装的类 MySQL.py

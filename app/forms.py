@@ -10,7 +10,7 @@ from wtforms.validators import *
 import LocalStrings as lstr
 
 
-class form_expenditure(Form):
+class Form_expenditure(Form):
     userID = StringField(lstr.userID,
                          validators=[DataRequired(message=lstr.warn_userIDFill),
                                      Length(min=8, max=8, message=lstr.warn_userIDLength)],
@@ -24,7 +24,17 @@ class form_expenditure(Form):
                           default='0')
 
 
-class form_acperiod(Form):
+class Form_income(Form):
+    devID = StringField(lstr.devID, validators=[DataRequired(message=lstr.warn_devIDFill),
+                                                Length(max=10, message=lstr.warn_devIDLength)], default='YQSH1826')
+
+    dateRange = StringField(lstr.dateRange, validators=[Optional()])
+    modeDate = RadioField(lstr.modeDate,
+                          choices=[('0', lstr.Day), ('1', lstr.Wek), ('2', lstr.Mon), ('3', lstr.Qtr), ('4', lstr.Yer)],
+                          default='0')
+
+
+class Form_ACPeriod(Form):
     userID = StringField(lstr.userID,
                          validators=[DataRequired(message=lstr.warn_userIDFill),
                                      Length(min=8, max=8, message=lstr.warn_userIDLength)],
@@ -32,14 +42,15 @@ class form_acperiod(Form):
     dateRange = StringField(lstr.dateRange, validators=[Optional()])
 
 
-
-class form_income(Form):
-    devID = StringField(lstr.devID,
-                        validators=[DataRequired(message=lstr.warn_devIDFill),
-                                    Length(max=10, message=lstr.warn_devIDLength)],
-                        default='YQSH1826')
+class Form_ACValid(Form):
+    userID = StringField(lstr.devID, validators=[DataRequired(message=lstr.warn_devIDFill),
+                                                Length(max=10, message=lstr.warn_devIDLength)], default='NIHHXTXQ')
 
     dateRange = StringField(lstr.dateRange, validators=[Optional()])
-    modeDate = RadioField(lstr.modeDate,
-                          choices=[('0', lstr.Day), ('1', lstr.Wek), ('2', lstr.Mon), ('3', lstr.Qtr), ('4', lstr.Yer)],
-                          default='0')
+
+
+class Form_ACCategory(Form):
+    userID = StringField(lstr.devID, validators=[DataRequired(message=lstr.warn_devIDFill),
+                                                 Length(max=10, message=lstr.warn_devIDLength)], default='NIHHXTXQ')
+
+    dateRange = StringField(lstr.dateRange, validators=[Optional()])

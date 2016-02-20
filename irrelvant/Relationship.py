@@ -9,7 +9,7 @@ import MySQL
 
 def relationshipA(target="PPNWPQQW"):
 	dbconfig = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'passwd': 'root', 'db': 'witcampus',
-	            'charset': 'utf8'}  # 数据库连接配置信息
+                'charset': 'utf8'}  # 数据库连接配置信息
 	t1 = 30
 	t2 = 30
 	b = 10
@@ -33,4 +33,5 @@ def relationshipA(target="PPNWPQQW"):
 		if value > b:
 			print key
 
-relationshipA()
+if __name__ == '__main__':
+	relationshipA()
