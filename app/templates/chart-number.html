@@ -1,0 +1,74 @@
+{% extends "charts.html" %}
+{% block chartField %}
+
+    <div id="chartNumber" style="width: inherit; height: 350px;"></div>
+
+    <script>
+
+        var chartNumber = echarts.init(document.getElementById('chartNumber'));
+
+        var optionChartNumber = {
+            title: {text: '人数统计'},
+            tooltip: {trigger: 'axis'},
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: {show: true},
+                    dataView: {show: true, readOnly: false},
+                    magicType: {show: true, type: ['line', 'bar', 'stack']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: true,
+                data: ['老师', '本科生', '研究生', '博士生', '其他']
+            },
+            yAxis: {
+                type: 'value',
+                name: '人数',
+                axisLabel: {
+                    formatter: '{value} 人'
+                }
+            },
+            series: [
+                {
+                    name: '人数',
+                    type: 'bar',
+                    data: []
+                }
+            ]
+        };
+
+        chartNumber.setOption(optionChartNumber);
+
+        var json_number;
+
+        load_number = function () {
+            chartNumber.showLoading();
+            $.get('/charts/number/getData?', function (json_response) {
+
+                chartNumber.hideLoading();
+
+                if (!json_response.errMsg) {
+                    chartNumber.setOption({
+                        series: [
+                            {
+                                name: 'test',
+                                <!--type:'bar',-->
+                                data: [json_response.teacher, json_response.stu1, json_response.stu2, json_response.stu3,json_response.other]
+                            }
+                        ]
+                    });
+
+                } else {
+                    for (err in json_response.errMsg) {
+                        alert(json_response.errMsg[err]);
+                    }
+                }
+            }, 'json')
+        };
+    </script>
+
+{% endblock %}
