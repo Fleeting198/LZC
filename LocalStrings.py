@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
+
 userID = u'工号'
 devID = u'设备号'
 startDate = u'开始日期'
@@ -18,3 +19,17 @@ Mon = u'月'
 Wek = u'周'
 Qtr = u'季'
 Yer = u'年'
+
+dictTrans = {
+    'water' : u'生活用水',
+    'shop' : u'超市',
+    'recharge' : u'充值',
+    'discipline' : u'违纪',
+    'food' : u'餐饮',
+    'sport' : u'运动',
+    'med' : u'医务',
+    'study' : u'学习',
+
+    '0': u'非法',
+    '1': u'合法'
+}

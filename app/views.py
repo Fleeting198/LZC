@@ -11,11 +11,12 @@ from flask import render_template, request, jsonify
 from app.models import *
 from app.forms import *
 
-from sqlalchemy import and_,func
+from sqlalchemy import and_, func
 from datetime import datetime
 import json
 import types
 
+import LocalStrings as lstr
 
 @app.route('/')
 def show_index():
@@ -199,17 +200,17 @@ def refresh_chart_acvalid():
         endDate = form.dateRange.data[-10:]
 
         # Query.
-        strQuery = db.session.query(acrec.legal).filter(acrec.user_id == userID)
+        strQuery = db.session.query(acrec.legal, func.count('*')).filter(acrec.user_id == userID).group_by(acrec.legal)
         if len(startDate) != 0:
             strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
         results = strQuery.all()
-        res_legal = [result.legal for result in results]
 
         # Process data.
-        from controls.ACValid import ACValid
-        json_acvalid = ACValid(res_legal)
+        from controls.CategoryProcess import CategoryProcess
+        titles, seriesData = CategoryProcess(results)
 
-        json_response = jsonify(json_acvalid)
+        json_response = {'titles': titles, 'seriesData': seriesData}
+        json_response = jsonify(json_response)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -233,17 +234,53 @@ def refresh_chart_accategory():
         endDate = form.dateRange.data[-10:]
 
         # Query.
-        strQuery = db.session.query(ac_loc.category).filter(ac_loc.node_des==acrec.node_des)
+        strQuery = db.session.query(ac_loc.category).filter(and_(ac_loc.node_des==acrec.node_des, acrec.user_id==userID))
         if len(startDate) != 0:
             strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
         results = strQuery.all()
-        res_category = [result.category for result in results]
 
         # Process data.
-        from controls.ACCategory import ACCategory
-        json_acvalid = ACCategory(res_category)
+        from controls.CategoryProcess import CategoryProcess
+        titles, seriesData = CategoryProcess(results)
 
-        json_response = jsonify(json_acvalid)
+        json_response = {'titles': titles, 'seriesData': seriesData}
+        json_response = jsonify(json_response)
+    else:
+        json_response = jsonify(errMsg=form.errors)
+    return json_response
+
+
+@app.route('/charts/concategory')
+def show_chart_concategory():
+    form = Form_ACCategory()
+    return render_template('chart-concategory.html', form=form)
+
+
+@app.route('/charts/concategory/getData')
+def refresh_chart_concategory():
+    form = Form_ACCategory()
+    form.userID.data = request.args.get('userID')
+    form.dateRange.data = request.args.get('dateRange')
+
+    if form.validate():
+        userID = form.userID.data
+        startDate = form.dateRange.data[:10]
+        endDate = form.dateRange.data[-10:]
+
+        # Query.
+        strQuery = db.session.query(dev_loc.category, func.sum(consumption.amount)).filter(
+            and_(consumption.user_id == userID, dev_loc.node_id == device.node_id, device.dev_id == consumption.dev_id)).group_by(dev_loc.category)
+        if len(startDate) != 0:
+            strQuery = strQuery.filter(and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
+
+        results = strQuery.all()
+
+        # Process data.
+        from controls.CategoryProcess import CategoryProcess
+        titles, seriesData = CategoryProcess(results)
+
+        json_response = {'titles': titles, 'seriesData': seriesData}
+        json_response = jsonify(json_response)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
