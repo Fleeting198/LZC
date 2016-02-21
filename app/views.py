@@ -255,7 +255,6 @@ def show_chart_concategory():
     form = Form_ACCategory()
     return render_template('chart-concategory.html', form=form)
 
-<<<<<<< HEAD
 
 @app.route('/charts/concategory/getData')
 def refresh_chart_concategory():
@@ -285,57 +284,29 @@ def refresh_chart_concategory():
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
-=======
-    return render_template('chart-test.html')
+
 
 @app.route('/charts/number')
 def show_chart_number():
-    # form = form_acperiod()
     return render_template('chart-number.html')
-    # return render_template('chart-number.html', form=form)
 
 
 @app.route('/charts/number/getData', methods=['GET'])
 def refresh_chart_number():
-    # form = form_acperiod()
-    # form.userID.data = request.args.get('userID')
-    # form.dateRange.data = request.args.get('dateRange')
-
-    # if form.validate():
-    #     userID = form.userID.data
-    #     startDate = form.dateRange.data[:10]
-    #     endDate = form.dateRange.data[-10:]
-
-        # 查询
+    # 查询
     strQuery = db.session.query(individual.role, func.count('*')).group_by(individual.role)
-    # strQuery = individual.query.filter(individual.role, func.count('*')).group_by(individual.role)
-        # strQuery = acrec.query.filter(acrec.user_id == userID).order_by(acrec.ac_datetime)
-        # if len(startDate) != 0 and len(endDate) != 0:
-        #     strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
-        # elif len(startDate) != 0 and len(endDate) == 0:
-        #     strQuery = strQuery.filter(acrec.ac_datetime >= startDate)
-        # elif len(startDate) == 0 and len(endDate) != 0:
-        #     strQuery = strQuery.filter(acrec.ac_datetime <= endDate)
 
     results = strQuery.all()
-    print results
 
     json_number = {}
     for result in results:
         json_number[result[0]] = result[1]
-    print json_number
+
     json_number['teacher']=json_number.pop(u'老师')
     json_number['other']=json_number.pop(u'其他')
     json_number['stu1']=json_number.pop(u'本科生')
     json_number['stu2']=json_number.pop(u'研究生')
     json_number['stu3']=json_number.pop(u'博士生')
-        # timeDistribution 返回值
-        # axisLables, vals = process.timeDistribution()
-        # json_timeDistribution = {'axisLables': axisLables, 'vals': vals}
-
 
     json_response = jsonify(json_number)
-    # else:
-    #     json_response = jsonify(errMsg=form.errors)
     return json_response
->>>>>>> refs/heads/pr/1
