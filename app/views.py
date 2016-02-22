@@ -288,25 +288,87 @@ def refresh_chart_concategory():
 
 @app.route('/charts/number')
 def show_chart_number():
-    return render_template('chart-number.html')
+    # return render_template('chart-number.html')
+    return render_template('chart-numberBar.html')
 
 
 @app.route('/charts/number/getData', methods=['GET'])
 def refresh_chart_number():
-    # 查询
-    strQuery = db.session.query(individual.role, func.count('*')).group_by(individual.role)
 
-    results = strQuery.all()
+    # query number of people by dividing into total & grades
+    strQueryTotal = db.session.query(individual.role, func.count('*')).group_by(individual.role)
+    # GradeB stands for 本科生的年级
+    strQueryGradeB = db.session.query(individual.grade, func.count('*')).filter(individual.role == u'本科生').group_by(individual.grade)
+    # GradePg stands for 研究生的年级
+    strQueryGradePg = db.session.query(individual.grade, func.count('*')).filter(individual.role == u'研究生').group_by(individual.grade)
+    # GradeDr stands for 博士生的年级
+    strQueryGradeDr = db.session.query(individual.grade, func.count('*')).filter(individual.role == u'博士生').group_by(individual.grade)
 
-    json_number = {}
-    for result in results:
-        json_number[result[0]] = result[1]
+    # try query grade at one time?
+    # strQueryGrade = db.session.query(individual.grade, func.count('*')).filter(individual.role.in_(['本科生', '研究生', '博士生'])).group_by(individual.grade)
 
-    json_number['teacher']=json_number.pop(u'老师')
-    json_number['other']=json_number.pop(u'其他')
-    json_number['stu1']=json_number.pop(u'本科生')
-    json_number['stu2']=json_number.pop(u'研究生')
-    json_number['stu3']=json_number.pop(u'博士生')
+    # go
+    resultsTotal = strQueryTotal.all()
+    resultsGradeB = strQueryGradeB.all()
+    resultsGradePg = strQueryGradePg.all()
+    resultsGradeDr = strQueryGradeDr.all()
 
-    json_response = jsonify(json_number)
+    # for test only
+    # print resultsGradeB
+    # print resultsGradeB[0][0]
+    # print resultsGradeB[0][1]
+    # sum = 0
+    # for num in resultsGradeB:
+    #     sum += num[1]
+    # print sum
+
+    # process numberTotal
+    json_numberTotal = {}
+    for result in resultsTotal:
+        json_numberTotal[result[0]] = result[1]
+
+    json_numberTotal['teacher'] = json_numberTotal.pop(u'老师')
+    json_numberTotal['other'] = json_numberTotal.pop(u'其他')
+    json_numberTotal['stuB'] = json_numberTotal.pop(u'本科生')
+    json_numberTotal['stuPg'] = json_numberTotal.pop(u'研究生')
+    json_numberTotal['stuDr'] = json_numberTotal.pop(u'博士生')
+
+    # process numberGrade
+    grade = {'10', '11', '12', '13', '14', '15'}
+
+    # init json
+    json_numberGradeB = {'unknown': 0}
+    json_numberGradePg = {'unknown': 0}
+    json_numberGradeDr = {'unknown': 0}
+
+    # convert result to json func?
+    def result_to_jsonUnicode(resultGrade):
+        json = {'unknown': 0}
+        for result in resultGrade:
+            if result[0] in grade:
+                json[result[0]] = result[1]
+            else:
+                json['unknown'] += result[1]
+        return json
+
+    # go
+    json_numberGradeB = result_to_jsonUnicode(resultsGradeB)
+    json_numberGradePg = result_to_jsonUnicode(resultsGradePg)
+    json_numberGradeDr = result_to_jsonUnicode(resultsGradeDr)
+
+    def result_to_jsonString(json):
+        json['g10'] = json.pop(u'10')
+        json['g11'] = json.pop(u'11')
+        json['g12'] = json.pop(u'12')
+        json['g13'] = json.pop(u'13')
+        json['g14'] = json.pop(u'14')
+        json['g15'] = json.pop(u'15')
+        return json
+
+    json_numberGradeB = result_to_jsonString(json_numberGradeB)
+    json_numberGradePg = result_to_jsonString(json_numberGradePg)
+    json_numberGradeDr = result_to_jsonString(json_numberGradeDr)
+
+    # return
+    json_response = jsonify(json_numberTotal = json_numberTotal, json_numberGradeB = json_numberGradeB, json_numberGradePg = json_numberGradePg, json_numberGradeDr = json_numberGradeDr)
     return json_response

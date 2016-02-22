@@ -3,14 +3,18 @@
 
     <!--place divs for charts-->
     <div id="chartNumberTotal" style="width: inherit; height: 350px;"></div>
-    <div id="chartNumberGrade" style="width: inherit; height: 350px;"></div>
+    <div id="chartNumberGradeB" style="width: inherit; height: 350px;"></div>
+    <div id="chartNumberGradePg" style="width: inherit; height: 350px;"></div>
+    <div id="chartNumberGradeDr" style="width: inherit; height: 350px;"></div>
 
 
     <script>
 
         <!--init charts-->
         var chartNumberTotal = echarts.init(document.getElementById('chartNumberTotal'));
-        var chartNumberGrade = echarts.init(document.getElementById('chartNumberGrade'));
+        var chartNumberGradeB = echarts.init(document.getElementById('chartNumberGradeB'));
+        var chartNumberGradePg = echarts.init(document.getElementById('chartNumberGradePg'));
+        var chartNumberGradeDr = echarts.init(document.getElementById('chartNumberGradeDr'));
 
         <!--start options for charts-->
         var optionChartNumberTotal = {
@@ -49,13 +53,10 @@
 
         var optionChartNumberGrade = {
             title: {
-                text: '本科生、研究生、博士生各年级比例'
             },
             tooltip: {
-                trigger: 'axis'
-            },
-            legend: {
-                data:['10','11','12','13','14','15','其他']
+                trigger: 'item',
+                formatter: "{b} : {c} ({d}%)"
             },
             toolbox: {
                 show: true,
@@ -66,29 +67,31 @@
                     saveAsImage: {show: true}
                 }
             },
-            xAxis: [
-                {
-                    type: 'category',
-                    data: ['本科生', '研究生', '博士生']
-                }
-            ],
-            yAxis: [
-                {
-                    type : 'value',
-                }
-            ],
-            series: [
-            ]
+            <!--legend: {-->
+                <!--show: true,-->
+                <!--orient: 'horizontal',-->
+                <!--left: 'center',-->
+                <!--data: ['10', '11', '12', '13', '14', '15', '其他']-->
+            <!--},-->
+            series: [{
+                name: '年级比例',
+                type: 'pie',
+                radious: '50%',
+                center: ['50%', '50%'],
+                data: []
+            }]
         };
 
         <!--set options for charts-->
         chartNumberTotal.setOption(optionChartNumberTotal);
-        chartNumberGrade.setOption(optionChartNumberGrade);
+        chartNumberGradeB.setOption(optionChartNumberGrade);
+        chartNumberGradePg.setOption(optionChartNumberGrade);
+        chartNumberGradeDr.setOption(optionChartNumberGrade);
 
         load_number = function () {
 
             chartNumberTotal.showLoading();
-            chartNumberGrade.showLoading();
+            chartNumberGradeB.showLoading();
 
             $.get('/charts/number/getData?', function (json_response) {
 
@@ -98,7 +101,7 @@
                 json_numberGradeDr = json_response.json_numberGradeDr;
 
                 chartNumberTotal.hideLoading();
-                chartNumberGrade.hideLoading();
+                chartNumberGradeB.hideLoading();
 
                     chartNumberTotal.setOption({
                         series: [
@@ -108,29 +111,53 @@
                         ]
                     });
 
-                <!--try generate series dynamically-->
+                <!--fetch data dynamically-->
                 names = new Array('10', '11', '12', '13', '14', '15', '其他');
                 datas = new Array('g10', 'g11', 'g12', 'g13', 'g14', 'g15', 'unknown')
-                function json2serie () {
-                    var serie = [];
-                    for ( var i = 0; i < 7; i++ ) {
-                        d = new Array()
-                        eval('d.push(json_numberGradeB.' + datas[i] + ')')
-                        eval('d.push(json_numberGradePg.' + datas[i] + ')')
-                        eval('d.push(json_numberGradeDr.' + datas[i] + ')')
+
+                function json2data (json_numberGrade) {
+                    var dataOfSeries = [];
+                    for ( var i = 0; i < datas.length; i++ ) {
                         var item = {
-                            name: names[i],
-                            type: 'bar',
-                            stack: 'grade',
-                            data: d
+                        value: eval('json_numberGrade.'+datas[i]),
+                        name: names[i]
                         }
-                        serie.push(item);
+                        dataOfSeries.push(item);
                     }
-                    return serie;
+                    return dataOfSeries;
                 }
 
-                chartNumberGrade.setOption({
-                    series: json2serie()
+                chartNumberGradeB.setOption({
+                    title: {
+                        text: '各年级本科生比例'
+                    },
+                    series: [
+                        {
+                            data: json2data(json_numberGradeB)
+                        }
+                    ]
+                });
+
+                chartNumberGradePg.setOption({
+                    title: {
+                        text: '各年级研究生比例'
+                    },
+                    series: [
+                        {
+                            data: json2data(json_numberGradePg)
+                        }
+                    ]
+                });
+
+                chartNumberGradeDr.setOption({
+                    title: {
+                        text: '各年级博士生比例'
+                    },
+                    series: [
+                        {
+                            data: json2data(json_numberGradeDr)
+                        }
+                    ]
                 });
 
             }, 'json')
