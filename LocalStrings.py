@@ -20,6 +20,7 @@ Wek = u'周'
 Qtr = u'季'
 Yer = u'年'
 
+
 dictTrans = {
     'water' : u'生活用水',
     'shop' : u'超市',
@@ -31,5 +32,13 @@ dictTrans = {
     'study' : u'学习',
 
     '0': u'非法',
-    '1': u'合法'
+    '1': u'合法',
+
+    'acad': u'教学楼',
+    'dorm': u'宿舍',
+    'admin':u'行政',
+    'lib':u'图书馆',
+    'sci':u'科研',
+
+    'none':u'未分类|其他',
 }

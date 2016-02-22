@@ -16,6 +16,8 @@ def CategoryProcess(results):
         # Into tmp_data.
         tmp_data[str(result[0])] = float(result[1])
 
+    print tmp_data
+
     # From tmp_data to seriesData.
     for k, v in tmp_data.iteritems():
         # 汉化seriesData 中的lable。

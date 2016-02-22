@@ -18,15 +18,10 @@ import types
 
 import LocalStrings as lstr
 
+
 @app.route('/')
 def show_index():
     return render_template('index.html')
-
-
-# Ignore this.
-# @app.route('/test')
-# def show_test():
-#     return app.config['SQLALCHEMY_DATABASE_URI']
 
 
 @app.route('/charts')
@@ -36,7 +31,7 @@ def show_charts():
 
 @app.route('/charts/expenditure')
 def show_chart_expenditure():
-    form = Form_expenditure()
+    form = Form_UserDaterangemode()
     return render_template('chart-expenditure.html', form=form)
 
 
@@ -44,7 +39,7 @@ def show_chart_expenditure():
 def refresh_chart_expenditure():
 
     # 从GET获得表单值赋给wtform
-    form = Form_expenditure()
+    form = Form_UserDaterangemode()
     form.userID.data = request.args.get('userID')
     form.modeDate.data = request.args.get('modeDate')
     form.dateRange.data = request.args.get('dateRange')
@@ -89,13 +84,13 @@ def refresh_chart_expenditure():
 
 @app.route('/charts/acperiod')
 def show_chart_acperiod():
-    form = Form_ACPeriod()
+    form = Form_UserDaterange()
     return render_template('chart-acperiod.html', form=form)
 
 
 @app.route('/charts/acperiod/getData', methods=['GET'])
 def refresh_chart_acperiod():
-    form = Form_ACPeriod()
+    form = Form_UserDaterange()
     form.userID.data = request.args.get('userID')
     form.dateRange.data = request.args.get('dateRange')
 
@@ -133,14 +128,14 @@ def refresh_chart_acperiod():
 
 @app.route('/charts/income')
 def show_chart_income():
-    form = Form_income()
+    form = Form_DevDaterangemode()
     return render_template('chart-income.html', form=form)
 
 
 @app.route('/charts/income/getData', methods=['GET'])
 def refresh_chart_income():
     # 从GET获得表单值赋给wtform
-    form = Form_income()
+    form = Form_DevDaterangemode()
     form.devID.data = request.args.get('devID')
     form.modeDate.data = request.args.get('modeDate')
     form.dateRange.data = request.args.get('dateRange')
@@ -184,13 +179,13 @@ def refresh_chart_income():
 
 @app.route('/charts/acvalid')
 def show_chart_acvalid():
-    form = Form_ACValid()
+    form = Form_UserDaterange()
     return render_template('chart-acvalid.html', form=form)
 
 
 @app.route('/charts/acvalid/getData')
 def refresh_chart_acvalid():
-    form = Form_ACValid()
+    form = Form_UserDaterange()
     form.userID.data = request.args.get('userID')
     form.dateRange.data = request.args.get('dateRange')
 
@@ -218,13 +213,13 @@ def refresh_chart_acvalid():
 
 @app.route('/charts/accategory')
 def show_chart_accategory():
-    form = Form_ACCategory()
+    form = Form_UserDaterange()
     return render_template('chart-accategory.html', form=form)
 
 
 @app.route('/charts/accategory/getData')
 def refresh_chart_accategory():
-    form = Form_ACCategory()
+    form = Form_UserDaterange()
     form.userID.data = request.args.get('userID')
     form.dateRange.data = request.args.get('dateRange')
 
@@ -234,7 +229,8 @@ def refresh_chart_accategory():
         endDate = form.dateRange.data[-10:]
 
         # Query.
-        strQuery = db.session.query(ac_loc.category).filter(and_(ac_loc.node_des==acrec.node_des, acrec.user_id==userID))
+        strQuery = db.session.query(ac_loc.category, func.count('*')).filter(
+            and_(ac_loc.node_des==acrec.node_des, acrec.user_id==userID)).group_by(ac_loc.category)
         if len(startDate) != 0:
             strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
         results = strQuery.all()
@@ -252,13 +248,13 @@ def refresh_chart_accategory():
 
 @app.route('/charts/concategory')
 def show_chart_concategory():
-    form = Form_ACCategory()
+    form = Form_UserDaterange()
     return render_template('chart-concategory.html', form=form)
 
 
 @app.route('/charts/concategory/getData')
 def refresh_chart_concategory():
-    form = Form_ACCategory()
+    form = Form_UserDaterange()
     form.userID.data = request.args.get('userID')
     form.dateRange.data = request.args.get('dateRange')
 
@@ -295,7 +291,6 @@ def show_chart_number():
 def refresh_chart_number():
     # 查询
     strQuery = db.session.query(individual.role, func.count('*')).group_by(individual.role)
-
     results = strQuery.all()
 
     json_number = {}
@@ -310,3 +305,54 @@ def refresh_chart_number():
 
     json_response = jsonify(json_number)
     return json_response
+
+#
+# @app.route('/charts/acdatetime')
+# def show_chart_expenditure():
+#     form = Form_expenditure()
+#     return render_template('chart-expenditure.html', form=form)
+#
+#
+# @app.route('/charts/acdatetime/getData', methods=['GET'])
+# def refresh_chart_expenditure():
+#     form = Form_expenditure()
+#     form.userID.data = request.args.get('userID')
+#     form.modeDate.data = request.args.get('modeDate')
+#     form.dateRange.data = request.args.get('dateRange')
+#
+#     if form.validate():
+#         userID = form.userID.data
+#         modeDate = int(form.modeDate.data)
+#         startDate = form.dateRange.data[:10]
+#         endDate = form.dateRange.data[-10:]
+#
+#         # Query.
+#         strQuery = db.session.query(consumption.con_datetime, consumption.amount).filter(
+#             consumption.user_id == userID).order_by(consumption.con_datetime)
+#         if len(startDate) != 0:
+#             strQuery = strQuery.filter(and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
+#         results = strQuery.all()
+#
+#         # Get columns.
+#         res_datetimes = [result.con_datetime for result in results]
+#         res_amounts = [result.amount for result in results]
+#
+#         from app.controls.DateTimeValueProcess import DateTimeValueProcess
+#         process = DateTimeValueProcess(res_datetimes, res_amounts)
+#
+#         # Get and pack dateTrend() return.
+#         axisLables, accumulatedVals, pointVals = process.dateTrend(modeDate)
+#         json_dateTrend = {'axisLables': axisLables, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
+#         # json_dateTrend = jsonify(axisLables=axisLables, accumulatedVals=accumulatedVals, pointVals=pointVals)
+#
+#         # Get and pack timeDistribution() return.
+#         axisLables, vals = process.timeDistribution()
+#         json_timeDistribution = {'axisLables': axisLables, 'vals': vals}
+#         # json_timeDistribution = jsonify(axisLables=axisLables, vals=vals)
+#
+#         # 没有错误就不传errMsg。前端通过检查errMsg是否存在来判断查询是否成功。
+#         json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
+#     else:
+#         json_response = jsonify(errMsg=form.errors)
+#     return json_response
+#
