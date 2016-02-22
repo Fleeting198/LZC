@@ -34,8 +34,8 @@ class Form_DevDaterange(Form):
     """
     设备号日期范围
     """
-    userID = StringField(lstr.userID, validators=[DataRequired(message=lstr.warn_userIDFill),
-                                                  Length(min=8, max=8, message=lstr.warn_userIDLength)])
+    devID = StringField(lstr.userID, validators=[DataRequired(message=lstr.warn_userIDFill),
+                                                  Length(max=10, message=lstr.warn_userIDLength)])
     dateRange = StringField(lstr.dateRange, validators=[Optional()])
 
 
@@ -47,44 +47,3 @@ class Form_DevDaterangemode(Form_UserDaterange):
                           choices=[('0', lstr.Day), ('1', lstr.Wek), ('2', lstr.Mon), ('3', lstr.Qtr), ('4', lstr.Yer)],
                           default='0')
 
-
-# class Form_expenditure(Form):
-#     userID = StringField(lstr.userID,
-#                          validators=[DataRequired(message=lstr.warn_userIDFill),
-#                                      Length(min=8, max=8, message=lstr.warn_userIDLength)] )
-#
-#     dateRange = StringField(lstr.dateRange, validators=[Optional()])
-#     modeDate = RadioField(lstr.modeDate,
-#                           choices=[('0', lstr.Day), ('1', lstr.Wek), ('2', lstr.Mon), ('3', lstr.Qtr), ('4', lstr.Yer)],
-#                           default='0')
-#
-#
-# class Form_income(Form):
-#     devID = StringField(lstr.devID, validators=[DataRequired(message=lstr.warn_devIDFill),
-#                                                 Length(max=10, message=lstr.warn_devIDLength)])
-#
-#     dateRange = StringField(lstr.dateRange, validators=[Optional()])
-#     modeDate = RadioField(lstr.modeDate,
-#                           choices=[('0', lstr.Day), ('1', lstr.Wek), ('2', lstr.Mon), ('3', lstr.Qtr), ('4', lstr.Yer)],
-#                           default='0')
-#
-#
-# class Form_ACPeriod(Form):
-#     userID = StringField(lstr.userID,
-#                          validators=[DataRequired(message=lstr.warn_userIDFill),
-#                                      Length(min=8, max=8, message=lstr.warn_userIDLength)])
-#     dateRange = StringField(lstr.dateRange, validators=[Optional()])
-#
-#
-# class Form_ACValid(Form):
-#     userID = StringField(lstr.devID, validators=[DataRequired(message=lstr.warn_devIDFill),
-#                                                 Length(max=10, message=lstr.warn_devIDLength)])
-#
-#     dateRange = StringField(lstr.dateRange, validators=[Optional()])
-#
-#
-# class Form_ACCategory(Form):
-#     userID = StringField(lstr.devID, validators=[DataRequired(message=lstr.warn_devIDFill),
-#                                                  Length(max=10, message=lstr.warn_devIDLength)])
-#
-#     dateRange = StringField(lstr.dateRange, validators=[Optional()])

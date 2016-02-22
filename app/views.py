@@ -120,6 +120,11 @@ def refresh_chart_acperiod():
         axisLables, vals = process.timeDistribution()
         json_timeDistribution = {'axisLables': axisLables, 'vals': vals}
 
+        # 输出格式;
+        # xAxis: ['date1', 'date2', ...]
+        # legend: ['item1', 'item2', ...]
+        # series: [{name:'item1', data:[data1, data2, ...]}, {name:'item2', data:[data1, data2, ...]}]
+
         json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
     else:
         json_response = jsonify(errMsg=form.errors)
@@ -306,53 +311,59 @@ def refresh_chart_number():
     json_response = jsonify(json_number)
     return json_response
 
-#
-# @app.route('/charts/acdatetime')
-# def show_chart_expenditure():
-#     form = Form_expenditure()
-#     return render_template('chart-expenditure.html', form=form)
-#
-#
-# @app.route('/charts/acdatetime/getData', methods=['GET'])
-# def refresh_chart_expenditure():
-#     form = Form_expenditure()
-#     form.userID.data = request.args.get('userID')
-#     form.modeDate.data = request.args.get('modeDate')
-#     form.dateRange.data = request.args.get('dateRange')
-#
-#     if form.validate():
-#         userID = form.userID.data
-#         modeDate = int(form.modeDate.data)
-#         startDate = form.dateRange.data[:10]
-#         endDate = form.dateRange.data[-10:]
-#
-#         # Query.
-#         strQuery = db.session.query(consumption.con_datetime, consumption.amount).filter(
-#             consumption.user_id == userID).order_by(consumption.con_datetime)
-#         if len(startDate) != 0:
-#             strQuery = strQuery.filter(and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
-#         results = strQuery.all()
-#
-#         # Get columns.
-#         res_datetimes = [result.con_datetime for result in results]
-#         res_amounts = [result.amount for result in results]
-#
-#         from app.controls.DateTimeValueProcess import DateTimeValueProcess
-#         process = DateTimeValueProcess(res_datetimes, res_amounts)
-#
-#         # Get and pack dateTrend() return.
-#         axisLables, accumulatedVals, pointVals = process.dateTrend(modeDate)
-#         json_dateTrend = {'axisLables': axisLables, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
-#         # json_dateTrend = jsonify(axisLables=axisLables, accumulatedVals=accumulatedVals, pointVals=pointVals)
-#
-#         # Get and pack timeDistribution() return.
-#         axisLables, vals = process.timeDistribution()
-#         json_timeDistribution = {'axisLables': axisLables, 'vals': vals}
-#         # json_timeDistribution = jsonify(axisLables=axisLables, vals=vals)
-#
-#         # 没有错误就不传errMsg。前端通过检查errMsg是否存在来判断查询是否成功。
-#         json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
-#     else:
-#         json_response = jsonify(errMsg=form.errors)
-#     return json_response
-#
+
+@app.route('/charts/acdatetime')
+def show_chart_acdatetime():
+    form = Form_UserDaterangemode()
+    return render_template('chart-expenditure.html', form=form)
+
+
+@app.route('/charts/acdatetime/getData', methods=['GET'])
+def refresh_chart_acdatetime():
+    form = Form_UserDaterangemode()
+    form.userID.data = request.args.get('userID')
+    form.modeDate.data = request.args.get('modeDate')
+    form.dateRange.data = request.args.get('dateRange')
+
+    if form.validate():
+        userID = form.userID.data
+        modeDate = int(form.modeDate.data)
+        startDate = form.dateRange.data[:10]
+        endDate = form.dateRange.data[-10:]
+
+        # Query.
+        strQuery = db.session.query(acrec.ac_datetime, ac_loc.category).filter(
+            and_(acrec.user_id == userID, acrec.node_des == ac_loc.node_des)).order_by(acrec.ac_datetime)
+
+        if len(startDate) != 0:
+            strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
+        results = strQuery.all()
+
+        print strQuery
+
+        # Get columns.
+        res_datetimes = [result.con_datetime for result in results]
+        res_amounts = [result.amount for result in results]
+
+        from app.controls.DateTimeValueProcess import DateTimeValueProcess
+        process = DateTimeValueProcess(res_datetimes, res_amounts)
+
+        # Get and pack dateTrend() return.
+        axisLables, accumulatedVals, pointVals = process.dateTrend(modeDate)
+        json_dateTrend = {'axisLables': axisLables, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
+        # json_dateTrend = jsonify(axisLables=axisLables, accumulatedVals=accumulatedVals, pointVals=pointVals)
+
+        # Get and pack timeDistribution() return.
+        axisLables, vals = process.timeDistribution()
+        json_timeDistribution = {'axisLables': axisLables, 'vals': vals}
+        # json_timeDistribution = jsonify(axisLables=axisLables, vals=vals)
+
+
+
+
+
+        json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
+    else:
+        json_response = jsonify(errMsg=form.errors)
+    return json_response
+

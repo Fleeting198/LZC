@@ -28,8 +28,7 @@ class DateTimeValueProcess():
         axisLables = self.oriDate[:]
         accumulatedVals = self.oriValues[:]
 
-        # Keep only date.
-        axisLables = map(lambda x: x.date(), axisLables)
+        axisLables = map(lambda x: x.date(), axisLables)  # Keep only date.
 
         # 补全没有记录的日期，值为0。
         # 遍历日期，若当前日期大于前一个日期超过1天，插入后一天日期。
@@ -93,8 +92,7 @@ class DateTimeValueProcess():
         dates = self.oriDate[:]
         values = map(lambda x: float(x), self.oriValues)
 
-        # Time periods：
-        # 23~5 5~12 12~20 20~23
+        # Time periods：23~5 5~12 12~20 20~23
         period = (time(5), time(12), time(20), time(23))
         axisLables = ('23点~5点', '5点~12点', '12点~20点', '20点~23点')
 
