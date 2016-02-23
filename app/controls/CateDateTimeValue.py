@@ -95,25 +95,29 @@ class DateTimeValueProcess():
         for i in range(len(dates)):
             values.append({copy.deepcopy(self.oriValues[i]): 1})
 
-        # Time periods：23~5 5~12 12~20 20~23
-        period = (time(5), time(12), time(20), time(23))
-        axisLabels = ('23点~5点', '5点~12点', '12点~20点', '20点~23点')
-        lTimes = map(lambda d: d.time(), dates)  # Keep time.
+        # 生成时间点和时间标签队列。
+        periods = []
+        axisLabels = []
+        for i in range(24):
+            periods.append(time(i))
+            axisLabels.append(str(i) + u'点~' + str((i + 1) % 24) + u'点')
 
+        # 时间点队列 -> 时间区间队列。
+        periodRanges = []
+        for i in range(len(periods)):
+            periodRange = [periods[i], periods[(i + 1) % len(periods)]]
+            periodRanges.append(periodRange)
+
+        lTimes = map(lambda d: d.time(), dates)  # Keep time.
         vals = []  # Init vals
-        for i in range(len(period)):
+        for i in range(len(periods)):
             vals.append({})
 
         # Add to total vals.
         for i in range(len(lTimes)):
-            if period[0] <= lTimes[i] < period[1]:
-                vals[1] = self.mergeDict(vals[1], values[i])
-            elif period[1] <= lTimes[i] < period[2]:
-                vals[2] = self.mergeDict(vals[2], values[i])
-            elif period[2] <= lTimes[i] < period[3]:
-                vals[3] = self.mergeDict(vals[3], values[i])
-            else:
-                vals[0] = self.mergeDict(vals[0], values[i])
+            for j in range(len(periodRanges)):
+                if periodRanges[j][0] <= lTimes[i] < periodRanges[j][1]:
+                    vals[j + 1] = self.mergeDict(vals[j + 1], values[i])
 
         return axisLabels, vals
 

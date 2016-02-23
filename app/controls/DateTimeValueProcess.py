@@ -94,13 +94,20 @@ class DateTimeValueProcess():
         dates = self.oriDate[:]
         values = map(lambda x: float(x), self.oriValues)
 
-        # Time periods：
-        # 23~5 5~12 12~20 20~23
-        period = (time(5), time(12), time(20), time(23))
-        axisLabels = ('23点~5点', '5点~12点', '12点~20点', '20点~23点')
+        # 生成时间点和时间标签队列。
+        periods=[]
+        axisLabels=[]
+        for i in range(24):
+            periods.append(time(i))
+            axisLabels.append(str(i)+u'点~'+str((i + 1) % 24)+u'点')
 
-        vals = [float(0)] * len(period)  # Init vals
+        # 时间点队列 -> 时间区间队列。
+        periodRanges = []
+        for i in range(len(periods)):
+            periodRange = [periods[i], periods[(i+1)%len(periods)]]
+            periodRanges.append(periodRange)
 
+        vals = [float(0)] * len(periods)  # Init vals
         lTimes = map(lambda d: d.time(), dates)  # Keep time.
 
         # dates = map(lambda d: d.date(), dates)
@@ -108,14 +115,19 @@ class DateTimeValueProcess():
 
         # Add to total vals.
         for i in range(len(lTimes)):
-            if period[0] <= lTimes[i] < period[1]:
-                vals[1] += values[i]
-            elif period[1] <= lTimes[i] < period[2]:
-                vals[2] += values[i]
-            elif period[2] <= lTimes[i] < period[3]:
-                vals[3] += values[i]
-            else:
-                vals[0] += values[i]
+            for j in range(len(periodRanges)):
+                if periodRanges[j][0] <= lTimes[i] < periodRanges[j][1]:
+                    vals[j+1] += values[i]
+
+            # Old version.
+            # if periods[0] <= lTimes[i] < periods[1]:
+            #     vals[1] += values[i]
+            # elif periods[1] <= lTimes[i] < periods[2]:
+            #     vals[2] += values[i]
+            # elif periods[2] <= lTimes[i] < periods[3]:
+            #     vals[3] += values[i]
+            # else:
+            #     vals[0] += values[i]
 
         for i in range(len(vals)):
             # vals[i] = vals[i] / len_mdates if len_mdates != 0 else 0

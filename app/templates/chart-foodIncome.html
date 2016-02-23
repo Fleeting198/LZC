@@ -1,8 +1,7 @@
 {% extends "charts.html" %}
 {% block chartField %}
 
-    <form id="form-ipt" class="form-inline" >
-        {{ form.devID(class="form-control", maxlength='10', placeholder='设备号', value='YQSH1826') }}
+    <form id="form-ipt" class="form-inline">
         {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
         {{ form.modeDate.label }}
         {% for subfield in form.modeDate %}
@@ -36,7 +35,7 @@
         var chartTimeDistribution = echarts.init(document.getElementById('chartTimeDistribution'));
 
         var optionChartDate = {
-            title: {text: '收入趋势'},
+            title: {text: '餐饮收入趋势'},
             tooltip: {trigger: 'axis'},
             toolbox: {
                 show: true,
@@ -89,7 +88,7 @@
             ]
         };
         var optionChartTime = {
-            title: {text: '收入时间段分布'},
+            title: {text: '餐饮收入时间分布'},
             tooltip: {trigger: 'axis'},
             toolbox: {
                 show: true,
@@ -146,7 +145,7 @@
             chartDateTrend.showLoading();
             chartTimeDistribution.showLoading();
 
-            $.get('/charts/income/getData?' + $("#form-ipt").serialize(), function (json_response) {
+            $.get('/charts/foodIncome/getData?' + $("#form-ipt").serialize(), function (json_response) {
                 chartDateTrend.hideLoading();
                 chartTimeDistribution.hideLoading();
 

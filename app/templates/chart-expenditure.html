@@ -114,6 +114,20 @@
                     formatter: '{value} 元'
                 }
             },
+            dataZoom: [
+                {
+                    type: 'inside',
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 100
+                },
+                {
+                    type: 'slider',
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 100
+                }
+            ],
             series: [{
                 name: '消费总额',
                 type: 'bar',
@@ -132,16 +146,20 @@
             chartDateTrend.showLoading();
             chartTimeDistribution.showLoading();
             $.get('/charts/expenditure/getData?'+$("#form-ipt").serialize(), function(json_response){
+                chartDateTrend.hideLoading();
+                chartTimeDistribution.hideLoading();
+
+                chartDateTrend.setOption(optionChartDate);
+                chartTimeDistribution.setOption(optionChartTime);
+
                 json_dateTrend = json_response.json_dateTrend;
                 json_timeDistribution = json_response.json_timeDistribution;
 
-                chartDateTrend.hideLoading();
-                chartTimeDistribution.hideLoading();
 
                 if(!json_response.errMsg){
                     chartDateTrend.setOption({
                         xAxis: [{
-                            data: json_dateTrend.axisLables
+                            data: json_dateTrend.axisLabels
                         }],
                         series: [
                             {
@@ -156,7 +174,7 @@
                     });
                     chartTimeDistribution.setOption({
                         xAxis: [{
-                            data: json_timeDistribution.axisLables
+                            data: json_timeDistribution.axisLabels
                         }],
                         series: [{
                             data: json_timeDistribution.vals

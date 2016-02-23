@@ -67,6 +67,8 @@
             chartACValid.showLoading();
             $.get('/charts/acvalid/getData?' + $("#form-ipt").serialize(), function (json_response) {
                 chartACValid.hideLoading();
+                chartACValid.setOption(optionChartACValid);
+
                 if (!json_response.errMsg) {
 
                     titles = json_response.titles;

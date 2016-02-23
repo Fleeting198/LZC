@@ -5,6 +5,7 @@
 # 02-14 日期域改回StringField，暂时使用直接引入Datetimepick，因为flask-admin的picker无法运行。
 # 02-16 Implementing dateRangePicker.
 # 02-22 Form 类根据输入重构继承，而不是每个功能定义一个类。
+# 02-23 其实并继承不了。添加Form_DaterangeMode。
 
 from wtforms import StringField, RadioField, Form
 from wtforms.validators import *
@@ -20,7 +21,7 @@ class Form_UserDaterange(Form):
     dateRange = StringField(lstr.dateRange, validators=[Optional()])
 
 
-class Form_UserDaterangemode(Form):
+class Form_UserDaterangeMode(Form):
     """
     在Form_UserDaterange 基础上加上日期模式。
     """
@@ -41,12 +42,22 @@ class Form_DevDaterange(Form):
     dateRange = StringField(lstr.dateRange, validators=[Optional()])
 
 
-class Form_DevDaterangemode(Form):
+class Form_DevDaterangeMode(Form):
     """
     Form_DevDaterange 基础上加上日期模式。
     """
     devID = StringField(lstr.userID, validators=[DataRequired(message=lstr.warn_userIDFill),
                                                  Length(max=10, message=lstr.warn_userIDLength)])
+    dateRange = StringField(lstr.dateRange, validators=[Optional()])
+    modeDate = RadioField(lstr.modeDate,
+                          choices=[('0', lstr.Day), ('1', lstr.Wek), ('2', lstr.Mon), ('3', lstr.Qtr), ('4', lstr.Yer)],
+                          default='0')
+
+
+class Form_DaterangeMode(Form):
+    """
+    日期范围，日期模式
+    """
     dateRange = StringField(lstr.dateRange, validators=[Optional()])
     modeDate = RadioField(lstr.modeDate,
                           choices=[('0', lstr.Day), ('1', lstr.Wek), ('2', lstr.Mon), ('3', lstr.Qtr), ('4', lstr.Yer)],

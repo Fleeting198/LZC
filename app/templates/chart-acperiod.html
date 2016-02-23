@@ -1,9 +1,16 @@
+<-- Replaced by chart-acperiodcate.html on 02-23 -->
+
 {% extends "charts.html" %}
 {% block chartField %}
 
     <form id="form-ipt" class="form-inline" >
         {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='AQPTHHPQ')}}
         {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
+        {{ form.modeDate.label }}
+        {% for subfield in form.modeDate %}
+            {{ subfield }}{{ subfield.label }}
+            &nbsp;&nbsp;
+        {% endfor %}
         <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
     </form>
 
@@ -115,16 +122,20 @@
             chartDateTrend.showLoading();
             chartTimeDistribution.showLoading();
             $.get('/charts/acperiod/getData?' + $("#form-ipt").serialize(), function (json_response) {
-                json_dateTrend = json_response.json_dateTrend;
-                json_timeDistribution = json_response.json_timeDistribution;
-
                 chartDateTrend.hideLoading();
                 chartTimeDistribution.hideLoading();
+
+                // 还原图表选项
+                chartDateTrend.setOption(optionChartDate);
+                chartTimeDistribution.setOption(optionChartTime);
+
+                json_dateTrend = json_response.json_dateTrend;
+                json_timeDistribution = json_response.json_timeDistribution;
 
                 if (!json_response.errMsg) {
                     chartDateTrend.setOption({
                         xAxis: [{
-                            data: json_dateTrend.axisLables
+                            data: json_dateTrend.axisLabels
                         }],
                         series: [{
                                 data: json_dateTrend.pointVals
@@ -132,7 +143,7 @@
                     });
                     chartTimeDistribution.setOption({
                         xAxis: [{
-                            data: json_timeDistribution.axisLables
+                            data: json_timeDistribution.axisLabels
                         }],
                         series: [{
                             data: json_timeDistribution.vals

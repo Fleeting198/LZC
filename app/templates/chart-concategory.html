@@ -68,6 +68,8 @@
             chartConCategory.showLoading();
             $.get('/charts/concategory/getData?' + $("#form-ipt").serialize(), function (json_response) {
                 chartConCategory.hideLoading();
+                chartConCategory.setOption(optionChartConCategory);
+
                 if (!json_response.errMsg) {
 
                     titles = json_response.titles;
