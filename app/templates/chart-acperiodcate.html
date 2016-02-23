@@ -2,7 +2,7 @@
 {% block chartField %}
 
     <form id="form-ipt" class="form-inline" >
-        {{ form.userID(class="form-control", maxlength='8', placeholder='工号')}}
+        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='AQPTHHPQ')}}
         {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
         <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
     </form>
@@ -43,11 +43,11 @@
                     saveAsImage: {show: true}
                 }
             },
-            legend: {data: ['节点门禁次数']},
+            legend: {data: []},  // 设定
             xAxis: {
                 type: 'category',
                 boundaryGap: true,
-                data: []
+                data: []  // 设定
             },
             yAxis: {
                 type: 'value',
@@ -70,11 +70,7 @@
                     end: 100
                 }
             ],
-            series: [{
-                    name: '节点门禁次数',
-                    type: 'bar',
-                    data: []
-            }]
+            series: []
         };
         var optionChartTime = {
             title: {text: '门禁时间段分布'},
@@ -115,29 +111,52 @@
             chartDateTrend.showLoading();
             chartTimeDistribution.showLoading();
             $.get('/charts/acperiod/getData?' + $("#form-ipt").serialize(), function (json_response) {
-                json_dateTrend = json_response.json_dateTrend;
-                json_timeDistribution = json_response.json_timeDistribution;
-
                 chartDateTrend.hideLoading();
                 chartTimeDistribution.hideLoading();
 
+                json_dateTrend = json_response.json_dateTrend;
+                json_timeDistribution = json_response.json_timeDistribution;
+
                 if (!json_response.errMsg) {
                     chartDateTrend.setOption({
+                        legend: {data: json_dateTrend.legendLables},
                         xAxis: [{
                             data: json_dateTrend.axisLables
-                        }],
-                        series: [{
-                                data: json_dateTrend.pointVals
                         }]
                     });
+
+                    for(var i=0; i< json_dateTrend.pointSeriesData.length;i++){
+                        var tmp_option = chartDateTrend.getOption();
+                        tmp_option.series.push(
+                            {
+                                name: json_dateTrend.pointSeriesData[i].name,
+                                stack:'ac',
+                                type: 'bar',
+                                data: json_dateTrend.pointSeriesData[i].data
+                            }
+
+                        );
+                        chartDateTrend.setOption(tmp_option);
+                    }
+
                     chartTimeDistribution.setOption({
                         xAxis: [{
                             data: json_timeDistribution.axisLables
-                        }],
-                        series: [{
-                            data: json_timeDistribution.vals
                         }]
                     });
+
+                    for (var i = 0; i < json_timeDistribution.vals.length; i++) {
+                        var tmp_option = chartTimeDistribution.getOption();
+                        tmp_option.series.push(
+                                {
+                                    name: json_timeDistribution.vals[i].name,
+                                    stack: 'ac',
+                                    type: 'bar',
+                                    data: json_timeDistribution.vals[i].data
+                                }
+                        );
+                        chartTimeDistribution.setOption(tmp_option);
+                    }
 
                 } else {
                     for (err in json_response.errMsg) {

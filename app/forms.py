@@ -21,10 +21,13 @@ class Form_UserDaterange(Form):
     dateRange = StringField(lstr.dateRange, validators=[Optional()])
 
 
-class Form_UserDaterangemode(Form_UserDaterange):
+class Form_UserDaterangemode(Form):
     """
     在Form_UserDaterange 基础上加上日期模式。
     """
+    userID = StringField(lstr.userID, validators=[DataRequired(message=lstr.warn_userIDFill),
+                                                  Length(min=8, max=8, message=lstr.warn_userIDLength)])
+    dateRange = StringField(lstr.dateRange, validators=[Optional()])
     modeDate = RadioField(lstr.modeDate,
                           choices=[('0', lstr.Day), ('1', lstr.Wek), ('2', lstr.Mon), ('3', lstr.Qtr), ('4', lstr.Yer)],
                           default='0')
@@ -39,10 +42,13 @@ class Form_DevDaterange(Form):
     dateRange = StringField(lstr.dateRange, validators=[Optional()])
 
 
-class Form_DevDaterangemode(Form_UserDaterange):
+class Form_DevDaterangemode(Form):
     """
     Form_DevDaterange 基础上加上日期模式。
     """
+    devID = StringField(lstr.userID, validators=[DataRequired(message=lstr.warn_userIDFill),
+                                                 Length(max=10, message=lstr.warn_userIDLength)])
+    dateRange = StringField(lstr.dateRange, validators=[Optional()])
     modeDate = RadioField(lstr.modeDate,
                           choices=[('0', lstr.Day), ('1', lstr.Wek), ('2', lstr.Mon), ('3', lstr.Qtr), ('4', lstr.Yer)],
                           default='0')
