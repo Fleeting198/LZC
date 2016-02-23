@@ -25,19 +25,19 @@ class DateTimeValueProcess():
         默认日期模式为月
         """
         # Copy source data.
-        axisLables = self.oriDate[:]
+        axisLabels = self.oriDate[:]
         accumulatedVals = self.oriValues[:]
 
         # Keep only date.
-        axisLables = map(lambda x: x.date(), axisLables)
+        axisLabels = map(lambda x: x.date(), axisLabels)
 
         # 补全没有记录的日期，值为0。
         # 遍历日期，若当前日期大于前一个日期超过1天，插入后一天日期。
         # 有插入的情况下
         i = 1
-        while i < len(axisLables):
-            if axisLables[i] - axisLables[i - 1] > timedelta(days=1):
-                axisLables.insert(i, axisLables[i - 1] + timedelta(days=1))
+        while i < len(axisLabels):
+            if axisLabels[i] - axisLabels[i - 1] > timedelta(days=1):
+                axisLabels.insert(i, axisLabels[i - 1] + timedelta(days=1))
                 accumulatedVals.insert(i, 0)
             else:
                 i += 1
@@ -47,28 +47,28 @@ class DateTimeValueProcess():
         if modeDate == 0:
             pass
         elif modeDate == 2:
-            axisLables = map(lambda d: str(d)[:7], axisLables)
+            axisLabels = map(lambda d: str(d)[:7], axisLabels)
         elif modeDate == 4:
-            axisLables = map(lambda d: str(d)[:4], axisLables)
+            axisLabels = map(lambda d: str(d)[:4], axisLabels)
         elif modeDate == 1:
             # 遍历日期，转变为一周"起始年月日~结束月日"，date-weekday 就为周起始，date + 6-weekday为周结束。
             # datetime.weekday() 周一为0，周日为6
-            axisLables = map(lambda d: str(d - timedelta(d.weekday())) + ' ~ ' + (
-            d + timedelta(days=6) - timedelta(d.weekday())).strftime(format='%m-%d'), axisLables)
+            axisLabels = map(lambda d: str(d - timedelta(d.weekday())) + ' ~ ' + (
+            d + timedelta(days=6) - timedelta(d.weekday())).strftime(format='%m-%d'), axisLabels)
         # TODO: 生成按季度分的数据，考虑到交互性可能由前端JS负责？
         elif modeDate == 3:
             pass
 
         # 遍历日期，合并相同日期以及对应的值
         i = 1
-        while i < len(axisLables):  # 每轮循环都要获取长度，用以遍历这个动态改变长度的列表
-            if axisLables[i] == axisLables[i - 1]:
+        while i < len(axisLabels):  # 每轮循环都要获取长度，用以遍历这个动态改变长度的列表
+            if axisLabels[i] == axisLabels[i - 1]:
                 # 去除 下标i-1  或i ?
-                del axisLables[i - 1]  # 去除日期
+                del axisLabels[i - 1]  # 去除日期
                 accumulatedVals[i] += accumulatedVals[i - 1]  # 合并值
                 del accumulatedVals[i - 1]  # 去除值
 
-                # axisLables = axisLables[:i - 1] + axisLables[i:]
+                # axisLabels = axisLabels[:i - 1] + axisLabels[i:]
                 # accumulatedVals = accumulatedVals[:i - 1] + accumulatedVals[i:]
             else:
                 i += 1
@@ -80,11 +80,11 @@ class DateTimeValueProcess():
             accumulatedVals[i] += accumulatedVals[i - 1]
 
         # Make sure type.
-        axisLables = map(lambda x: str(x), axisLables)
+        axisLabels = map(lambda x: str(x), axisLabels)
         accumulatedVals = map(lambda x: float(x), accumulatedVals)
         pointVals = map(lambda x: float(x), pointVals)
 
-        return axisLables, accumulatedVals, pointVals
+        return axisLabels, accumulatedVals, pointVals
 
     def timeDistribution(self):
         """
@@ -97,7 +97,7 @@ class DateTimeValueProcess():
         # Time periods：
         # 23~5 5~12 12~20 20~23
         period = (time(5), time(12), time(20), time(23))
-        axisLables = ('23点~5点', '5点~12点', '12点~20点', '20点~23点')
+        axisLabels = ('23点~5点', '5点~12点', '12点~20点', '20点~23点')
 
         vals = [float(0)] * len(period)  # Init vals
 
@@ -121,4 +121,4 @@ class DateTimeValueProcess():
             # vals[i] = vals[i] / len_mdates if len_mdates != 0 else 0
             vals[i] = round(vals[i], 2)
 
-        return axisLables, vals
+        return axisLabels, vals

@@ -16,7 +16,7 @@ from datetime import datetime
 import json
 import types
 
-import LocalStrings as lstr
+from app import helpers
 
 
 @app.route('/')
@@ -66,14 +66,14 @@ def refresh_chart_expenditure():
         process = DateTimeValueProcess(res_datetimes, res_amounts)
 
         # Get and pack dateTrend() return.
-        axisLables, accumulatedVals, pointVals = process.dateTrend(modeDate)
-        json_dateTrend = {'axisLables': axisLables, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
-        # json_dateTrend = jsonify(axisLables=axisLables, accumulatedVals=accumulatedVals, pointVals=pointVals)
+        axisLabels, accumulatedVals, pointVals = process.dateTrend(modeDate)
+        json_dateTrend = {'axisLabels': axisLabels, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
+        # json_dateTrend = jsonify(axisLabels=axisLabels, accumulatedVals=accumulatedVals, pointVals=pointVals)
 
         # Get and pack timeDistribution() return.
-        axisLables, vals = process.timeDistribution()
-        json_timeDistribution = {'axisLables': axisLables, 'vals':vals}
-        # json_timeDistribution = jsonify(axisLables=axisLables, vals=vals)
+        axisLabels, vals = process.timeDistribution()
+        json_timeDistribution = {'axisLabels': axisLabels, 'vals':vals}
+        # json_timeDistribution = jsonify(axisLabels=axisLabels, vals=vals)
 
         # 没有错误就不传errMsg。前端通过检查errMsg是否存在来判断查询是否成功。
         json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
@@ -112,13 +112,13 @@ def refresh_chart_acperiod():
 
         # 包装dateTrend 返回值。
         # 这个功能暂时不需要连续值，但还是必须获取，逻辑模块写一起了。
-        axisLables, accumulatedVals, pointVals = process.dateTrend(2)  # 暂时将日期模式直接设为月
+        axisLabels, accumulatedVals, pointVals = process.dateTrend(2)  # 暂时将日期模式直接设为月
 
-        json_dateTrend = {'axisLables': axisLables, 'pointVals': pointVals}
+        json_dateTrend = {'axisLabels': axisLabels, 'pointVals': pointVals}
 
         # timeDistribution 返回值
-        axisLables, vals = process.timeDistribution()
-        json_timeDistribution = {'axisLables': axisLables, 'vals': vals}
+        axisLabels, vals = process.timeDistribution()
+        json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
 
         json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
     else:
@@ -158,44 +158,62 @@ def refresh_chart_acperiodcate():
         process = DateTimeValueProcess(res_datetimes, res_categorys)
 
         # dateTrend
-        axisLables, pointVals = process.dateTrend(2)
+        axisLabels, pointVals = process.dateTrend(2)
 
         # 输出格式;
         # xAxis: ['date1', 'date2', ...]
         # legend: ['item1', 'item2', ...]
 
         # 图例项
-        legendLables = []
+        legendLabels = []
         for result in res_categorys:
-            if result not in legendLables:
-                legendLables.append(str(result))
+            if result not in legendLabels:
+                legendLabels.append(str(result))
 
         # 节点数据项
         # series: [{name:'item1', data:[data1, data2, ...]}, {name:'item2', data:[data1, data2, ...]}]
         def packSeriesData(Vals):
             seriesData = []
-            for legendLable in legendLables:
+            for legendLabel in legendLabels:
                 datumList = []
                 for val in Vals:
-                    if legendLable in val:
-                        datumList.append(val[legendLable])
+                    if legendLabel in val:
+                        datumList.append(val[legendLabel])
                     else:
                         datumList.append(0)
 
-                seriesDatum = {'name': legendLable, 'data': datumList}
+                seriesDatum = {'name': legendLabel, 'data': datumList}
                 seriesData.append(seriesDatum)
             return seriesData
 
         pointSeriesData=packSeriesData(pointVals)
+        # 翻译
+        for val in pointSeriesData:
+            val['name'] = helpers.translate(val['name'])
 
-        json_dateTrend = {'axisLables': axisLables, 'legendLables': legendLables, 'pointSeriesData': pointSeriesData}
+            # 备份
+        tmp_legendLabels = legendLabels[:]
+        # 翻译
+        legendLabels = [helpers.translate(Label) for Label in legendLabels]
+        # 打包
+        json_dateTrend = {'axisLabels': axisLabels, 'legendLabels': legendLabels, 'pointSeriesData': pointSeriesData}
 
         # timeDistribution
-        axisLables, vals = process.timeDistribution()
-        vals = packSeriesData(vals)
-        print vals
+        axisLabels, vals = process.timeDistribution()
 
-        json_timeDistribution = {'axisLables': axisLables, 'vals':vals}
+        # 还原legendLabels
+        legendLabels = tmp_legendLabels[:]
+        del tmp_legendLabels
+        # 处理
+        vals = packSeriesData(vals)
+
+        # 翻译
+        legendLabels = [helpers.translate(Label) for Label in legendLabels]
+        for val in vals:
+            val['name'] = helpers.translate(val['name'])
+
+        # 两个图表都传了图例标签队列以防以后要分开，流量占多一点点暂时没关系。
+        json_timeDistribution = {'axisLabels': axisLabels, 'legendLabels': legendLabels, 'vals':vals}
 
         json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
         # json_response = jsonify(json_dateTrend=json_dateTrend)
@@ -242,12 +260,12 @@ def refresh_chart_income():
         process = DateTimeValueProcess(res_datetimes, res_amounts)
 
         # Get and pack dateTrend() return.
-        axisLables, accumulatedVals, pointVals = process.dateTrend(modeDate)
-        json_dateTrend = {'axisLables': axisLables, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
+        axisLabels, accumulatedVals, pointVals = process.dateTrend(modeDate)
+        json_dateTrend = {'axisLabels': axisLabels, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
 
         # Get and pack timeDistribution() return.
-        axisLables, vals = process.timeDistribution()
-        json_timeDistribution = {'axisLables': axisLables, 'vals': vals}
+        axisLabels, vals = process.timeDistribution()
+        json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
 
         # 没有错误就不传errMsg
         json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)

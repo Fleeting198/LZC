@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-import LocalStrings as lstr
+from app import helpers
 
 
 def CategoryProcess(results):
@@ -19,16 +19,12 @@ def CategoryProcess(results):
     # From tmp_data to seriesData.
     for k, v in tmp_data.iteritems():
         # 汉化seriesData 中的lable。
-        k = translate(k)
+        k = helpers.translate(k)
         seriesData.append({'value': v, 'name': k})
 
     # 汉化titles。
-    titles = [translate(title) for title in titles]
+    titles = [helpers.translate(title) for title in titles]
 
     return titles, seriesData
 
 
-def translate(ipt):
-    if ipt in lstr.dictTrans:
-        return lstr.dictTrans[ipt]
-    return ipt

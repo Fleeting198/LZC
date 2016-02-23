@@ -27,25 +27,25 @@ class DateTimeValueProcess():
         默认日期模式为月
         """
         # Copy source data.
-        axisLables = self.oriDate[:]
+        axisLabels = self.oriDate[:]
 
         # 构造元素为dict的队列
         pointVals = []
-        for i in range(len(axisLables)):
+        for i in range(len(axisLabels)):
             pointVals.append({copy.deepcopy(self.oriValues[i]): 1})
 
         # ========================
 
-        axisLables = map(lambda x: x.date(), axisLables)  # Keep only date.
+        axisLabels = map(lambda x: x.date(), axisLabels)  # Keep only date.
 
         # 补全没有记录的日期，值为0。
         # 遍历日期，若当前日期大于前一个日期超过1天，插入后一天日期。
         # 有插入的情况下
         i = 1
-        while i < len(axisLables):
-            if axisLables[i] - axisLables[i - 1] > timedelta(days=1):
-                axisLables.insert(i, axisLables[i - 1] + timedelta(days=1))
-                pointVals.insert(i, {})  # 没有门禁记录的值记为'none'
+        while i < len(axisLabels):
+            if axisLabels[i] - axisLabels[i - 1] > timedelta(days=1):
+                axisLabels.insert(i, axisLabels[i - 1] + timedelta(days=1))
+                pointVals.insert(i, {})  # 没有门禁记录的值
             else:
                 i += 1
 
@@ -53,23 +53,23 @@ class DateTimeValueProcess():
         if modeDate == 0:
             pass
         elif modeDate == 2:
-            axisLables = map(lambda d: str(d)[:7], axisLables)
+            axisLabels = map(lambda d: str(d)[:7], axisLabels)
         elif modeDate == 4:
-            axisLables = map(lambda d: str(d)[:4], axisLables)
+            axisLabels = map(lambda d: str(d)[:4], axisLabels)
         elif modeDate == 1:
             # 遍历日期，转变为一周"起始年月日~结束月日"，date-weekday 就为周起始，date + 6-weekday为周结束。
             # datetime.weekday() 周一为0，周日为6
-            axisLables = map(lambda d: str(d - timedelta(d.weekday())) + ' ~ ' + (
-            d + timedelta(days=6) - timedelta(d.weekday())).strftime(format='%m-%d'), axisLables)
+            axisLabels = map(lambda d: str(d - timedelta(d.weekday())) + ' ~ ' + (
+            d + timedelta(days=6) - timedelta(d.weekday())).strftime(format='%m-%d'), axisLabels)
         elif modeDate == 3:
             pass
 
         # 遍历日期，合并相同日期以及对应的值
         i = 1
-        while i < len(axisLables):  # 每轮循环都要获取长度，用以遍历这个动态改变长度的列表
-            if axisLables[i] == axisLables[i - 1]:
+        while i < len(axisLabels):  # 每轮循环都要获取长度，用以遍历这个动态改变长度的列表
+            if axisLabels[i] == axisLabels[i - 1]:
                 # 去除 下标i-1  或i ?
-                del axisLables[i - 1]  # 去除日期
+                del axisLabels[i - 1]  # 去除日期
 
                 # Counter 可能效率更低
                 # pointVals[i] = dict(Counter(pointVals[i])+Counter(pointVals[i-1]))
@@ -80,9 +80,9 @@ class DateTimeValueProcess():
             else:
                 i += 1
 
-        axisLables = map(lambda x: str(x), axisLables)
+        axisLabels = map(lambda x: str(x), axisLabels)
 
-        return axisLables, pointVals
+        return axisLabels, pointVals
 
 
     def timeDistribution(self):
@@ -97,7 +97,7 @@ class DateTimeValueProcess():
 
         # Time periods：23~5 5~12 12~20 20~23
         period = (time(5), time(12), time(20), time(23))
-        axisLables = ('23点~5点', '5点~12点', '12点~20点', '20点~23点')
+        axisLabels = ('23点~5点', '5点~12点', '12点~20点', '20点~23点')
         lTimes = map(lambda d: d.time(), dates)  # Keep time.
 
         vals = []  # Init vals
@@ -115,7 +115,7 @@ class DateTimeValueProcess():
             else:
                 vals[0] = self.mergeDict(vals[0], values[i])
 
-        return axisLables, vals
+        return axisLabels, vals
 
 
     def mergeDict(self, dict1, dict2):

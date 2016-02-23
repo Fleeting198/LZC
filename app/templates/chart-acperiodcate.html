@@ -31,7 +31,7 @@
         var chartTimeDistribution = echarts.init(document.getElementById('chartTimeDistribution'));
 
         var optionChartDate = {
-            title: {text: '门禁趋势'},
+            title: {text: '门禁类型日期趋势'},
             tooltip: {trigger: 'axis'},
             toolbox: {
                 show: true,
@@ -43,11 +43,11 @@
                     saveAsImage: {show: true}
                 }
             },
-            legend: {data: []},  // 设定
+            legend: {data: []},
             xAxis: {
                 type: 'category',
                 boundaryGap: true,
-                data: []  // 设定
+                data: []
             },
             yAxis: {
                 type: 'value',
@@ -73,7 +73,7 @@
             series: []
         };
         var optionChartTime = {
-            title: {text: '门禁时间段分布'},
+            title: {text: '门禁类型时间分布'},
             tooltip: {trigger: 'axis'},
             toolbox: {
                 show: true,
@@ -85,20 +85,20 @@
                     saveAsImage: {show: true}
                 }
             },
-            legend: {data: ['门禁平均计数']},
+            legend: {data: []},
             xAxis: {
                 type: 'category',
                 boundaryGap: true,
                 data: []
             },
             yAxis: {
-                type: 'value'
+                type: 'value',
+                name: '次数',
+                axisLabel: {
+                    formatter: '{value} 次'
+                }
             },
-            series: [{
-                name: '门禁平均计数',
-                type: 'bar',
-                data: []
-            }]
+            series: []
         };
 
         chartDateTrend.setOption(optionChartDate);
@@ -118,13 +118,13 @@
                 json_timeDistribution = json_response.json_timeDistribution;
 
                 if (!json_response.errMsg) {
+                    // 日期趋势图表设定。
                     chartDateTrend.setOption({
-                        legend: {data: json_dateTrend.legendLables},
+                        legend: {data: json_dateTrend.legendLabels},
                         xAxis: [{
-                            data: json_dateTrend.axisLables
+                            data: json_dateTrend.axisLabels
                         }]
                     });
-
                     for(var i=0; i< json_dateTrend.pointSeriesData.length;i++){
                         var tmp_option = chartDateTrend.getOption();
                         tmp_option.series.push(
@@ -139,12 +139,13 @@
                         chartDateTrend.setOption(tmp_option);
                     }
 
+                    // 时间分布图表设定。
                     chartTimeDistribution.setOption({
+                        legend: {data: json_timeDistribution.legendLabels},
                         xAxis: [{
-                            data: json_timeDistribution.axisLables
+                            data: json_timeDistribution.axisLabels
                         }]
                     });
-
                     for (var i = 0; i < json_timeDistribution.vals.length; i++) {
                         var tmp_option = chartTimeDistribution.getOption();
                         tmp_option.series.push(
