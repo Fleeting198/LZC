@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # 02-09 Built
 # 02-11 将数据处理交给controlls，日期查询筛选
@@ -84,13 +84,13 @@ def refresh_chart_expenditure():
 
 @app.route('/charts/acperiod')
 def show_chart_acperiod():
-    form = Form_UserDaterange()
+    form = Form_UserDaterangemode()
     return render_template('chart-acperiod.html', form=form)
 
 
 @app.route('/charts/acperiod/getData', methods=['GET'])
 def refresh_chart_acperiod():
-    form = Form_UserDaterange()
+    form = Form_UserDaterangemode()
     form.userID.data = request.args.get('userID')
     form.dateRange.data = request.args.get('dateRange')
 
@@ -121,6 +121,85 @@ def refresh_chart_acperiod():
         json_timeDistribution = {'axisLables': axisLables, 'vals': vals}
 
         json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
+    else:
+        json_response = jsonify(errMsg=form.errors)
+    return json_response
+
+
+@app.route('/charts/acperiodcate')
+def show_chart_acperiodcate():
+    form = Form_UserDaterange()
+    return render_template('chart-acperiodcate.html', form=form)
+
+
+@app.route('/charts/acperiodcate/getData', methods=['GET'])
+def refresh_chart_acperiodcate():
+    form = Form_UserDaterange()
+    form.userID.data = request.args.get('userID')
+    form.dateRange.data = request.args.get('dateRange')
+
+    if form.validate():
+        userID = form.userID.data
+        startDate = form.dateRange.data[:10]
+        endDate = form.dateRange.data[-10:]
+
+        # Query.
+        strQuery = db.session.query(acrec.ac_datetime, ac_loc.category).filter(
+            and_(acrec.user_id == userID, acrec.node_des==ac_loc.node_des)).order_by(acrec.ac_datetime)
+        if len(startDate) != 0:
+            strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
+        results = strQuery.all()
+
+        res_datetimes = [result.ac_datetime for result in results]
+        res_categorys = [result.category for result in results]
+
+        # Process data.
+        from app.controls.CateDateTimeValue import DateTimeValueProcess
+        process = DateTimeValueProcess(res_datetimes, res_categorys)
+
+        # dateTrend
+        axisLables, pointVals = process.dateTrend(2)
+
+        # 输出格式;
+        # xAxis: ['date1', 'date2', ...]
+        # legend: ['item1', 'item2', ...]
+
+        # 图例项
+        legendLables = []
+        for result in res_categorys:
+            if result not in legendLables:
+                legendLables.append(str(result))
+
+        # 节点数据项
+        # series: [{name:'item1', data:[data1, data2, ...]}, {name:'item2', data:[data1, data2, ...]}]
+        def packSeriesData(Vals):
+            seriesData = []
+            for legendLable in legendLables:
+                datumList = []
+                for val in Vals:
+                    if legendLable in val:
+                        datumList.append(val[legendLable])
+                    else:
+                        datumList.append(0)
+
+                seriesDatum = {'name': legendLable, 'data': datumList}
+                seriesData.append(seriesDatum)
+            return seriesData
+
+        pointSeriesData=packSeriesData(pointVals)
+
+        json_dateTrend = {'axisLables': axisLables, 'legendLables': legendLables, 'pointSeriesData': pointSeriesData}
+
+        # timeDistribution
+        axisLables, vals = process.timeDistribution()
+        vals = packSeriesData(vals)
+        print vals
+
+        json_timeDistribution = {'axisLables': axisLables, 'vals':vals}
+
+        json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
+        # json_response = jsonify(json_dateTrend=json_dateTrend)
+
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -304,59 +383,5 @@ def refresh_chart_number():
     json_number['stu3']=json_number.pop(u'博士生')
 
     json_response = jsonify(json_number)
-    return json_response
-
-
-@app.route('/charts/acdatetime')
-def show_chart_acdatetime():
-    form = Form_UserDaterangemode()
-    return render_template('chart-acdatetime.html', form=form)
-
-
-@app.route('/charts/acdatetime/getData', methods=['GET'])
-def refresh_chart_acdatetime():
-    form = Form_UserDaterangemode()
-    form.userID.data = request.args.get('userID')
-    form.modeDate.data = request.args.get('modeDate')
-    form.dateRange.data = request.args.get('dateRange')
-
-    if form.validate():
-        userID = form.userID.data
-        modeDate = int(form.modeDate.data)
-        startDate = form.dateRange.data[:10]
-        endDate = form.dateRange.data[-10:]
-
-        # Query.
-        strQuery = db.session.query(acrec.ac_datetime, ).filter(
-            consumption.user_id == userID).order_by(consumption.con_datetime)
-        if len(startDate) != 0:
-            strQuery = strQuery.filter(and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
-        results = strQuery.all()
-
-
-
-        # Get columns.
-        res_datetimes = [result.con_datetime for result in results]
-        res_amounts = [result.amount for result in results]
-
-
-
-        from app.controls.DateTimeValueProcess import DateTimeValueProcess
-        process = DateTimeValueProcess(res_datetimes, res_amounts)
-
-        # Get and pack dateTrend() return.
-        axisLables, accumulatedVals, pointVals = process.dateTrend(modeDate)
-        json_dateTrend = {'axisLables': axisLables, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
-        # json_dateTrend = jsonify(axisLables=axisLables, accumulatedVals=accumulatedVals, pointVals=pointVals)
-
-        # Get and pack timeDistribution() return.
-        axisLables, vals = process.timeDistribution()
-        json_timeDistribution = {'axisLables': axisLables, 'vals': vals}
-        # json_timeDistribution = jsonify(axisLables=axisLables, vals=vals)
-
-        # 没有错误就不传errMsg。前端通过检查errMsg是否存在来判断查询是否成功。
-        json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
-    else:
-        json_response = jsonify(errMsg=form.errors)
     return json_response
 

@@ -5,7 +5,9 @@
 # 02-18 Weekly done.
 
 from datetime import time, datetime, timedelta, date
+import copy
 import types
+from collections import Counter
 
 
 class DateTimeValueProcess():
@@ -13,11 +15,11 @@ class DateTimeValueProcess():
     输入坐标（日期，可重复）与对应值，对其进行统计。
     """
     oriDate = []  # 日期
-    oriValues = []  # 与日期对应的消费额
+    oriValues = []  # 与日期对应的  地点分类字符串
 
     def __init__(self, dates, vals=None):
         self.oriDate = dates
-        self.oriValues = [1] * len(dates) if vals is None else vals  # 若不传值列表则设次数为 1
+        self.oriValues = vals  # 若不传值列表则设次数为 1
 
     def dateTrend(self, modeDate=2):
         """
@@ -26,10 +28,15 @@ class DateTimeValueProcess():
         """
         # Copy source data.
         axisLables = self.oriDate[:]
-        accumulatedVals = self.oriValues[:]
 
-        # Keep only date.
-        axisLables = map(lambda x: x.date(), axisLables)
+        # 构造元素为dict的队列
+        pointVals = []
+        for i in range(len(axisLables)):
+            pointVals.append({copy.deepcopy(self.oriValues[i]): 1})
+
+        # ========================
+
+        axisLables = map(lambda x: x.date(), axisLables)  # Keep only date.
 
         # 补全没有记录的日期，值为0。
         # 遍历日期，若当前日期大于前一个日期超过1天，插入后一天日期。
@@ -38,12 +45,11 @@ class DateTimeValueProcess():
         while i < len(axisLables):
             if axisLables[i] - axisLables[i - 1] > timedelta(days=1):
                 axisLables.insert(i, axisLables[i - 1] + timedelta(days=1))
-                accumulatedVals.insert(i, 0)
+                pointVals.insert(i, {})  # 没有门禁记录的值记为'none'
             else:
                 i += 1
 
         # 日期降维。
-        # TODO: 日级别数据处理返回是否必要，流量消耗太大。
         if modeDate == 0:
             pass
         elif modeDate == 2:
@@ -55,7 +61,6 @@ class DateTimeValueProcess():
             # datetime.weekday() 周一为0，周日为6
             axisLables = map(lambda d: str(d - timedelta(d.weekday())) + ' ~ ' + (
             d + timedelta(days=6) - timedelta(d.weekday())).strftime(format='%m-%d'), axisLables)
-        # TODO: 生成按季度分的数据，考虑到交互性可能由前端JS负责？
         elif modeDate == 3:
             pass
 
@@ -65,26 +70,20 @@ class DateTimeValueProcess():
             if axisLables[i] == axisLables[i - 1]:
                 # 去除 下标i-1  或i ?
                 del axisLables[i - 1]  # 去除日期
-                accumulatedVals[i] += accumulatedVals[i - 1]  # 合并值
-                del accumulatedVals[i - 1]  # 去除值
 
-                # axisLables = axisLables[:i - 1] + axisLables[i:]
-                # accumulatedVals = accumulatedVals[:i - 1] + accumulatedVals[i:]
+                # Counter 可能效率更低
+                # pointVals[i] = dict(Counter(pointVals[i])+Counter(pointVals[i-1]))
+
+                pointVals[i] = self.mergeDict(pointVals[i], pointVals[i-1])
+                del pointVals[i - 1]  # 去除值
+
             else:
                 i += 1
 
-        # 保存节点值
-        pointVals = accumulatedVals[:]
-        # 累加连续值
-        for i in range(1, len(accumulatedVals)):
-            accumulatedVals[i] += accumulatedVals[i - 1]
-
-        # Make sure type.
         axisLables = map(lambda x: str(x), axisLables)
-        accumulatedVals = map(lambda x: float(x), accumulatedVals)
-        pointVals = map(lambda x: float(x), pointVals)
 
-        return axisLables, accumulatedVals, pointVals
+        return axisLables, pointVals
+
 
     def timeDistribution(self):
         """
@@ -92,33 +91,38 @@ class DateTimeValueProcess():
         """
         # Copy source data.
         dates = self.oriDate[:]
-        values = map(lambda x: float(x), self.oriValues)
+        values = []
+        for i in range(len(dates)):
+            values.append({copy.deepcopy(self.oriValues[i]): 1})
 
-        # Time periods：
-        # 23~5 5~12 12~20 20~23
+        # Time periods：23~5 5~12 12~20 20~23
         period = (time(5), time(12), time(20), time(23))
         axisLables = ('23点~5点', '5点~12点', '12点~20点', '20点~23点')
-
-        vals = [float(0)] * len(period)  # Init vals
-
         lTimes = map(lambda d: d.time(), dates)  # Keep time.
 
-        # dates = map(lambda d: d.date(), dates)
-        # len_mdates = len(list(set(dates)))  # Day count to divide.
+        vals = []  # Init vals
+        for i in range(len(period)):
+            vals.append({})
 
         # Add to total vals.
         for i in range(len(lTimes)):
             if period[0] <= lTimes[i] < period[1]:
-                vals[1] += values[i]
+                vals[1] = self.mergeDict(vals[1], values[i])
             elif period[1] <= lTimes[i] < period[2]:
-                vals[2] += values[i]
+                vals[2] = self.mergeDict(vals[2], values[i])
             elif period[2] <= lTimes[i] < period[3]:
-                vals[3] += values[i]
+                vals[3] = self.mergeDict(vals[3], values[i])
             else:
-                vals[0] += values[i]
-
-        for i in range(len(vals)):
-            # vals[i] = vals[i] / len_mdates if len_mdates != 0 else 0
-            vals[i] = round(vals[i], 2)
+                vals[0] = self.mergeDict(vals[0], values[i])
 
         return axisLables, vals
+
+
+    def mergeDict(self, dict1, dict2):
+        """
+        dict1 = dict1 + dict2
+        合并相同的key的值
+        """
+        for k, v in dict2.iteritems():
+            dict1[k] = dict1[k] + v if k in dict1 else 1
+        return dict1

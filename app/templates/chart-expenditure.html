@@ -124,17 +124,6 @@
         chartDateTrend.setOption(optionChartDate);
         chartTimeDistribution.setOption(optionChartTime);
 
-{#        包装dateTrend#}
-{#        axisLables, accumulatedVals, pointVals = process.dateTrend(modeDate)#}
-{#        json_dateTrend = jsonify(axisLables = axisLables, accumulatedVals = accumulatedVals, pointVals = pointVals)#}
-{##}
-{#        timeDistribution#}
-{#        axisLables, vals = process.timeDistribution(toCountAxis = False)#}
-{#        json_timeDistribution = jsonify(axisLables = axisLables, vals = vals)#}
-{##}
-{#        没有错误就不传errMsg#}
-{#        json_response = jsonify(json_dateTrend = json_dateTrend, json_timeDistribution = json_timeDistribution)#}
-
         var json_dateTrend;
         var json_timeDistribution;
 

@@ -1,14 +1,9 @@
 {% extends "charts.html" %}
 {% block chartField %}
 
-    <form id="form-ipt" class="form-inline">
-        {{ form.userID(class="form-control", maxlength='8', placeholder='工号' ,value='TPPZLPHY') }}
+    <form id="form-ipt" class="form-inline" >
+        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='AQPTHHPQ')}}
         {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
-        {{ form.modeDate.label }}
-        {% for subfield in form.modeDate %}
-            {{ subfield }}{{ subfield.label }}
-            &nbsp;&nbsp;
-        {% endfor %}
         <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
     </form>
 
@@ -25,7 +20,7 @@
             }
         });
         dateRangePicker.on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' ~ ' + picker.endDate.format('YYYY-MM-DD'));
+            $(this).val(picker.startDate.format('YYYY-MM-DD')+' ~ '+picker.endDate.format('YYYY-MM-DD'));
         });
         dateRangePicker.on('cancel.daterangepicker', function (ev, picker) {
             $(this).val('');
@@ -36,7 +31,7 @@
         var chartTimeDistribution = echarts.init(document.getElementById('chartTimeDistribution'));
 
         var optionChartDate = {
-            title: {text: '门禁分类趋势'},
+            title: {text: '门禁趋势'},
             tooltip: {trigger: 'axis'},
             toolbox: {
                 show: true,
@@ -48,11 +43,11 @@
                     saveAsImage: {show: true}
                 }
             },
-            legend: {data: ['节点门禁']},
+            legend: {data: []},  // 设定
             xAxis: {
                 type: 'category',
                 boundaryGap: true,
-                data: []
+                data: []  // 设定
             },
             yAxis: {
                 type: 'value',
@@ -75,18 +70,10 @@
                     end: 100
                 }
             ],
-            series: [
-                {
-                    name: '节点门禁',
-                    type: 'bar',
-                    data: []
-                }
-            ]
+            series: []
         };
-
-
         var optionChartTime = {
-            title: {text: '时间段门禁趋势'},
+            title: {text: '门禁时间段分布'},
             tooltip: {trigger: 'axis'},
             toolbox: {
                 show: true,
@@ -98,21 +85,17 @@
                     saveAsImage: {show: true}
                 }
             },
-            legend: {data: []}, // 需要根据个体门禁类型设定
+            legend: {data: ['门禁平均计数']},
             xAxis: {
                 type: 'category',
                 boundaryGap: true,
                 data: []
             },
             yAxis: {
-                type: 'value',
-                name: '',
-                axisLabel: {
-                    formatter: '{value} 元'
-                }
+                type: 'value'
             },
             series: [{
-                name: '消费总额',
+                name: '门禁平均计数',
                 type: 'bar',
                 data: []
             }]
@@ -124,44 +107,56 @@
         var json_dateTrend;
         var json_timeDistribution;
 
-        // get向后端请求json刷新图表。
         refresh_chart = function () {
             chartDateTrend.showLoading();
             chartTimeDistribution.showLoading();
-            $.get('/charts/expenditure/getData?' + $("#form-ipt").serialize(), function (json_response) {
-                json_dateTrend = json_response.json_dateTrend;
-                json_timeDistribution = json_response.json_timeDistribution;
-
+            $.get('/charts/acperiod/getData?' + $("#form-ipt").serialize(), function (json_response) {
                 chartDateTrend.hideLoading();
                 chartTimeDistribution.hideLoading();
 
+                json_dateTrend = json_response.json_dateTrend;
+                json_timeDistribution = json_response.json_timeDistribution;
+
                 if (!json_response.errMsg) {
                     chartDateTrend.setOption({
+                        legend: {data: json_dateTrend.legendLables},
                         xAxis: [{
                             data: json_dateTrend.axisLables
-                        }],
-                        series: [
-                            {
-                                name: '累积支出',
-                                data: json_dateTrend.accumulatedVals
-                            },
-                            {
-                                name: '节点支出',
-                                data: json_dateTrend.pointVals
-                            }
-                        ]
+                        }]
                     });
 
+                    for(var i=0; i< json_dateTrend.pointSeriesData.length;i++){
+                        var tmp_option = chartDateTrend.getOption();
+                        tmp_option.series.push(
+                            {
+                                name: json_dateTrend.pointSeriesData[i].name,
+                                stack:'ac',
+                                type: 'bar',
+                                data: json_dateTrend.pointSeriesData[i].data
+                            }
 
+                        );
+                        chartDateTrend.setOption(tmp_option);
+                    }
 
                     chartTimeDistribution.setOption({
                         xAxis: [{
                             data: json_timeDistribution.axisLables
-                        }],
-                        series: [{
-                            data: json_timeDistribution.vals
                         }]
                     });
+
+                    for (var i = 0; i < json_timeDistribution.vals.length; i++) {
+                        var tmp_option = chartTimeDistribution.getOption();
+                        tmp_option.series.push(
+                                {
+                                    name: json_timeDistribution.vals[i].name,
+                                    stack: 'ac',
+                                    type: 'bar',
+                                    data: json_timeDistribution.vals[i].data
+                                }
+                        );
+                        chartTimeDistribution.setOption(tmp_option);
+                    }
 
                 } else {
                     for (err in json_response.errMsg) {
@@ -171,4 +166,5 @@
             }, 'json')
         };
     </script>
+
 {% endblock %}
