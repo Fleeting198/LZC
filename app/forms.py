@@ -11,7 +11,6 @@ from wtforms.validators import *
 import LocalStrings as lstr
 
 
-
 class Form_UserDaterange(Form):
     """
     工号日期范围

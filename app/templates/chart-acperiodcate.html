@@ -110,7 +110,7 @@
         refresh_chart = function () {
             chartDateTrend.showLoading();
             chartTimeDistribution.showLoading();
-            $.get('/charts/acperiod/getData?' + $("#form-ipt").serialize(), function (json_response) {
+            $.get('/charts/acperiodcate/getData?' + $("#form-ipt").serialize(), function (json_response) {
                 chartDateTrend.hideLoading();
                 chartTimeDistribution.hideLoading();
 
