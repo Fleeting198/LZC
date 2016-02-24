@@ -1,4 +1,5 @@
 import MySQLdb, re, thread
+import json
 
 DEFAULT_CONFIG = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'passwd': 'root', 'db': 'witcampus', 'charset': 'utf8'}
 MAX_NUM = int(1e6)
@@ -32,6 +33,11 @@ class MysqlClient:
     def query(self, sql):
         self._cursor.execute(sql)
         return self._cursor.fetchall()
+    def insert_data(self, tableName, **insertValues):
+        # self._cursor.execute('create table if not exists %s (k text ,v text)'%(tableName))
+        for key, value in insertValues.items():
+            self._cursor.execute('insert into %s values("%s", "%s")'%(tableName, key, MySQLdb.escape_string(value)))
+        self._connection.commit()
     @source_function
     def simple_data_source(self, sql): # return a function to provide one data at a time
         c = self._connection.cursor()
@@ -68,7 +74,9 @@ class MysqlClient:
 if __name__ == '__main__':
     mc = MysqlClient()
 
-    r = mc.data_source('select * from dev_loc order by node_id')
-    @get_data_from_source(r)
-    def p(data): print str(data)
-    p()
+    a = {'a':'a'}
+    mc.insert_data('con_friendmap', **{'json': json.dumps(a)})
+    # r = mc.data_source('select * from dev_loc order by node_id')
+    # @get_data_from_source(r)
+    # def p(data): print str(data)
+    # p()

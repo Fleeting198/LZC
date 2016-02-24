@@ -12,9 +12,9 @@ class FriendMap:
         self.calculate_time()
         self.fixedList = self.get_fixed_list(fixedItem)
     def calculate_time(self):
-        print 'Calculating time...'
+        print 'Calculating the total work...'
         self.totalNum = self.mc.query('select count(*) from %s'%self.tableName)[0][0]
-        print 'This search will take around %s seconds'%(self.totalNum / 1e6 * 2)
+        # print 'This search will take around %s seconds'%(self.totalNum / 1e6 * 2)
     def get_fixed_list(self, fixedItem):
         try:
             with open('%sList.json'%self.tableName) as f: l = json.loads(f.read())
@@ -41,18 +41,23 @@ class FriendMap:
         return l
     def calculate(self):
         try:
-            nameDict = {}
             process = -1
-            for itemId in xrange(len(self.fixedList)):
-                # idItem, orderBy
-                if process < itemId * 100 / len(self.fixedList):
-                    process = itemId * 100 / len(self.fixedList)
+            totalLen = len(self.fixedList)
+            itemId = 0
+            while self.fixedList:
+                fixedItem = self.fixedList.pop()
+                itemId += 1
+                # calculating process
+                if process < itemId * 100 / totalLen:
+                    process = itemId * 100 / totalLen
                     sys.stdout.write('\r')
                     sys.stdout.flush()
                     sys.stdout.write('Calculating friend map of %s: %s%s'%(self.tableName, process, '%'))
+                # get data function
                 dataSource = self.mc.data_source('select %s,%s from %s where %s="%s" order by %s'%(
-                    self.searchItem[0], self.searchItem[2], self.tableName, self.searchItem[1], self.fixedList[itemId], self.searchItem[2]))
+                    self.searchItem[0], self.searchItem[2], self.tableName, self.searchItem[1], fixedItem, self.searchItem[2]))
                 idListFindingFriends = []
+                nameDict = {}
                 def add_friend_point(personA, personB):
                     if not nameDict.has_key(personA): nameDict[personA] = {}
                     if not nameDict[personA].has_key(personB): nameDict[personA][personB] = 0
@@ -67,10 +72,13 @@ class FriendMap:
                             add_friend_point(iff[0], data[0])
                         else:
                             idListFindingFriends = idListFindingFriends[1:]
+                # store the result in mysql
+                self.mc.insert_data('con_friendmap', **{'%s'%fixedItem: json.dumps(nameDict)})
+                # store the current process
+                with open('%sList.json'%self.tableName, 'w') as f: f.write(json.dumps(self.fixedList))
         except:
             traceback.print_exc()
         print 'Processing Finished'
-        return nameDict
 
 if __name__ == '__main__':
     config = {'tableName' : 'acrec', 'idItem' : 'user_id', 'fixedItem' : 'node_des', 'orderBy' : 'ac_datetime', 'maxRange' : 60}
