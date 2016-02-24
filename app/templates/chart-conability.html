@@ -48,11 +48,7 @@
                         normal: {}
                     },
                     data: [],
-                    },
-                    {
-                        name: '个人',
-                        type: 'line',
-                        markPoint: {
+                    markPoint: {
                             itemStyle: {
                                 normal: {}
                         },
@@ -82,23 +78,21 @@
                             data: json_conability.amount
                         }],
                         series: [{
-                                data: json_conability.num
-                                },
-                                {
-                                    markPoint: {
-                                        data: [
-                                        {
-                                            label: {
-                                                normal: {
-                                                    formatter: json_userAmount.userAmount,
-                                                    textStyle: {
-                                                        fontSize: 10
-                                                    }
+                                data: json_conability.num,
+                                markPoint: {
+                                    data: [
+                                    {
+                                        label: {
+                                            normal: {
+                                                formatter: json_userAmount.userAmount,
+                                                textStyle: {
+                                                    fontSize: 10
                                                 }
-                                            },
-                                            value: parseFloat(json_userAmount.userAmount),
-                                            coord: [parseInt(json_userAmount.userAmount), 0]
-                                        }]
+                                            }
+                                        },
+                                        value: parseFloat(json_userAmount.userAmount),
+                                        coord: [parseFloat(json_userAmount.userAmount), 0]
+                                    }]
                                 }
                         }],
                         dataZoom: [

@@ -473,3 +473,7 @@ def refresh_chart_conability():
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
+
+@app.route('/charts/conwater')
+def show_chart_conwater():
+    return render_template('chart-conwater.html')
