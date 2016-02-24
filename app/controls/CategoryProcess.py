@@ -7,7 +7,6 @@ def CategoryProcess(results):
     tmp_data = {}  # 暂时用以累加数据 {'title0': val1, 'title1': val2, ...}
     titles = []  # ['title0', 'title1', ...]
     seriesData = []  # [{value: , name: }, {value: , name: }, ...]
-    # trans = {'food': lstr.food, 'water': lstr.water}
 
     for result in results:
         # Into titles.
@@ -24,7 +23,6 @@ def CategoryProcess(results):
 
     # 汉化titles。
     titles = [helpers.translate(title) for title in titles]
-
     return titles, seriesData
 
 

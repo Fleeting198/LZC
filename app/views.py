@@ -12,11 +12,7 @@ from app.models import *
 from app.forms import *
 
 from sqlalchemy import and_, func
-from datetime import datetime
-import json
 import types
-
-from app import helpers
 
 
 @app.route('/')
@@ -37,8 +33,6 @@ def show_chart_expenditure():
 
 @app.route('/charts/expenditure/getData', methods=['GET'])
 def refresh_chart_expenditure():
-
-    # 从GET获得表单值赋给wtform
     form = Form_UserDaterangeMode()
     form.userID.data = request.args.get('userID')
     form.modeDate.data = request.args.get('modeDate')
@@ -66,12 +60,12 @@ def refresh_chart_expenditure():
         process = DateTimeValueProcess(res_datetimes, res_amounts)
 
         # Get and pack dateTrend() return.
-        axisLabels, accumulatedVals, pointVals = process.dateTrend(modeDate)
+        axisLabels, accumulatedVals, pointVals = process.get_date_trend(modeDate)
         json_dateTrend = {'axisLabels': axisLabels, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
         # json_dateTrend = jsonify(axisLabels=axisLabels, accumulatedVals=accumulatedVals, pointVals=pointVals)
 
         # Get and pack timeDistribution() return.
-        axisLabels, vals = process.timeDistribution()
+        axisLabels, vals = process.get_time_distribution()
         json_timeDistribution = {'axisLabels': axisLabels, 'vals':vals}
         # json_timeDistribution = jsonify(axisLabels=axisLabels, vals=vals)
 
@@ -114,12 +108,12 @@ def refresh_chart_acperiod():
 
         # 包装dateTrend 返回值。
         # 这个功能暂时不需要连续值，但还是必须获取，逻辑模块写一起了。
-        axisLabels, accumulatedVals, pointVals = process.dateTrend(modeDate)
+        axisLabels, accumulatedVals, pointVals = process.get_date_trend(modeDate)
 
         json_dateTrend = {'axisLabels': axisLabels, 'pointVals': pointVals}
 
         # timeDistribution 返回值
-        axisLabels, vals = process.timeDistribution()
+        axisLabels, vals = process.get_time_distribution()
         json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
 
         json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
@@ -137,8 +131,8 @@ def show_chart_acperiodcate():
 @app.route('/charts/acperiodcate/getData', methods=['GET'])
 def refresh_chart_acperiodcate():
     """
-    门禁分类日期趋势时间分布 -C
-    处理数据部分写得太长了。
+    门禁分类日期趋势时间分布    -C
+    Codes mainly in controls.ACPeriodCate.py.
     """
     form = Form_UserDaterangeMode()
     form.userID.data = request.args.get('userID')
@@ -161,71 +155,10 @@ def refresh_chart_acperiodcate():
         res_datetimes = [result.ac_datetime for result in results]
         res_categorys = [result.category for result in results]
 
-        # Process data.
-        from app.controls.CateDateTimeValue import DateTimeValueProcess
-        process = DateTimeValueProcess(res_datetimes, res_categorys)
-
-        # dateTrend
-        axisLabels, pointVals = process.dateTrend(modeDate)
-
-        # 输出格式;
-        # xAxis: ['date1', 'date2', ...]
-        # legend: ['item1', 'item2', ...]
-
-        # 图例项
-        legendLabels = []
-        for result in res_categorys:
-            if result not in legendLabels:
-                legendLabels.append(str(result))
-
-        # 节点数据项
-        # series: [{name:'item1', data:[data1, data2, ...]}, {name:'item2', data:[data1, data2, ...]}]
-        def packSeriesData(Vals):
-            seriesData = []
-            for legendLabel in legendLabels:
-                datumList = []
-                for val in Vals:
-                    if legendLabel in val:
-                        datumList.append(val[legendLabel])
-                    else:
-                        datumList.append(0)
-
-                seriesDatum = {'name': legendLabel, 'data': datumList}
-                seriesData.append(seriesDatum)
-            return seriesData
-
-        pointSeriesData=packSeriesData(pointVals)
-        # 翻译
-        for val in pointSeriesData:
-            val['name'] = helpers.translate(val['name'])
-
-        # 备份
-        tmp_legendLabels = legendLabels[:]
-        # 翻译
-        legendLabels = [helpers.translate(Label) for Label in legendLabels]
-        # 打包
-        json_dateTrend = {'axisLabels': axisLabels, 'legendLabels': legendLabels, 'pointSeriesData': pointSeriesData}
-
-        # timeDistribution
-        axisLabels, vals = process.timeDistribution()
-
-        # 还原legendLabels
-        legendLabels = tmp_legendLabels[:]
-        del tmp_legendLabels
-        # 处理
-        vals = packSeriesData(vals)
-
-        # 翻译
-        legendLabels = [helpers.translate(Label) for Label in legendLabels]
-        for val in vals:
-            val['name'] = helpers.translate(val['name'])
-
-        # 两个图表都传了图例标签队列以防以后要分开，流量占多一点点暂时没关系。
-        json_timeDistribution = {'axisLabels': axisLabels, 'legendLabels': legendLabels, 'vals':vals}
+        from controls.ACPeriodCate import ACPeriodCate
+        json_dateTrend, json_timeDistribution = ACPeriodCate(res_datetimes, res_categorys, modeDate)
 
         json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
-        # json_response = jsonify(json_dateTrend=json_dateTrend)
-
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -266,11 +199,11 @@ def refresh_chart_income():
         process = DateTimeValueProcess(res_datetimes, res_amounts)
 
         # Get and pack dateTrend() return.
-        axisLabels, accumulatedVals, pointVals = process.dateTrend(modeDate)
+        axisLabels, accumulatedVals, pointVals = process.get_date_trend(modeDate)
         json_dateTrend = {'axisLabels': axisLabels, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
 
         # Get and pack timeDistribution() return.
-        axisLabels, vals = process.timeDistribution()
+        axisLabels, vals = process.get_time_distribution()
         json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
 
         # 没有错误就不传errMsg
@@ -319,11 +252,11 @@ def refresh_chart_foodIncome():
         process = DateTimeValueProcess(res_datetimes, res_amounts)
 
         # Get and pack dateTrend() return.
-        axisLabels, accumulatedVals, pointVals = process.dateTrend(modeDate)
+        axisLabels, accumulatedVals, pointVals = process.get_date_trend(modeDate)
         json_dateTrend = {'axisLabels': axisLabels, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
 
         # Get and pack timeDistribution() return.
-        axisLabels, vals = process.timeDistribution()
+        axisLabels, vals = process.get_time_distribution()
         json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
 
         json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)

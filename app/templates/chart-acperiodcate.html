@@ -134,14 +134,14 @@
                             data: json_dateTrend.axisLabels
                         }]
                     });
-                    for(var i=0; i< json_dateTrend.pointSeriesData.length;i++){
+                    for(var i=0; i< json_dateTrend.seriesData.length;i++){
                         var tmp_option = chartDateTrend.getOption();
                         tmp_option.series.push(
                             {
-                                name: json_dateTrend.pointSeriesData[i].name,
+                                name: json_dateTrend.seriesData[i].name,
                                 stack:'ac',
                                 type: 'bar',
-                                data: json_dateTrend.pointSeriesData[i].data
+                                data: json_dateTrend.seriesData[i].data
                             }
 
                         );
@@ -155,14 +155,14 @@
                             data: json_timeDistribution.axisLabels
                         }]
                     });
-                    for (var i = 0; i < json_timeDistribution.vals.length; i++) {
+                    for (var i = 0; i < json_timeDistribution.seriesData.length; i++) {
                         var tmp_option = chartTimeDistribution.getOption();
                         tmp_option.series.push(
                                 {
-                                    name: json_timeDistribution.vals[i].name,
+                                    name: json_timeDistribution.seriesData[i].name,
                                     stack: 'ac',
                                     type: 'bar',
-                                    data: json_timeDistribution.vals[i].data
+                                    data: json_timeDistribution.seriesData[i].data
                                 }
                         );
                         chartTimeDistribution.setOption(tmp_option);
