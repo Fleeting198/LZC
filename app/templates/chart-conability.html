@@ -1,0 +1,127 @@
+{% extends "charts.html" %}
+{% block chartField %}
+
+    <form id="form-ipt" class="form-inline" >
+        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='NLPANWPQ')}}
+        <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
+    </form>
+
+    <div id="chartConAbility" style="width: inherit; height: 350px;"></div>
+
+    <script>
+
+        // 图表初始化。
+        var chartConAbility = echarts.init(document.getElementById('chartConAbility'));
+
+        var optionChartConAbility = {
+            title: {text: '个人消费能力'},
+            tooltip: {trigger: 'axis'},
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: {show: true},
+                    dataView: {show: true, readOnly: false},
+                    magicType: {show: true, type: ['line', 'bar']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            legend: {data: ['个人情况']},
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: []
+            },
+            yAxis: {
+                type: 'value',
+                name: '人数',
+                axisLabel: {
+                    formatter: '{value} 人'
+                }
+            },
+            series: [{
+                    name: '人数',
+                    type: 'line',
+                    smooth: true,
+                    stack: 'a',
+                    areaStyle: {
+                        normal: {}
+                    },
+                    data: [],
+                    },
+                    {
+                        name: '个人',
+                        type: 'line',
+                        markPoint: {
+                            itemStyle: {
+                                normal: {}
+                        },
+                        data : []
+                        }
+                    }
+            ],
+            dataZoom: []
+        };
+
+        chartConAbility.setOption(optionChartConAbility);
+
+        refresh_chart = function () {
+
+            chartConAbility.showLoading();
+
+            $.get('/charts/conability/getData?' + $("#form-ipt").serialize(), function (json_response) {
+
+                json_userAmount = json_response.json_userAmount;
+                json_conability = json_response.json_conability;
+
+                chartConAbility.hideLoading();
+
+                if (!json_response.errMsg) {
+                    chartConAbility.setOption({
+                        xAxis: [{
+                            data: json_conability.amount
+                        }],
+                        series: [{
+                                data: json_conability.num
+                                },
+                                {
+                                    markPoint: {
+                                        data: [
+                                        {
+                                            label: {
+                                                normal: {
+                                                    formatter: json_userAmount.userAmount,
+                                                    textStyle: {
+                                                        fontSize: 10
+                                                    }
+                                                }
+                                            },
+                                            value: parseFloat(json_userAmount.userAmount),
+                                            coord: [parseInt(json_userAmount.userAmount), 0]
+                                        }]
+                                }
+                        }],
+                        dataZoom: [
+                            {
+                                type: 'inside',
+                                xAxisIndex: 0,
+                                startValue: parseInt(json_userAmount.userAmount) - 77,
+                                endValue: parseInt(json_userAmount.userAmount) + 77
+                            },
+                            {
+                                type: 'slider',
+                                startValue: parseInt(json_userAmount.userAmount) - 77,
+                                endValue: parseInt(json_userAmount.userAmount) + 77
+                            }
+                        ],
+                    });
+                } else {
+                    for (err in json_response.errMsg) {
+                        alert(json_response.errMsg[err]);
+                    }
+                }
+            }, 'json')
+        };
+    </script>
+
+{% endblock %}

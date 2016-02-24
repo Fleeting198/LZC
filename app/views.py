@@ -378,23 +378,11 @@ def refresh_chart_number():
     # GradeDr stands for 博士生的年级
     strQueryGradeDr = db.session.query(individual.grade, func.count('*')).filter(individual.role == u'博士生').group_by(individual.grade)
 
-    # try query grade at one time?
-    # strQueryGrade = db.session.query(individual.grade, func.count('*')).filter(individual.role.in_(['本科生', '研究生', '博士生'])).group_by(individual.grade)
-
     # go
     resultsTotal = strQueryTotal.all()
     resultsGradeB = strQueryGradeB.all()
     resultsGradePg = strQueryGradePg.all()
     resultsGradeDr = strQueryGradeDr.all()
-
-    # for test only
-    # print resultsGradeB
-    # print resultsGradeB[0][0]
-    # print resultsGradeB[0][1]
-    # sum = 0
-    # for num in resultsGradeB:
-    #     sum += num[1]
-    # print sum
 
     # process numberTotal
     json_numberTotal = {}
@@ -415,7 +403,7 @@ def refresh_chart_number():
     json_numberGradePg = {'unknown': 0}
     json_numberGradeDr = {'unknown': 0}
 
-    # convert result to json func?
+    # func convert result to json
     def result_to_jsonUnicode(resultGrade):
         json = {'unknown': 0}
         for result in resultGrade:
@@ -447,3 +435,41 @@ def refresh_chart_number():
     json_response = jsonify(json_numberTotal = json_numberTotal, json_numberGradeB = json_numberGradeB, json_numberGradePg = json_numberGradePg, json_numberGradeDr = json_numberGradeDr)
     return json_response
 
+@app.route('/charts/conability')
+def show_chart_conability():
+    form = Form_User()
+    return render_template('chart-conability.html', form=form)
+
+
+@app.route('/charts/conability/getData', methods=['GET'])
+def refresh_chart_conability():
+    form = Form_User()
+    form.userID.data = request.args.get('userID')
+
+    if form.validate():
+        userID = form.userID.data
+
+        # search for user conability & role
+        strQuery = db.session.query(conability.amount_avg, conability.role).filter(conability.user_id == userID)
+        results = strQuery.first()
+
+        # unpacking results
+        userAmount, role = results
+
+        strQueryLine = db.session.query(conability_line.amount_avg, conability_line.num).filter(conability_line.role == role).order_by(conability_line.amount_avg)
+        resultsLine = strQueryLine.all();
+
+        # process conability for all
+        amount = []
+        num = []
+        for result in resultsLine:
+            amount.append(result[0])
+            num.append(result[1])
+
+        # return
+        json_userAmount = {'userAmount': str(userAmount)}
+        json_conability = {'amount': amount, 'num': num}
+        json_response = jsonify({'json_userAmount': json_userAmount, 'json_conability': json_conability})
+    else:
+        json_response = jsonify(errMsg=form.errors)
+    return json_response
