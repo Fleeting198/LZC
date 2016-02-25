@@ -10,12 +10,11 @@ import types
 
 
 def ACPeriodCate(res_datetimes, res_categorys, mode_date):
-    # Format return data for ECharts setting.
-
-    # dateTrend  ===============================
+    # Original data.
     oriDate = res_datetimes
     oriValues = res_categorys
 
+    # dateTrend  ===============================
     # Copy source data.
     axisLabels = oriDate[:]
     pointVals = [{copy.deepcopy(oriValue): 1} for oriValue in oriValues]
@@ -24,6 +23,15 @@ def ACPeriodCate(res_datetimes, res_categorys, mode_date):
 
     df = DataFrame(pointVals, index=axisLabels)
     df = df.resample(rule_mode[str(mode_date)], how='sum')
+    df = df.fillna(0)
+
+    cols_name = []
+    for name, col in df.iteritems():
+        cols_name.append(name)
+    df['SUM'] = 0
+    for i in range(len(cols_name)):
+        df['SUM'] += df[cols_name[i]]
+    df['PER_DORM'] = df['dorm']/df['SUM']
 
     axisLabels = map(lambda x: x.strftime('%Y-%m-%d'), df.index.tolist())
 
@@ -33,6 +41,11 @@ def ACPeriodCate(res_datetimes, res_categorys, mode_date):
         legendLabels.append(colName)
         data = map(lambda x: 0.0 if isnan(x) else x, col.tolist())
         seriesData.append({'name': colName, 'data': data})
+
+    # Translate.
+    legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+    for datum in seriesData:
+        datum['name'] = helpers.translate(datum['name'])
 
     json_dateTrend = {'axisLabels': axisLabels, 'legendLabels': legendLabels, 'seriesData': seriesData}
 
@@ -71,8 +84,13 @@ def ACPeriodCate(res_datetimes, res_categorys, mode_date):
     legendLabels = []
     for colName, col in df.iteritems():
         legendLabels.append(colName)
-        data = map(lambda x: 0.0 if isnan(x) else x, col.tolist())
+        data = map(lambda x: 0 if isnan(x) else x, col.tolist())
         seriesData.append({'name': colName, 'data': data})
+
+    # Translate.
+    legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+    for datum in seriesData:
+        datum['name'] = helpers.translate(datum['name'])
 
     json_timeDistribution = {'axisLabels': axisLabels, 'legendLabels': legendLabels, 'seriesData': seriesData}
 

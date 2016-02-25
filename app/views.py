@@ -292,8 +292,7 @@ def refresh_chart_acvalid():
         from controls.CategoryProcess import CategoryProcess
         titles, seriesData = CategoryProcess(results)
 
-        json_response = {'titles': titles, 'seriesData': seriesData}
-        json_response = jsonify(json_response)
+        json_response = jsonify({'titles': titles, 'seriesData': seriesData})
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -327,8 +326,7 @@ def refresh_chart_accategory():
         from controls.CategoryProcess import CategoryProcess
         titles, seriesData = CategoryProcess(results)
 
-        json_response = {'titles': titles, 'seriesData': seriesData}
-        json_response = jsonify(json_response)
+        json_response = jsonify({'titles': titles, 'seriesData': seriesData})
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -363,8 +361,7 @@ def refresh_chart_concategory():
         from controls.CategoryProcess import CategoryProcess
         titles, seriesData = CategoryProcess(results)
 
-        json_response = {'titles': titles, 'seriesData': seriesData}
-        json_response = jsonify(json_response)
+        json_response = jsonify({'titles': titles, 'seriesData': seriesData})
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -456,3 +453,50 @@ def refresh_chart_number():
     json_response = jsonify(json_numberTotal = json_numberTotal, json_numberGradeB = json_numberGradeB, json_numberGradePg = json_numberGradePg, json_numberGradeDr = json_numberGradeDr)
     return json_response
 
+
+@app.route('/charts/conwater')
+def show_chart_conWater():
+    return render_template('chart-conwater.html')
+
+
+@app.route('/charts/conwater/getData', methods=['GET'])
+def refresh_chart_conWater():
+    form = Form_DaterangeMode()
+    form.modeDate.data = request.args.get('modeDate')
+    form.dateRange.data = request.args.get('dateRange')
+
+    if form.validate():
+        modeDate = int(form.modeDate.data)
+        startDate = form.dateRange.data[:10]
+        endDate = form.dateRange.data[-10:]
+
+        # Query.
+        strQuery = db.session.query(consumption.con_datetime, consumption.amount).filter(
+            consumption.user_id == userID).order_by(consumption.con_datetime)
+
+        if len(startDate) != 0:
+            strQuery = strQuery.filter(and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
+        results = strQuery.all()
+
+        # Get columns.
+        res_datetimes = [result.con_datetime for result in results]
+        res_amounts = [result.amount for result in results]
+
+        from app.controls.DateTimeValueProcess import DateTimeValueProcess
+        process = DateTimeValueProcess(res_datetimes, res_amounts)
+
+        # Get and pack dateTrend() return.
+        axisLabels, accumulatedVals, pointVals = process.get_date_trend(modeDate)
+        json_dateTrend = {'axisLabels': axisLabels, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
+        # json_dateTrend = jsonify(axisLabels=axisLabels, accumulatedVals=accumulatedVals, pointVals=pointVals)
+
+        # Get and pack timeDistribution() return.
+        axisLabels, vals = process.get_time_distribution()
+        json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
+        # json_timeDistribution = jsonify(axisLabels=axisLabels, vals=vals)
+
+        # 没有错误就不传errMsg。前端通过检查errMsg是否存在来判断查询是否成功。
+        json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
+    else:
+        json_response = jsonify(errMsg=form.errors)
+    return json_response

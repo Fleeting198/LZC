@@ -37,7 +37,19 @@
 
         var optionChartDate = {
             title: {text: '门禁类型日期趋势'},
-            tooltip: {trigger: 'axis'},
+            tooltip: {
+                trigger: 'axis',
+                formatter: function(params){
+                    var str_return = params[0].name + '<br/>';
+                    for (var i=0; i<params.length; i++){
+                        if(params[i].seriesName != '宿舍比重'){
+                            str_return += params[i].seriesName + ' : ' + params[i].value + ' 次<br/>'
+                        }else
+                            str_return += params[i].seriesName + ' : ' + (params[i].value*100).toFixed(2) + ' %<br/>'
+                    }
+                    return str_return;
+                }
+            },
             toolbox: {
                 show: true,
                 feature: {
@@ -54,22 +66,30 @@
                 boundaryGap: true,
                 data: []
             },
-            yAxis: {
-                type: 'value',
-                name: '次数',
-                axisLabel: {
-                    formatter: '{value} 次'
+            yAxis:[
+                {   type: 'value',
+                    name: '次数',
+                    axisLabel: {
+                        formatter: '{value} 次'
+                    }
+                },
+                {   type: 'value',
+                    name: '比例',
+                    axisLabel: {
+                        formatter: function(value){
+                            value *= 100;
+                            return value+"%";
+                        }
+                    }
                 }
-            },
+            ],
             dataZoom: [
-                {
-                    type: 'inside',
+                {   type: 'inside',
                     xAxisIndex: [0],
                     start: 0,
                     end: 100
                 },
-                {
-                    type: 'slider',
+                {   type: 'slider',
                     xAxisIndex: [0],
                     start: 0,
                     end: 100
@@ -136,35 +156,46 @@
                     });
                     for(var i=0; i< json_dateTrend.seriesData.length;i++){
                         var tmp_option = chartDateTrend.getOption();
-                        tmp_option.series.push(
-                            {
-                                name: json_dateTrend.seriesData[i].name,
-                                stack:'ac',
-                                type: 'bar',
-                                data: json_dateTrend.seriesData[i].data
-                            }
-
-                        );
+                        if (json_dateTrend.seriesData[i].name == '宿舍比重'){
+                            tmp_option.series.push({
+                                        name: json_dateTrend.seriesData[i].name,
+                                        type: 'line',
+                                        data: json_dateTrend.seriesData[i].data,
+                                        yAxisIndex: 1,
+                                        smooth: true,
+                            });
+                        }else if(json_dateTrend.seriesData[i].name == '总和'){
+                            tmp_option.series.push({
+                                        name: json_dateTrend.seriesData[i].name,
+                                        type: 'bar',
+                                        barWidth: 5,
+                                        data: json_dateTrend.seriesData[i].data
+                            });
+                        }else{
+                            tmp_option.series.push({
+                                        name: json_dateTrend.seriesData[i].name,
+                                        stack: 'ac',
+                                        type: 'bar',
+                                        data: json_dateTrend.seriesData[i].data
+                            });
+                        }
                         chartDateTrend.setOption(tmp_option);
                     }
 
                     // 时间分布图表设定。
                     chartTimeDistribution.setOption({
-                        legend: {data: json_timeDistribution.legendLabels},
-                        xAxis: [{
-                            data: json_timeDistribution.axisLabels
-                        }]
+                        legend: {data: json_timeDistribution.legendLabels },
+                        xAxis: [{data: json_timeDistribution.axisLabels }]
                     });
+
                     for (var i = 0; i < json_timeDistribution.seriesData.length; i++) {
                         var tmp_option = chartTimeDistribution.getOption();
-                        tmp_option.series.push(
-                                {
+                        tmp_option.series.push({
                                     name: json_timeDistribution.seriesData[i].name,
                                     stack: 'ac',
                                     type: 'bar',
                                     data: json_timeDistribution.seriesData[i].data
-                                }
-                        );
+                        });
                         chartTimeDistribution.setOption(tmp_option);
                     }
 
