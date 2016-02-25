@@ -131,3 +131,25 @@ class conability_line(db.Model):
         self.amount_avg = amount_avg
         self.num = num
         self.role = role
+
+class penalty(db.Model):
+    """
+    个体滞纳金缴纳情况：工号,缴纳总额
+    """
+    user_id = db.Column(db.String(8), primary_key=True)
+    amount = db.Column(db.DECIMAL())
+
+    def __init__(self, user_id, amount_avg, role):
+        self.user_id = user_id
+        self.amount = amount
+
+class penalty_line(db.Model):
+    """
+    滞纳金缴纳情况统计：缴纳总额(取整),人数
+    """
+    amount = db.Column(db.Integer(), primary_key=True)
+    num = db.Column(db.Integer())
+
+    def __init__(self, amount_avg, num, role):
+        self.amount_avg = amount_avg
+        self.num = num

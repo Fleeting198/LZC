@@ -477,3 +477,42 @@ def refresh_chart_conability():
 @app.route('/charts/conwater')
 def show_chart_conwater():
     return render_template('chart-conwater.html')
+
+
+@app.route('/charts/penalty')
+def show_chart_penalty():
+    form = Form_User()
+    return render_template('chart-penalty.html', form=form)
+
+
+@app.route('/charts/penalty/getData', methods=['GET'])
+def refresh_chart_penalty():
+    form = Form_User()
+    form.userID.data = request.args.get('userID')
+
+    if form.validate():
+        userID = form.userID.data
+
+        # query
+        strQuery = db.session.query(penalty.amount).filter(penalty.user_id == userID)
+        strQueryLine = db.session.query(penalty_line.amount, penalty_line.num).order_by(penalty_line.amount)
+        results = strQuery.first()
+        resultsLine = strQueryLine.all();
+
+        # unpacking results
+        userAmount = results[0]
+
+        # process conability for all
+        amount = []
+        num = []
+        for result in resultsLine:
+            amount.append(result[0])
+            num.append(result[1])
+
+        # return
+        json_userAmount = {'userAmount': str(userAmount)}
+        json_penalty = {'amount': amount, 'num': num}
+        json_response = jsonify({'json_userAmount': json_userAmount, 'json_penalty': json_penalty})
+    else:
+        json_response = jsonify(errMsg=form.errors)
+    return json_response
