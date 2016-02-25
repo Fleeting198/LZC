@@ -105,3 +105,51 @@ class consumption(db.Model):
         self.dev_id = dev_id
         self.con_datetime = con_datetime
         self.amount = amount
+
+class conability(db.Model):
+    """
+    个人月消费能力：工号,月平均消费金额(保留2位小数),角色[老师，学生]
+    """
+    user_id = db.Column(db.String(8), primary_key=True)
+    amount_avg = db.Column(db.DECIMAL())
+    role = db.Column(db.String(3))
+
+    def __init__(self, user_id, amount_avg, role):
+        self.user_id = user_id
+        self.amount_avg = amount_avg
+        self.role = role
+
+class conability_line(db.Model):
+    """
+    月消费能力统计：月平均消费金额(取整),人数,角色[老师，学生]
+    """
+    amount_avg = db.Column(db.Integer(), primary_key=True)
+    num = db.Column(db.Integer())
+    role = db.Column(db.String(3))
+
+    def __init__(self, amount_avg, num, role):
+        self.amount_avg = amount_avg
+        self.num = num
+        self.role = role
+
+class penalty(db.Model):
+    """
+    个体滞纳金缴纳情况：工号,缴纳总额
+    """
+    user_id = db.Column(db.String(8), primary_key=True)
+    amount = db.Column(db.DECIMAL())
+
+    def __init__(self, user_id, amount_avg, role):
+        self.user_id = user_id
+        self.amount = amount
+
+class penalty_line(db.Model):
+    """
+    滞纳金缴纳情况统计：缴纳总额(取整),人数
+    """
+    amount = db.Column(db.Integer(), primary_key=True)
+    num = db.Column(db.Integer())
+
+    def __init__(self, amount_avg, num, role):
+        self.amount_avg = amount_avg
+        self.num = num

@@ -10,6 +10,12 @@ from wtforms import StringField, RadioField, Form
 from wtforms.validators import *
 import LocalStrings as lstr
 
+class Form_User(Form):
+    """
+    工号选择
+    """
+    userID = StringField(lstr.userID, validators=[DataRequired(message=lstr.warn_userIDFill),
+                                                  Length(min=8, max=8, message=lstr.warn_userIDLength)])
 
 class Form_UserDaterange(Form):
     """

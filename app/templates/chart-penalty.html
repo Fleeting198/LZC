@@ -1,0 +1,123 @@
+{% extends "charts.html" %}
+{% block chartField %}
+
+    <form id="form-ipt" class="form-inline" >
+        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='XQXXQQTQ')}}
+        <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
+    </form>
+
+    <div id="chartPenalty" style="width: inherit; height: 350px;"></div>
+
+    <script>
+
+        var chartPenalty = echarts.init(document.getElementById('chartPenalty'));
+
+        var optionChartPenalty = {
+            title: {text: '滞纳金缴纳'},
+            tooltip: {trigger: 'axis'},
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: {show: true},
+                    dataView: {show: true, readOnly: false},
+                    magicType: {show: true, type: ['line', 'bar']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: []
+            },
+            yAxis: {
+                type: 'value',
+                name: '人数',
+                axisLabel: {
+                    formatter: '{value} 人'
+                }
+            },
+            series: [{
+                    name: '人数',
+                    type: 'line',
+                    smooth: true,
+                    stack: 'a',
+                    areaStyle: {
+                        normal: {}
+                    },
+                    data: [],
+                    markPoint: {
+                            itemStyle: {
+                                normal: {}
+                        },
+                        data : []
+                        }
+                    }
+            ],
+            dataZoom: []
+        };
+
+        chartPenalty.setOption(optionChartPenalty);
+
+        refresh_chart = function () {
+
+            chartPenalty.showLoading();
+
+            $.get('/charts/penalty/getData?' + $("#form-ipt").serialize(), function (json_response) {
+
+                json_userAmount = json_response.json_userAmount;
+                json_penalty = json_response.json_penalty;
+
+                chartPenalty.hideLoading();
+
+                if (!json_response.errMsg) {
+
+                    var startPoint = (parseInt(json_userAmount.userAmount) - 33 > 0) ? (parseInt(json_userAmount.userAmount) - 33): 0;
+                    var endPoint = (parseInt(json_userAmount.userAmount) + 33 > json_penalty.amount[json_penalty.amount.length - 1]) ? json_penalty.amount[json_penalty.amount.length - 1] : (parseInt(json_userAmount.userAmount) + 33);
+
+                    chartPenalty.setOption({
+                        xAxis: [{
+                            data: json_penalty.amount
+                        }],
+                        series: [{
+                                data: json_penalty.num,
+                                markPoint: {
+                                    data: [
+                                    {
+                                        label: {
+                                            normal: {
+                                                formatter: json_userAmount.userAmount,
+                                                textStyle: {
+                                                    fontSize: 10
+                                                }
+                                            }
+                                        },
+                                        value: parseFloat(json_userAmount.userAmount),
+                                        coord: [parseFloat(json_userAmount.userAmount), 0]
+                                    }]
+                                }
+                        }],
+                        dataZoom: [
+                            {
+                                type: 'inside',
+                                xAxisIndex: 0,
+                                startValue: startPoint,
+                                endValue: endPoint
+                            },
+                            {
+                                type: 'slider',
+                                startValue: startPoint,
+                                endValue: endPoint
+                            }
+                        ],
+                    });
+                } else {
+                    for (err in json_response.errMsg) {
+                        alert(json_response.errMsg[err]);
+                    }
+                }
+            }, 'json')
+        };
+    </script>
+
+{% endblock %}
