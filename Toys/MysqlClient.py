@@ -30,11 +30,12 @@ class MysqlClient:
         self._connection = MySQLdb.connect(**config)
         self._cursor = self._connection.cursor()
         self._storedDataSource = None
+        self._cursor.execute('set sql_notes = 0') # disable warnings
     def query(self, sql):
         self._cursor.execute(sql)
         return self._cursor.fetchall()
     def insert_data(self, tableName, **insertValues):
-        # self._cursor.execute('create table if not exists %s (k text ,v text)'%(tableName))
+        self._cursor.execute('create table if not exists %s (k text ,v text)'%(tableName))
         for key, value in insertValues.items():
             self._cursor.execute('insert into %s values("%s", "%s")'%(tableName, key, MySQLdb.escape_string(value)))
         self._connection.commit()

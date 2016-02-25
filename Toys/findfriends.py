@@ -18,6 +18,7 @@ class FriendMap:
     def get_fixed_list(self, fixedItem):
         try:
             with open('%sList.json'%self.tableName) as f: l = json.loads(f.read())
+            if not l: raise Exception
             print 'Got user specificed fixed item list'
         except:
             l = []
@@ -73,11 +74,12 @@ class FriendMap:
                         else:
                             idListFindingFriends = idListFindingFriends[1:]
                 # store the result in mysql
-                self.mc.insert_data('con_friendmap', **{'%s'%fixedItem: json.dumps(nameDict)})
-                # store the current process
-                with open('%sList.json'%self.tableName, 'w') as f: f.write(json.dumps(self.fixedList))
+                self.mc.insert_data('%s_friendmap'%self.tableName[:3], **{'%s'%fixedItem: json.dumps(nameDict)})
         except:
+            # store the current process
+            print 'Process stopped when processing %s'%fixedItem
             traceback.print_exc()
+        with open('%sList.json'%self.tableName, 'w') as f: f.write(json.dumps(self.fixedList))
         print 'Processing Finished'
 
 if __name__ == '__main__':
