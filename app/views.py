@@ -454,14 +454,14 @@ def refresh_chart_number():
     return json_response
 
 
-@app.route('/charts/conwater')
-def show_chart_conWater():
+@app.route('/charts/conwaterC')
+def show_chart_conWaterC():
     form = Form_DaterangeMode()
-    return render_template('chart-conwater.html',form=form)
+    return render_template('chart-conwaterC.html', form=form)
 
 
-@app.route('/charts/conwater/getData', methods=['GET'])
-def refresh_chart_conWater():
+@app.route('/charts/conwaterC/getData', methods=['GET'])
+def refresh_chart_conWaterC():
     form = Form_DaterangeMode()
     form.modeDate.data = request.args.get('modeDate')
     form.dateRange.data = request.args.get('dateRange')
