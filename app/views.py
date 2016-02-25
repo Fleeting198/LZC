@@ -456,7 +456,8 @@ def refresh_chart_number():
 
 @app.route('/charts/conwater')
 def show_chart_conWater():
-    return render_template('chart-conwater.html')
+    form = Form_DaterangeMode()
+    return render_template('chart-conwater.html',form=form)
 
 
 @app.route('/charts/conwater/getData', methods=['GET'])
@@ -470,10 +471,8 @@ def refresh_chart_conWater():
         startDate = form.dateRange.data[:10]
         endDate = form.dateRange.data[-10:]
 
-        # Query.
-        strQuery = db.session.query(consumption.con_datetime, consumption.amount).filter(
-            consumption.user_id == userID).order_by(consumption.con_datetime)
-
+        # Query. 所有用水消费信息
+        strQuery = db.session.query(con_water_simp.con_datetime, con_water_simp.amount)
         if len(startDate) != 0:
             strQuery = strQuery.filter(and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
         results = strQuery.all()

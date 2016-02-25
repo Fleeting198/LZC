@@ -37,7 +37,16 @@
 
         var optionChartDate = {
             title: {text: '支出趋势'},
-            tooltip: {trigger: 'axis'},
+            tooltip: {
+                trigger: 'axis',
+                formatter: function (params) {
+                    var str_return = params[0].name + '<br/>';
+                    for (var i = 0; i < params.length; i++) {
+                            str_return += params[i].seriesName + ' : ' + params[i].value.toFixed(2) + ' 元<br/>'
+                    }
+                    return str_return;
+                }
+            },
             toolbox: {
                 show: true,
                 feature: {
@@ -89,8 +98,17 @@
             ]
         };
         var optionChartTime = {
-            title: {text: '消费时间段分布'},
-            tooltip: {trigger: 'axis'},
+            title: {text: '支出分布'},
+            tooltip: {
+                trigger: 'axis',
+                formatter: function (params) {
+                    var str_return = params[0].name + '<br/>';
+                    for (var i = 0; i < params.length; i++) {
+                        str_return += params[i].seriesName + ' : ' + params[i].value.toFixed(2) + ' 元<br/>'
+                    }
+                    return str_return;
+                }
+            },
             toolbox: {
                 show: true,
                 feature: {
@@ -101,7 +119,7 @@
                     saveAsImage: {show: true}
                 }
             },
-            legend: {data: ['消费总额']},
+            legend: {data: ['平均支出']},
             xAxis: {
                 type: 'category',
                 boundaryGap: true,
@@ -109,7 +127,7 @@
             },
             yAxis: {
                 type: 'value',
-                name: '支出',
+                name: '平均支出',
                 axisLabel: {
                     formatter: '{value} 元'
                 }
@@ -129,7 +147,7 @@
                 }
             ],
             series: [{
-                name: '消费总额',
+                name: '支出总额',
                 type: 'bar',
                 data: []
             }]

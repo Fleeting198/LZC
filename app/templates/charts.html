@@ -11,7 +11,10 @@
             <input type="button" class="btn btn-default" value="个体门禁分类分布" onclick="window.location.href='{{ url_for('show_chart_accategory') }}'"/>
             <input type="button" class="btn btn-default" value="个体消费分类分布" onclick="window.location.href='{{ url_for('show_chart_concategory') }}'"/>
             <input type="button" class="btn btn-default" value="人数统计" onclick="window.location.href='{{ url_for('show_chart_number') }}'"/>
-{#            <input type="button" class="btn btn-default" value="个体门禁时间分布(leg)" onclick="window.location.href='{{ url_for('show_chart_acperiod') }}'"/>#}
+            <input type="button" class="btn btn-default" value="水消费规律"
+                   onclick="window.location.href='{{ url_for('show_chart_conWater') }}'"/>
+
+            {#<input type="button" class="btn btn-default" value="个体门禁时间分布(leg)" onclick="window.location.href='{{ url_for('show_chart_acperiod') }}'"/>#}
 
           
         {% endblock %}

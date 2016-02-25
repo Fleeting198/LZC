@@ -7,6 +7,7 @@
 
 from datetime import time
 from pandas import Series
+from decimal import *
 import types
 
 
@@ -24,10 +25,10 @@ class DateTimeValueProcess:
         默认日期模式为月
         """
         # TODO: 日期坐标字符串调整
-
         ts = Series(self.oriValues, index=self.oriDate)
 
-        rule_mode = {'0': '1D', '1': '1W', '2': '1M', '3': '1Q', '4': '1Y'}
+        # TODO: 年规则不可eval
+        rule_mode = {'0': 'D', '1': 'W', '2': 'M', '3': 'Q', '4': 'Y'}
         # 按照modeDate 合并数据
         ts = ts.resample(rule_mode[str(mode_date)], how='sum')
 
@@ -39,41 +40,46 @@ class DateTimeValueProcess:
 
         return axisLabels, accumulatedVals, pointVals
 
-    def get_time_distribution(self):
+    def get_time_distribution(self, mode_time=1):
         """
         时间分布，输出各时间段总计数，目的在于对比。
         """
-        # Copy source data.
         dates = self.oriDate[:]
-        values = map(lambda x: float(x), self.oriValues)
+        values = self.oriValues[:]
 
-        # 生成时间点和时间标签队列。
-        periods = []
-        axisLabels = []
-        for i in range(24):
-            periods.append(time(i))
-            axisLabels.append(str(i) + u'点~' + str((i + 1) % 24) + u'点')
+        if mode_time==0:
+            # 按天 - 24小时分割时间段
+            dates = map(lambda x: x.time().hour, dates)
+            periods = []
+            axisLabels = []
+            for i in range(24):
+                periods.append(i)
+                axisLabels.append(str(i) + u'点~' + str((i + 1) % 24) + u'点')
 
-        # 时间点队列 -> 时间区间队列。
-        periodRanges = []
-        for i in range(len(periods)):
-            periodRange = [periods[i], periods[(i + 1) % len(periods)]]
-            periodRanges.append(periodRange)
+        elif mode_time==1:
+            # 按周 - 7天分割时间段
+            dates = map(lambda x: x.weekday()+1, dates)
+            axisLabels = [u'周一',u'周二',u'周三', u'周四',u'周五', u'周六',u'周日',]
+            periods = [1,2,3,4,5,6,7]
 
-        vals = [float(0)] * len(periods)  # Init vals
-        lTimes = map(lambda d: d.time(), dates)  # Keep time.
+        elif mode_time==2:
+            # 按年 - 月分割时间段
+            dates = map(lambda x: x.day, dates)
+            axisLabels = [u'一月', u'二月', u'三月', u'四月', u'五月', u'六月', u'七月', u'八月', u'九月', u'十月', u'十一月', u'十二月',]
+            periods = range(1,13)
 
-        # dates = map(lambda d: d.date(), dates)
-        # len_mdates = len(list(set(dates)))  # Day count to divide.
+        vals = [Decimal(0)] * len(periods)  # Init vals
 
-        # Add to total vals.
-        for i in range(len(lTimes)):
-            for j in range(len(periodRanges)):
-                if periodRanges[j][0] <= lTimes[i] < periodRanges[j][1]:
-                    vals[j + 1] += values[i]
+        dividers = [0]*len(periods) # 用以取平均值的除数
+        for i in range(len(dates)):
+            for j in range(len(periods)):
+                if dates[i] == periods[j]:
+                    dividers[j] += 1
+                    vals[j] += values[i]
 
+        # TODO: vals 取平均值
         for i in range(len(vals)):
-            # vals[i] = vals[i] / len_mdates if len_mdates != 0 else 0
-            vals[i] = round(vals[i], 2)
+            vals[i] /= dividers[i]
 
+        vals = map(lambda x:float(x), vals)
         return axisLabels, vals

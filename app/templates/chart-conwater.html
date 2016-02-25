@@ -2,7 +2,6 @@
 {% block chartField %}
 
     <form id="form-ipt" class="form-inline" >
-        {{ form.userID(class="form-control", maxlength='8', placeholder='工号' ,value='TPPZLPHY') }}
         {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
         {{ form.modeDate.label }}
         {% for subfield in form.modeDate %}
@@ -36,8 +35,17 @@
         var chartTimeDistribution = echarts.init(document.getElementById('chartTimeDistribution'));
 
         var optionChartDate = {
-            title: {text: '支出趋势'},
-            tooltip: {trigger: 'axis'},
+            title: {text: '消费趋势'},
+            tooltip: {
+                trigger: 'axis',
+                formatter: function (params) {
+                    var str_return = params[0].name + '<br/>';
+                    for (var i = 0; i < params.length; i++) {
+                        str_return += params[i].seriesName + ' : ' + params[i].value.toFixed(2) + ' 元<br/>'
+                    }
+                    return str_return;
+                }
+            },
             toolbox: {
                 show: true,
                 feature: {
@@ -48,7 +56,7 @@
                     saveAsImage: {show: true}
                 }
             },
-            legend: {data: ['累积支出','节点支出']},
+            legend: {data: ['累积消费','节点消费']},
             xAxis: {
                 type: 'category',
                 boundaryGap: true,
@@ -56,7 +64,7 @@
             },
             yAxis: {
                 type: 'value',
-                name: '支出',
+                name: '消费',
                 axisLabel: {
                     formatter: '{value} 元'
                 }
@@ -77,20 +85,29 @@
             ],
             series: [
                 {
-                    name: '累积支出',
+                    name: '累积消费',
                     type: 'line',
                     data: []
                 },
                 {
-                    name: '节点支出',
+                    name: '节点消费',
                     type: 'bar',
                     data: []
                 }
             ]
         };
         var optionChartTime = {
-            title: {text: '消费时间段分布'},
-            tooltip: {trigger: 'axis'},
+            title: {text: '消费分布'},
+            tooltip: {
+                trigger: 'axis',
+                formatter: function (params) {
+                    var str_return = params[0].name + '<br/>';
+                    for (var i = 0; i < params.length; i++) {
+                        str_return += params[i].seriesName + ' : ' + params[i].value.toFixed(2) + ' 元<br/>'
+                    }
+                    return str_return;
+                }
+            },
             toolbox: {
                 show: true,
                 feature: {
@@ -109,7 +126,7 @@
             },
             yAxis: {
                 type: 'value',
-                name: '支出',
+                name: '平均消费',
                 axisLabel: {
                     formatter: '{value} 元'
                 }
@@ -145,7 +162,7 @@
         refresh_chart = function(){
             chartDateTrend.showLoading();
             chartTimeDistribution.showLoading();
-            $.get('/charts/expenditure/getData?'+$("#form-ipt").serialize(), function(json_response){
+            $.get('/charts/conwater/getData?'+$("#form-ipt").serialize(), function(json_response){
                 chartDateTrend.hideLoading();
                 chartTimeDistribution.hideLoading();
 
@@ -155,7 +172,6 @@
                 json_dateTrend = json_response.json_dateTrend;
                 json_timeDistribution = json_response.json_timeDistribution;
 
-
                 if(!json_response.errMsg){
                     chartDateTrend.setOption({
                         xAxis: [{
@@ -163,11 +179,11 @@
                         }],
                         series: [
                             {
-                                name: '累积支出',
+                                name: '累积消费',
                                 data: json_dateTrend.accumulatedVals
                             },
                             {
-                                name: '节点支出',
+                                name: '节点消费',
                                 data: json_dateTrend.pointVals
                             }
                         ]

@@ -19,7 +19,8 @@ def ACPeriodCate(res_datetimes, res_categorys, mode_date):
     axisLabels = oriDate[:]
     pointVals = [{copy.deepcopy(oriValue): 1} for oriValue in oriValues]
 
-    rule_mode = {'0': '1D', '1': '1W', '2': '1M', '3': '1Q', '4': '1Y'}
+    # TODO: 年规则不可eval
+    rule_mode = {'0': 'D', '1': 'W', '2': 'M', '3': 'Q', '4': 'Y'}
 
     df = DataFrame(pointVals, index=axisLabels)
     df = df.resample(rule_mode[str(mode_date)], how='sum')
@@ -39,7 +40,7 @@ def ACPeriodCate(res_datetimes, res_categorys, mode_date):
     legendLabels = []
     for colName, col in df.iteritems():
         legendLabels.append(colName)
-        data = map(lambda x: 0.0 if isnan(x) else x, col.tolist())
+        data = map(lambda x: 0.0 if isnan(x) else float(x), col.tolist())
         seriesData.append({'name': colName, 'data': data})
 
     # Translate.
@@ -84,7 +85,7 @@ def ACPeriodCate(res_datetimes, res_categorys, mode_date):
     legendLabels = []
     for colName, col in df.iteritems():
         legendLabels.append(colName)
-        data = map(lambda x: 0 if isnan(x) else x, col.tolist())
+        data = map(lambda x: 0 if isnan(x) else int(x), col.tolist())
         seriesData.append({'name': colName, 'data': data})
 
     # Translate.
