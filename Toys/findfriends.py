@@ -2,6 +2,34 @@ import sys, datetime, time, traceback, json
 from MysqlClient import MysqlClient, get_data_from_source
 from TimeCalculate import TimeCalculate
 
+class ProcessRecorder:
+    def __init__(self, processName = 'DefaultProcess', begin = 0, total = 0, warningMessage = ''):
+        self.processName = processName
+        self.warningMessage = warningMessage
+        self.process = -1
+        self.count = begin
+        self.total = total
+        self.load_process()
+    def load_process(self):
+        try:
+            with open('%s.json'%self.processName) as f: process_data = json.loads(f.read())
+            self.count = process_data['count']
+            self.total = process_data['total']
+            self.currentPlace = process_data['currentPlace']
+        except:
+            self.currentPlace = ''
+    def store_process(self):
+        process_data = {'count': self.count, 'total': self.total, 'currentPlace': self.currentPlace,}
+        with open('%s.json'%self.processName, 'w') as f: f.write(json.dumps(process_data))
+    def add(self, i = 1):
+        self.count += i
+        if self.process < self.count * 100 / self.total:
+            self.process = self.count * 100 / self.total
+            sys.stdout.write('\r')
+            sys.stdout.flush()
+            sys.stdout.write('%s%s%s'%(self.warningMessage, self.process, '%'))
+    def set_current_place(self, currentPlace):
+        self.currentPlace = currentPlace
 
 class FriendMap:
     def __init__(self, tableName, idItem, fixedItem, orderBy, maxRange):
@@ -9,78 +37,60 @@ class FriendMap:
         self.searchItem = (idItem, fixedItem, orderBy)
         self.maxRange = maxRange
         self.mc = MysqlClient()
-        self.calculate_time()
-        self.fixedList = self.get_fixed_list(fixedItem)
-    def calculate_time(self):
+        self.prepare_environment()
+    def prepare_environment(self):
         print 'Calculating the total work...'
         self.totalNum = self.mc.query('select count(*) from %s'%self.tableName)[0][0]
-        # print 'This search will take around %s seconds'%(self.totalNum / 1e6 * 2)
-    def get_fixed_list(self, fixedItem):
-        try:
-            with open('%sList.json'%self.tableName) as f: l = json.loads(f.read())
-            if not l: raise Exception
-            print 'Got user specificed fixed item list'
-        except:
-            l = []
-            c = 0
-            process = 0
-            sys.stdout.write('Creating fixed item list')
-            dataSource = self.mc.data_source('select %s from %s'%(fixedItem, self.tableName))
-            while 1:
-                data = dataSource()
-                # show process
-                c += 1
-                if process < c * 100 / self.totalNum:
-                    sys.stdout.write('\r')
-                    sys.stdout.flush()
-                    process = c * 100 / self.totalNum
-                    sys.stdout.write('Creating fixed item list: %s%s'%(process, '%'))
-                if data is None: break
-                if not data[0] in l: l.append(data[0])
-            with open('%sList.json'%self.tableName, 'w') as f: f.write(json.dumps(l))
-            print '\nGot list'
-        return l
+        self.pr = ProcessRecorder(processName = self.tableName, total = self.totalNum, warning = 'Calculating friend map of %s'%self.tableName)
+        if self.pr.count == 0:
+            try:
+                self.mc.query('select * from %s limit 1'%(self.tableName + 'env'))
+            except:
+                self.mc.query('create table %s (user_id text, ac_datetime datetime, node_des text)'%(self.tableName + 'env')) 
+                print 'Restructure the data storage...'
+                s = self.mc.data_source('select * from %s order by node_des desc, ac_datetime desc'%self.tableName)
+                count = 0
+                while 1:
+                    data = s()
+                    if data is None: break
+                    self.mc.query('insert into %s values("%s", "%s", "%s")'%(self.tableName + 'env', data[0], data[1], data[2]))
+                    count += 1
+                    if count >= int(1e5):
+                        count = 0
+                        self.mc._connection.commit()
+            self.mc._connection.commit()
     def calculate(self):
         try:
-            process = -1
-            totalLen = len(self.fixedList)
-            itemId = 0
-            while self.fixedList:
-                fixedItem = self.fixedList.pop()
-                itemId += 1
-                # calculating process
-                if process < itemId * 100 / totalLen:
-                    process = itemId * 100 / totalLen
-                    sys.stdout.write('\r')
-                    sys.stdout.flush()
-                    sys.stdout.write('Calculating friend map of %s: %s%s'%(self.tableName, process, '%'))
-                # get data function
-                dataSource = self.mc.data_source('select %s,%s from %s where %s="%s" order by %s'%(
-                    self.searchItem[0], self.searchItem[2], self.tableName, self.searchItem[1], fixedItem, self.searchItem[2]))
-                idListFindingFriends = []
-                nameDict = {}
-                def add_friend_point(personA, personB):
-                    if not nameDict.has_key(personA): nameDict[personA] = {}
-                    if not nameDict[personA].has_key(personB): nameDict[personA][personB] = 0
-                    nameDict[personA][personB] += 1
-                while 1:
-                    data = dataSource()
-                    if data is None: break
-                    idListFindingFriends.append(data)
-                    for iff in idListFindingFriends[:-1]:
-                        if data[1] - iff[1] <= datetime.timedelta(0, self.maxRange):
-                            add_friend_point(data[0], iff[0])
-                            add_friend_point(iff[0], data[0])
-                        else:
-                            idListFindingFriends = idListFindingFriends[1:]
-                # store the result in mysql
-                self.mc.insert_data('%s_friendmap'%self.tableName[:3], **{'%s'%fixedItem: json.dumps(nameDict)})
+            dataSource = self.mc.data_source('select * from %s limit %s,100'%(self.tableName + 'env', self.pr.count))
+            currentPlace = self.pr.currentPlace
+            def add_friend_point(personA, personB):
+                if not nameDict.has_key(personA): nameDict[personA] = {}
+                if not nameDict[personA].has_key(personB): nameDict[personA][personB] = 0
+                nameDict[personA][personB] += 1
+            while 1:
+                data = dataSource()
+                if data is None: break
+                self.pr.add()
+                if currentPlace != data[2]:
+                    if currentPlace != '': self.mc.insert_data('%s_friendmap'%self.tableName[:3], **{'%s'%currentPlace: json.dumps(nameDict)})
+                    currentPlace = data[2]
+                    self.pr.set_current_place(data[2])
+                    nameDict = {}
+                    idListFindingFriends = []
+                idListFindingFriends.append(data)
+                for iff in idListFindingFriends[:-1]:
+                    if data[1] - iff[1] <= datetime.timedelta(0, self.maxRange):
+                        add_friend_point(data[0], iff[0])
+                        add_friend_point(iff[0], data[0])
+                    else:
+                        idListFindingFriends = idListFindingFriends[1:]
         except:
             # store the current process
-            print 'Process stopped when processing %s'%fixedItem
+            print '\nProcess stopped when processing %s'%currentPlace
             traceback.print_exc()
-        with open('%sList.json'%self.tableName, 'w') as f: f.write(json.dumps(self.fixedList))
-        print 'Processing Finished'
+            self.pr.store_process()
+        if data is None: self.mc.insert_data('%s_friendmap'%self.tableName[:3], **{'%s'%currentPlace: json.dumps(nameDict)})
+        print '\nProcessing Finished'
 
 if __name__ == '__main__':
     config = {'tableName' : 'acrec', 'idItem' : 'user_id', 'fixedItem' : 'node_des', 'orderBy' : 'ac_datetime', 'maxRange' : 60}
@@ -90,4 +100,3 @@ if __name__ == '__main__':
     def fn(): return fm.calculate()
     r = fn()
     print 'It took %ss'%r[0]
-    with open('%sFriendMap.json'%config['tableName'],'w') as f: f.write(json.dumps(r[1]))

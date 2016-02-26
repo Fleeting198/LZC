@@ -2,7 +2,7 @@ import MySQLdb, re, thread
 import json
 
 DEFAULT_CONFIG = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'passwd': 'root', 'db': 'witcampus', 'charset': 'utf8'}
-MAX_NUM = int(1e6)
+MAX_NUM = int(1e5)
 
 def source_function(fn, *args, **kwargs): # get a iter item fn and return a function to get data one at a time
     def wrapped(*args, **kwargs):
@@ -35,7 +35,7 @@ class MysqlClient:
         self._cursor.execute(sql)
         return self._cursor.fetchall()
     def insert_data(self, tableName, **insertValues):
-        self._cursor.execute('create table if not exists %s (k text ,v text)'%(tableName))
+        self._cursor.execute('create table if not exists %s (k text ,v longtext)'%(tableName))
         for key, value in insertValues.items():
             self._cursor.execute('insert into %s values("%s", "%s")'%(tableName, key, MySQLdb.escape_string(value)))
         self._connection.commit()
@@ -45,16 +45,16 @@ class MysqlClient:
         c.execute(sql)
         for item in c.fetchall(): yield item
     @source_function
-    def parallel_get_source_of_data_source(self, sql):
+    def parallel_get_source_of_data_source(self, sql, beginNumber = 0):
         regex = re.compile('from (\S+)')
         tableName = re.findall(regex, sql)[0]
         totalNum = self.query('select count(*) from %s'%tableName)[0][0]
-        unitNumber = int(totalNum / MAX_NUM)
+        unitNumber = totalNum / MAX_NUM + 1
+        self._storedDataSource = self.simple_data_source('%s limit %s, %s'%(sql, beginNumber, MAX_NUM))
         def get(i):
-            self._storedDataSource = self.simple_data_source('%s limit %s, %s'%(sql, i * MAX_NUM, MAX_NUM if i != unitNumber else totalNum - i * MAX_NUM))
-        get(0)
-        if unitNumber == 0: yield self._storedDataSource
-        for i in range(1, unitNumber + 2):
+            self._storedDataSource = self.simple_data_source('%s limit %s, %s'%(sql, i * MAX_NUM, MAX_NUM))
+        if unitNumber == beginNumber / MAX_NUM: yield self._storedDataSource
+        for i in range(beginNumber / MAX_NUM + 1, unitNumber + 1):
             while self._storedDataSource is None: print 'Thread sucks'
             r = self._storedDataSource
             self._storedDataSource = None
@@ -62,7 +62,9 @@ class MysqlClient:
             yield r
     @source_function
     def data_source(self, sql): # limit is now useless here
-        sourceOfDataSource = self.parallel_get_source_of_data_source(sql)
+        regex = re.compile('(select .*? from .*?)(?: limit (\S+),.*)?$')
+        r = re.findall(regex, sql)[0]
+        sourceOfDataSource = self.parallel_get_source_of_data_source(r[0], int(r[1]) if r[1] else 0)
         # I failed to use get_data_from_source here and don't know why
         while 1:
             dataSource = sourceOfDataSource()
@@ -75,9 +77,9 @@ class MysqlClient:
 if __name__ == '__main__':
     mc = MysqlClient()
 
-    a = {'a':'a'}
-    mc.insert_data('con_friendmap', **{'json': json.dumps(a)})
-    # r = mc.data_source('select * from dev_loc order by node_id')
-    # @get_data_from_source(r)
-    # def p(data): print str(data)
-    # p()
+    # a = {'a':'a'}
+    # mc.insert_data('con_friendmap', **{'json': json.dumps(a)})
+    r = mc.data_source('select * from dev_loc order by node_id limit 300, 100')
+    @get_data_from_source(r)
+    def p(data): print str(data)
+    p()
