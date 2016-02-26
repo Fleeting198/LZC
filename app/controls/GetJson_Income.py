@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-from flask import jsonify
 from app.models import *
 from sqlalchemy import and_
 
@@ -28,5 +27,5 @@ def GetJson_Income(devID, modeDate, modeTime, startDate, endDate):
     axisLabels, vals = process.get_time_distribution(modeTime)
     json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
 
-    json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
+    json_response = {'json_dateTrend':json_dateTrend, 'json_timeDistribution':json_timeDistribution}
     return json_response

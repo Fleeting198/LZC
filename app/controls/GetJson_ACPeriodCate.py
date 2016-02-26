@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-from flask import jsonify
 from app.models import *
 from sqlalchemy import and_
 
@@ -20,5 +19,7 @@ def GetJson_ACPeriodCate(userID, modeDate, startDate, endDate):
     from ACPeriodCate import ACPeriodCate
     json_dateTrend, json_timeDistribution = ACPeriodCate(res_datetimes, res_categorys, modeDate)
 
-    json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
+    # json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
+    json_response = {'json_dateTrend':json_dateTrend, 'json_timeDistribution':json_timeDistribution}
+
     return json_response

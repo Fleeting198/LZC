@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-from flask import jsonify
 from app.models import *
 
 def GetJson_IncomeFood(modeTime):
@@ -24,5 +23,5 @@ def GetJson_IncomeFood(modeTime):
     vals = [float(result.sum_amount) for result in results]
 
     json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
-    json_response = jsonify(json_timeDistribution=json_timeDistribution)
+    json_response = {'json_timeDistribution':json_timeDistribution}
     return json_response

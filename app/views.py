@@ -11,8 +11,10 @@ from flask import render_template, request, jsonify
 from app.models import *
 from app.forms import *
 
-from sqlalchemy import and_, func
+from sqlalchemy import and_, func, distinct
 import types
+from pandas import Series, DataFrame
+from app import helpers
 
 
 @app.route('/')
@@ -23,27 +25,69 @@ def show_index():
 @app.route('/summary')
 def show_summary():
 
+    userID = 'AQPTHHPQ'
+    startDate = ''
+    endDate = ''
+
     # 最近一月 distinct门禁地点名数
     # 门禁地点数
     # 地点类型比重第二高的 accategory
-    json_accategory = refresh_chart_accategory()
+    sql = "SELECT node_des,COUNT(acrec.node_des)as con from acrec where user_id='%s' GROUP BY node_des ORDER BY con DESC"%(userID)
+    # sql = db.session.query(acrec.node_des, func.count(acrec.node_des)).filter(acrec.user_id==userID).(acrec.node_des)
+    results = db.session.execute(sql).fetchall()
 
+    node_des = [result.node_des for result in results] # 地点名
+    count = [result.con for result in results]         # 地点门禁次数
+    node_cate = []                                     # 地点分类
+    total_count = sum(count)                           # 总门禁次数
+
+    for i in range(len(node_des)):
+        sql = db.session.query(ac_loc.category).filter(ac_loc.node_des==node_des[i])
+        node_cate.append(sql.first())
 
 
     # 最近一个月
     # 时间分布 6点~7点宿舍打卡
-    # 23点到5点打卡
+    # 23点到5点打卡  ACPeriodCate
 
-    # 图书，最近一个月图书馆次数，教学楼次数，需要教学楼二级分类？
+    from controls.GetJson_ACPeriodCate import GetJson_ACPeriodCate
+    json_ACPeriodCate = GetJson_ACPeriodCate(userID, 2, startDate, endDate)
+    timeDistri = json_ACPeriodCate["json_timeDistribution"]
+
+    dict_vals = {}
+    for item in timeDistri["seriesData"]:
+        dict_vals[item['name']] = item['data']
+
+    df = DataFrame(dict_vals, index=range(24))
+    # print df
+
+
+    # 图书，最近一个月图书馆、教学楼次数
+    from controls.GetJson_ACCategory import GetJson_ACCategory
+    json_ACCategory = GetJson_ACCategory(userID,startDate,startDate)
+
+    print json_ACCategory['seriesData']
+    for item in json_ACCategory['seriesData']:
+        if item['name'] == 'acad':
+            count_acad = item['value']
+        elif item['name'] == 'lib':
+            count_lib = item['value']
+
+    # print count_acad
+    # print count_lib
+
 
     # 好友 —— 等待好友结果
 
     # 账单： 最近一月：
     # 消费类型比例 concategory, conablilty, expenditure
+    
+
+
 
     # 滞纳金：penalty
 
-    return render_template('summarization.html',data=data)
+    return render_template('summarization.html')
 
 
 @app.route('/charts')
@@ -74,6 +118,7 @@ def refresh_chart_expenditure():
 
         from controls.GetJson_expenditure import GetJson_expenditure
         json_response = GetJson_expenditure(userID,modeDate,modeTime,startDate,endDate)
+        json_response = jsonify(json_response)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -150,6 +195,31 @@ def refresh_chart_acperiodcate():
 
         from controls.GetJson_ACPeriodCate import GetJson_ACPeriodCate
         json_response = GetJson_ACPeriodCate(userID,modeDate,startDate,endDate)
+
+        # ===========================
+        # 解包，翻译，打包
+        legendLabels = json_response['json_dateTrend']['legendLabels']
+        seriesData = json_response['json_dateTrend']['seriesData']
+
+        legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
+
+        json_response['json_dateTrend']['legendLabels'] = legendLabels
+        json_response['json_dateTrend']['seriesData'] = seriesData
+
+        legendLabels = json_response['json_timeDistribution']['legendLabels']
+        seriesData = json_response['json_timeDistribution']['seriesData']
+
+        legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
+
+        json_response['json_timeDistribution']['legendLabels'] = legendLabels
+        json_response['json_timeDistribution']['seriesData'] = seriesData
+        # ===========================
+
+        json_response = jsonify(json_response)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -178,6 +248,7 @@ def refresh_chart_income():
 
         from controls.GetJson_Income import GetJson_Income
         json_response = GetJson_Income(devID,modeDate, modeTime, startDate, endDate)
+        json_response = jsonify(json_response)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -202,6 +273,7 @@ def refresh_chart_foodIncome():
 
         from controls.GetJson_IncomeFood import GetJson_IncomeFood
         json_response = GetJson_IncomeFood(modeTime)
+        json_response = jsonify(json_response)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -226,6 +298,7 @@ def refresh_chart_acvalid():
 
         from controls.GetJson_ACValid import GetJson_ACValid
         json_response = GetJson_ACValid(userID, startDate, endDate)
+        json_response = jsonify(json_response)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -250,6 +323,20 @@ def refresh_chart_accategory():
 
         from controls.GetJson_ACCategory import GetJson_ACCategory
         json_response = GetJson_ACCategory(userID, startDate, endDate)
+
+        # ==================
+        titles = json_response['titles']
+        seriesData = json_response['seriesData']
+
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
+        titles = [helpers.translate(title) for title in titles]
+
+        json_response['titles'] = titles
+        json_response['seriesData'] = seriesData
+        # ==================
+
+        json_response = jsonify(json_response)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -274,6 +361,20 @@ def refresh_chart_concategory():
 
         from controls.GetJson_ConCategory import GetJson_ConCategory
         json_response = GetJson_ConCategory(userID, startDate, endDate)
+
+        # ==================
+        titles = json_response['titles']
+        seriesData = json_response['seriesData']
+
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
+        titles = [helpers.translate(title) for title in titles]
+
+        json_response['titles'] = titles
+        json_response['seriesData'] = seriesData
+        # ==================
+
+        json_response = jsonify(json_response)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -369,6 +470,7 @@ def refresh_chart_conWaterTime():
         modeTime = int(form.modeTime.data)  # 赋值给变量
         from controls.GetJson_ConWaterTime import GetJson_ConWaterTime
         json_response = GetJson_ConWaterTime(modeTime)
+        json_response = jsonify(json_response)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -390,6 +492,7 @@ def refresh_chart_conability():
 
         from controls.GetJson_ConAbility import GetJson_ConAbility
         json_response = GetJson_ConAbility(userID)
+        json_response = jsonify(json_response)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -415,6 +518,7 @@ def refresh_chart_penalty():
         userID = form.userID.data
         from controls.GetJson_Penalty import GetJson_Penalty
         json_response = GetJson_Penalty(userID)
+        json_response = jsonify(json_response)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response

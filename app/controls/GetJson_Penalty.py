@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-from flask import jsonify
 from app.models import *
 
 def GetJson_Penalty(userID):
@@ -21,6 +20,6 @@ def GetJson_Penalty(userID):
     # return
     json_userAmount = {'userAmount': str(userAmount)}
     json_penalty = {'amount': amount, 'num': num}
-    json_response = jsonify(json_userAmount = json_userAmount, json_penalty = json_penalty)
+    json_response = {'json_userAmount':json_userAmount, 'json_penalty':json_penalty}
 
     return json_response

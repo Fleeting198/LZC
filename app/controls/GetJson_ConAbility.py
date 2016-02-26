@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-from flask import jsonify
 from app.models import *
 
 def GetJson_ConAbility(userID):
@@ -23,6 +22,6 @@ def GetJson_ConAbility(userID):
     # return
     json_userAmount = {'userAmount': str(userAmount)}
     json_conability = {'amount': amount, 'num': num}
-    json_response = jsonify(json_userAmount=json_userAmount, json_conability=json_conability)
+    json_response = {'json_userAmount':json_userAmount, 'json_conability':json_conability}
 
     return json_response

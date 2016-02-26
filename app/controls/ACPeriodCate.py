@@ -10,11 +10,13 @@ import types
 
 
 def ACPeriodCate(res_datetimes, res_categorys, mode_date):
-    # Original data.
     oriDate = res_datetimes
     oriValues = res_categorys
 
-    # dateTrend  ===============================
+    # =====================================================
+    # dateTrend
+    # =====================================================
+
     # Copy source data.
     axisLabels = oriDate[:]
     pointVals = [{copy.deepcopy(oriValue): 1} for oriValue in oriValues]
@@ -43,14 +45,12 @@ def ACPeriodCate(res_datetimes, res_categorys, mode_date):
         data = map(lambda x: 0.0 if isnan(x) else float(x), col.tolist())
         seriesData.append({'name': colName, 'data': data})
 
-    # Translate.
-    legendLabels = map(lambda x: helpers.translate(x), legendLabels)
-    for datum in seriesData:
-        datum['name'] = helpers.translate(datum['name'])
-
     json_dateTrend = {'axisLabels': axisLabels, 'legendLabels': legendLabels, 'seriesData': seriesData}
 
-    # timeDistribution   ===============================
+    # =====================================================
+    # timeDistribution
+    # =====================================================
+
     # Copy source data.
     dates = oriDate[:]
     values = [{copy.deepcopy(oriValue): 1} for oriValue in oriValues]
@@ -87,11 +87,6 @@ def ACPeriodCate(res_datetimes, res_categorys, mode_date):
         legendLabels.append(colName)
         data = map(lambda x: 0 if isnan(x) else int(x), col.tolist())
         seriesData.append({'name': colName, 'data': data})
-
-    # Translate.
-    legendLabels = map(lambda x: helpers.translate(x), legendLabels)
-    for datum in seriesData:
-        datum['name'] = helpers.translate(datum['name'])
 
     json_timeDistribution = {'axisLabels': axisLabels, 'legendLabels': legendLabels, 'seriesData': seriesData}
 

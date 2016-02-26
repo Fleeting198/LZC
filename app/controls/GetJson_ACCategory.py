@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-from flask import jsonify
 from app.models import *
 from sqlalchemy import and_, func
 
@@ -17,6 +16,5 @@ def GetJson_ACCategory(userID, startDate, endDate):
     from CategoryProcess import CategoryProcess
     titles, seriesData = CategoryProcess(results)
 
-    json_response = jsonify({'titles': titles, 'seriesData': seriesData})
-
+    json_response = {'titles': titles, 'seriesData': seriesData}
     return json_response
