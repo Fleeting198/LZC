@@ -26,6 +26,7 @@ def show_summary():
     # 最近一月 distinct门禁地点名数
     # 门禁地点数
     # 地点类型比重第二高的 accategory
+    json_accategory = refresh_chart_accategory()
 
 
 
@@ -71,42 +72,17 @@ def refresh_chart_expenditure():
         startDate = form.dateRange.data[:10]
         endDate = form.dateRange.data[-10:]
 
-        # Query.
-        strQuery = db.session.query(consumption.con_datetime,consumption.amount).filter(
-            consumption.user_id == userID).order_by(consumption.con_datetime)
-        if len(startDate) != 0:
-            strQuery = strQuery.filter(
-                and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
-        results = strQuery.all()
-
-        # Get columns.
-        res_datetimes = [result.con_datetime for result in results]
-        res_amounts = [result.amount for result in results]
-
-        from app.controls.DateTimeValueProcess import DateTimeValueProcess
-        process = DateTimeValueProcess(res_datetimes, res_amounts)
-
-        # Get and pack dateTrend() return.
-        axisLabels, accumulatedVals, pointVals = process.get_date_trend(modeDate)
-        json_dateTrend = {'axisLabels': axisLabels, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
-        # json_dateTrend = jsonify(axisLabels=axisLabels, accumulatedVals=accumulatedVals, pointVals=pointVals)
-
-        # Get and pack timeDistribution() return.
-        axisLabels, vals = process.get_time_distribution(modeTime)
-        json_timeDistribution = {'axisLabels': axisLabels, 'vals':vals}
-        # json_timeDistribution = jsonify(axisLabels=axisLabels, vals=vals)
-
-        # 没有错误就不传errMsg。前端通过检查errMsg是否存在来判断查询是否成功。
-        json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
+        from controls.GetJson_expenditure import GetJson_expenditure
+        json_response = GetJson_expenditure(userID,modeDate,modeTime,startDate,endDate)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
 
 
-@app.route('/charts/acperiod')
-def show_chart_acperiod():
-    form = Form_User_DR_MD()
-    return render_template('chart-acperiod.html', form=form)
+# @app.route('/charts/acperiod')
+# def show_chart_acperiod():
+#     form = Form_User_DR_MD()
+#     return render_template('chart-acperiod.html', form=form)
 
 
 # @app.route('/charts/acperiod/getData', methods=['GET'])
@@ -172,20 +148,8 @@ def refresh_chart_acperiodcate():
         endDate = form.dateRange.data[-10:]
         modeDate = int(form.modeDate.data)
 
-        # Query.
-        strQuery = db.session.query(acrec.ac_datetime, ac_loc.category).filter(
-            and_(acrec.user_id == userID, acrec.node_des==ac_loc.node_des)).order_by(acrec.ac_datetime)
-        if len(startDate) != 0:
-            strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
-        results = strQuery.all()
-
-        res_datetimes = [result.ac_datetime for result in results]
-        res_categorys = [result.category for result in results]
-
-        from controls.ACPeriodCate import ACPeriodCate
-        json_dateTrend, json_timeDistribution = ACPeriodCate(res_datetimes, res_categorys, modeDate)
-
-        json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
+        from controls.GetJson_ACPeriodCate import GetJson_ACPeriodCate
+        json_response = GetJson_ACPeriodCate(userID,modeDate,startDate,endDate)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -212,31 +176,8 @@ def refresh_chart_income():
         startDate = form.dateRange.data[:10]
         endDate = form.dateRange.data[-10:]
 
-        # Query.
-        strQuery = db.session.query(consumption.con_datetime,consumption.amount).filter(
-            consumption.dev_id == devID).order_by(consumption.con_datetime)
-        if len(startDate) != 0:
-            strQuery = strQuery.filter(
-                and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
-        results = strQuery.all()
-        # Get columns.
-        res_datetimes = [result.con_datetime for result in results]
-        res_amounts = [result.amount for result in results]
-
-        # Process data.
-        from app.controls.DateTimeValueProcess import DateTimeValueProcess
-        process = DateTimeValueProcess(res_datetimes, res_amounts)
-
-        # Get and pack dateTrend() return.
-        axisLabels, accumulatedVals, pointVals = process.get_date_trend(modeDate)
-        json_dateTrend = {'axisLabels': axisLabels, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
-
-        # Get and pack timeDistribution() return.
-        axisLabels, vals = process.get_time_distribution(modeTime)
-        json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
-
-        # 没有错误就不传errMsg
-        json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
+        from controls.GetJson_Income import GetJson_Income
+        json_response = GetJson_Income(devID,modeDate, modeTime, startDate, endDate)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -259,26 +200,8 @@ def refresh_chart_foodIncome():
     if form.validate():
         modeTime = int(form.modeTime.data)
 
-        # Query.
-        if modeTime == 0:
-            strQuery = db.session.query(con_food_24h.sum_amount).order_by(con_food_24h.con_axis)
-            axisLabels = []
-            for i in range(24):
-                axisLabels.append(str((i + 1) % 24) + u'点')
-        elif modeTime == 1:
-            axisLabels = [u'周一', u'周二', u'周三', u'周四', u'周五', u'周六', u'周日', ]
-            strQuery = db.session.query(con_food_7d.con_axis, con_food_7d.sum_amount).order_by(con_food_7d.con_axis)
-        elif modeTime == 2:
-            axisLabels = [u'一月', u'二月', u'三月', u'四月', u'五月', u'六月', u'七月', u'八月', u'九月', u'十月', u'十一月', u'十二月', ]
-            strQuery = db.session.query(con_food_12m.con_axis, con_food_12m.sum_amount).order_by(con_food_12m.con_axis)
-
-        results = strQuery.all()
-
-        # Get columns.
-        vals = [float(result.sum_amount) for result in results]
-
-        json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
-        json_response = jsonify(json_timeDistribution=json_timeDistribution)
+        from controls.GetJson_IncomeFood import GetJson_IncomeFood
+        json_response = GetJson_IncomeFood(modeTime)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -301,17 +224,8 @@ def refresh_chart_acvalid():
         startDate = form.dateRange.data[:10]
         endDate = form.dateRange.data[-10:]
 
-        # Query.
-        strQuery = db.session.query(acrec.legal, func.count('*')).filter(acrec.user_id == userID).group_by(acrec.legal)
-        if len(startDate) != 0:
-            strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
-        results = strQuery.all()
-
-        # Process data.
-        from controls.CategoryProcess import CategoryProcess
-        titles, seriesData = CategoryProcess(results)
-
-        json_response = jsonify({'titles': titles, 'seriesData': seriesData})
+        from controls.GetJson_ACValid import GetJson_ACValid
+        json_response = GetJson_ACValid(userID, startDate, endDate)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -334,18 +248,8 @@ def refresh_chart_accategory():
         startDate = form.dateRange.data[:10]
         endDate = form.dateRange.data[-10:]
 
-        # Query.
-        strQuery = db.session.query(ac_loc.category, func.count('*')).filter(
-            and_(ac_loc.node_des==acrec.node_des, acrec.user_id==userID)).group_by(ac_loc.category)
-        if len(startDate) != 0:
-            strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
-        results = strQuery.all()
-
-        # Process data.
-        from controls.CategoryProcess import CategoryProcess
-        titles, seriesData = CategoryProcess(results)
-
-        json_response = jsonify({'titles': titles, 'seriesData': seriesData})
+        from controls.GetJson_ACCategory import GetJson_ACCategory
+        json_response = GetJson_ACCategory(userID, startDate, endDate)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -368,19 +272,8 @@ def refresh_chart_concategory():
         startDate = form.dateRange.data[:10]
         endDate = form.dateRange.data[-10:]
 
-        # Query.
-        strQuery = db.session.query(dev_loc.category, func.sum(consumption.amount)).filter(
-            and_(consumption.user_id == userID, dev_loc.node_id == device.node_id, device.dev_id == consumption.dev_id)).group_by(dev_loc.category)
-        if len(startDate) != 0:
-            strQuery = strQuery.filter(and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
-
-        results = strQuery.all()
-
-        # Process data.
-        from controls.CategoryProcess import CategoryProcess
-        titles, seriesData = CategoryProcess(results)
-
-        json_response = jsonify({'titles': titles, 'seriesData': seriesData})
+        from controls.GetJson_ConCategory import GetJson_ConCategory
+        json_response = GetJson_ConCategory(userID, startDate, endDate)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -461,39 +354,21 @@ def refresh_chart_number():
     return json_response
 
 
-@app.route('/charts/conwaterC')
-def show_chart_conWaterC():
+@app.route('/charts/conwatertime')
+def show_chart_conWaterTime():
     form = Form_DR_MD_MT()
-    return render_template('chart-conwaterC.html', form=form)
+    return render_template('chart-conwatertime.html', form=form)
 
 
-@app.route('/charts/conwaterC/getData', methods=['GET'])
-def refresh_chart_conWaterC():
+@app.route('/charts/conwatertime/getData', methods=['GET'])
+def refresh_chart_conWaterTime():
     form = Form_MT()
     form.modeTime.data = request.args.get('modeTime')
 
     if form.validate():
         modeTime = int(form.modeTime.data)  # 赋值给变量
-
-        # Query.
-        if modeTime == 0:
-            strQuery = db.session.query(con_food_24h.con_axis, con_food_24h.sum_amount).order_by(con_food_24h.con_axis)
-            axisLabels = []
-            for i in range(24):
-                axisLabels.append(str((i + 1) % 24) + u'点')
-        elif modeTime == 1:
-            axisLabels = [u'周一', u'周二', u'周三', u'周四', u'周五', u'周六', u'周日', ]
-            strQuery = db.session.query(con_food_7d.con_axis, con_food_7d.sum_amount).order_by(con_food_7d.con_axis)
-        elif modeTime == 2:
-            axisLabels = [u'一月', u'二月', u'三月', u'四月', u'五月', u'六月', u'七月', u'八月', u'九月', u'十月', u'十一月', u'十二月', ]
-            strQuery = db.session.query(con_food_12m.con_axis, con_food_12m.sum_amount).order_by(
-                con_food_12m.con_axis)
-        results = strQuery.all()
-
-        vals = [float(result.sum_amount) for result in results]
-
-        json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
-        json_response = jsonify(json_timeDistribution=json_timeDistribution)
+        from controls.GetJson_ConWaterTime import GetJson_ConWaterTime
+        json_response = GetJson_ConWaterTime(modeTime)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -513,27 +388,8 @@ def refresh_chart_conability():
     if form.validate():
         userID = form.userID.data
 
-        # search for user conability & role
-        strQuery = db.session.query(conability.amount_avg, conability.role).filter(conability.user_id == userID)
-        results = strQuery.first()
-
-        # unpacking results
-        userAmount, role = results
-
-        strQueryLine = db.session.query(conability_line.amount_avg, conability_line.num).filter(conability_line.role == role).order_by(conability_line.amount_avg)
-        resultsLine = strQueryLine.all()
-
-        # process conability for all
-        amount = []
-        num = []
-        for result in resultsLine:
-            amount.append(result[0])
-            num.append(result[1])
-
-        # return
-        json_userAmount = {'userAmount': str(userAmount)}
-        json_conability = {'amount': amount, 'num': num}
-        json_response = jsonify({'json_userAmount': json_userAmount, 'json_conability': json_conability})
+        from controls.GetJson_ConAbility import GetJson_ConAbility
+        json_response = GetJson_ConAbility(userID)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -557,27 +413,8 @@ def refresh_chart_penalty():
 
     if form.validate():
         userID = form.userID.data
-
-        # query
-        strQuery = db.session.query(penalty.amount).filter(penalty.user_id == userID)
-        strQueryLine = db.session.query(penalty_line.amount, penalty_line.num).order_by(penalty_line.amount)
-        results = strQuery.first()
-        resultsLine = strQueryLine.all()
-
-        # unpacking results
-        userAmount = results[0]
-
-        # process conability for all
-        amount = []
-        num = []
-        for result in resultsLine:
-            amount.append(result[0])
-            num.append(result[1])
-
-        # return
-        json_userAmount = {'userAmount': str(userAmount)}
-        json_penalty = {'amount': amount, 'num': num}
-        json_response = jsonify({'json_userAmount': json_userAmount, 'json_penalty': json_penalty})
+        from controls.GetJson_Penalty import GetJson_Penalty
+        json_response = GetJson_Penalty(userID)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
