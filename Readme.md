@@ -15,3 +15,4 @@ Run `python run.py` to start the app.
 * Flask-SQLAlchemy
 * Flask-wtf
 * wtforms
+* pandas
