@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style
+	img
+></style>
+
+<div id="fullpage">
+	<div class="section" id="section0">
+<!-- 		<div class="content">
+			<h1>考而不死是为神</h1>
+			<p>100</p>
+		</div> -->
+	</div>
+	<div class="section" id="section1">
+		<div class="slide" id="slide1">
+			<div class="content">
+				<!-- <h1>我的课程</h1>
+				<p>
+					这个学期，我不在上课，就在去上课的路上， 搞定……
+				</p>
+				<p>
+		      		傲视全国……
+				</p> -->
+			</div>
+		</div>
+		<div class="slide" id="slide2">
+			<!-- <div class="content">
+				<h1>这个是一个图表</h1>
+			</div> -->
+		</div>
+	</div>
+	<div class="section" id="section2">
+		<div class="content">
+			<!-- <h1>我的同学</h1>
+			<p>偶尔上课，其实是为了更美好的遇见，有……</p> -->
+		</div>
+	</div>
+	<div class="section" id="section3">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-7 col-sm-7">
+					<img data-src="../static/pic/section3/section3StraightA.png" class="img-responsive center-block">
+				</div>
+				<div class="col-md-5 col-sm-5">
+					<h1>
+						我的学习
+					</h1>
+					<p>
+						在最近的一个月中，
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section" id="section4">
+		<div class="content">
+			
+		</div>
+	</div>
+	<div class="section" id="section5">
+		<div class="content">
+			
+		</div>
+	</div>
+	<div class="section" id="section6">
+		<div class="content">
+			
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+
+	$(document).ready(function() {
+	    $('#fullpage').fullpage({
+	        //Navigation
+	        menu: false,
+	        lockAnchors: false,
+			anchors: [],
+	        navigation: true,
+	        navigationPosition: 'right',
+	        navigationTooltips: [],
+	        showActiveTooltip: false,
+	        slidesNavigation: true,
+	        slidesNavPosition: 'bottom',
+
+	        //Scrolling
+	        css3: true,
+	        scrollingSpeed: 700,
+	        autoScrolling: true,
+	        fitToSection: true,
+	        fitToSectionDelay: 1000,
+	        scrollBar: false,
+	        easing: 'easeInOutCubic',
+	        easingcss3: 'ease',
+	        loopBottom: false,
+	        loopTop: false,
+	        loopHorizontal: true,
+	        continuousVertical: false,
+	        normalScrollElements: null,
+	        scrollOverflow: false,
+	        touchSensitivity: 5,
+	        normalScrollElementTouchThreshold: 5,
+
+	        //Accessibility
+	        keyboardScrolling: true,
+	        animateAnchor: true,
+	        recordHistory: false,
+
+	        //Design
+	        controlArrows: true,
+	        verticalCentered: true,
+	        resize : true,
+	        // sectionsColor : ['#C0392B', '#D35400', '#F39C12', '#27AE60', '#16A085', '#2980B9', '#8E44AD'],
+	        sectionsColor : ['#E74C3C', '#E67E22', '#F1C40F', '#2ECC71', '#1ABC9C', '#3498DB', '#9B59B6'],
+	        paddingTop: 0,
+	        paddingBottom: 0,
+	        fixedElements: '#header, .footer',
+	        responsiveWidth: 0,
+	        responsiveHeight: 0,
+
+	        //Custom selectors
+	        sectionSelector: '.section',
+	        slideSelector: '.slide',
+
+	        //events
+	        // onLeave: function(index, nextIndex, direction){},
+	        // afterLoad: function(anchorLink, index){},
+	        // afterRender: function(){},
+	        // afterResize: function(){},
+	        // afterSlideLoad: function(anchorLink, index, slideAnchor, slideIndex){},
+	        // onSlideLeave: function(anchorLink, index, slideIndex, direction, nextSlideIndex){}
+	    });
+	});
+
+</script>
+
+{% endblock %}

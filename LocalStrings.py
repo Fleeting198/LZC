@@ -7,6 +7,7 @@ devID = u'设备号'
 startDate = u'开始日期'
 endDate = u'结束日期'
 modeDate = u'日期模式'
+modeTime = u'时间模式'
 dateRange = u'日期范围'
 
 warn_userIDFill = u'工号不可为空'
@@ -14,12 +15,8 @@ warn_userIDLength = u'工号长度应为8'
 warn_devIDFill = u'设备号不可为空'
 warn_devIDLength = u'设备号长度最大为10'
 
-Day = u'日'
-Mon = u'月'
-Wek = u'周'
-Qtr = u'季'
-Yer = u'年'
-
+opts_modeDate = (u'日', u'月', u'周', u'季', u'年')
+opts_modeTime = (u'24小时', u'7天', u'12月')
 
 dictTrans = {
     'water' : u'生活用水',

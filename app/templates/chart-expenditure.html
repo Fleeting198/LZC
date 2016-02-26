@@ -1,11 +1,17 @@
 {% extends "charts.html" %}
 {% block chartField %}
 
-    <form id="form-ipt" class="form-inline" >
+    <form id="form-ipt" class="form-inline" xmlns="http://www.w3.org/1999/html">
         {{ form.userID(class="form-control", maxlength='8', placeholder='工号' ,value='TPPZLPHY') }}
         {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
+        </br>
         {{ form.modeDate.label }}
         {% for subfield in form.modeDate %}
+            {{ subfield }}{{ subfield.label }}
+            &nbsp;&nbsp;
+        {% endfor %}
+        {{ form.modeTime.label }}
+        {% for subfield in form.modeTime %}
             {{ subfield }}{{ subfield.label }}
             &nbsp;&nbsp;
         {% endfor %}
@@ -147,7 +153,7 @@
                 }
             ],
             series: [{
-                name: '支出总额',
+                name: '平均支出',
                 type: 'bar',
                 data: []
             }]
@@ -173,19 +179,16 @@
                 json_dateTrend = json_response.json_dateTrend;
                 json_timeDistribution = json_response.json_timeDistribution;
 
-
                 if(!json_response.errMsg){
                     chartDateTrend.setOption({
                         xAxis: [{
                             data: json_dateTrend.axisLabels
                         }],
                         series: [
-                            {
-                                name: '累积支出',
+                            { name: '累积支出',
                                 data: json_dateTrend.accumulatedVals
                             },
-                            {
-                                name: '节点支出',
+                            {name: '节点支出',
                                 data: json_dateTrend.pointVals
                             }
                         ]
@@ -198,7 +201,6 @@
                             data: json_timeDistribution.vals
                         }]
                     });
-
                 }else{
                     for(err in json_response.errMsg){
                         alert(json_response.errMsg[err]);

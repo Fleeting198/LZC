@@ -47,7 +47,11 @@ class DateTimeValueProcess:
         dates = self.oriDate[:]
         values = self.oriValues[:]
 
-        if mode_time==0:
+        span_d = (dates[-1] - dates[0]).days
+        span_w = float((dates[-1] - dates[0]).days) / 7
+        span_y = float((dates[-1] - dates[0]).days) / 365
+
+        if mode_time == 0:
             # 按天 - 24小时分割时间段
             dates = map(lambda x: x.time().hour, dates)
             periods = []
@@ -55,18 +59,24 @@ class DateTimeValueProcess:
             for i in range(24):
                 periods.append(i)
                 axisLabels.append(str(i) + u'点~' + str((i + 1) % 24) + u'点')
+            # 跨多少天
+            divider = Decimal(span_d)
 
-        elif mode_time==1:
+        elif mode_time == 1:
             # 按周 - 7天分割时间段
             dates = map(lambda x: x.weekday()+1, dates)
             axisLabels = [u'周一',u'周二',u'周三', u'周四',u'周五', u'周六',u'周日',]
             periods = [1,2,3,4,5,6,7]
+            # 跨多少周
+            divider = Decimal(span_w)
 
-        elif mode_time==2:
+        elif mode_time == 2:
             # 按年 - 月分割时间段
             dates = map(lambda x: x.day, dates)
             axisLabels = [u'一月', u'二月', u'三月', u'四月', u'五月', u'六月', u'七月', u'八月', u'九月', u'十月', u'十一月', u'十二月',]
             periods = range(1,13)
+            # 跨多少年
+            divider = Decimal(span_y)
 
         vals = [Decimal(0)] * len(periods)  # Init vals
 
@@ -77,9 +87,10 @@ class DateTimeValueProcess:
                     dividers[j] += 1
                     vals[j] += values[i]
 
-        # TODO: vals 取平均值
+        # vals 取平均值
+        # 求日期跨度
         for i in range(len(vals)):
-            vals[i] /= dividers[i]
+            vals[i] = vals[i]/divider if divider!= 0 else 0
 
         vals = map(lambda x:float(x), vals)
         return axisLabels, vals

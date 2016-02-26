@@ -20,6 +20,31 @@ def show_index():
     return render_template('index.html')
 
 
+@app.route('/summary')
+def show_summary():
+
+    # 最近一月 distinct门禁地点名数
+    # 门禁地点数
+    # 地点类型比重第二高的 accategory
+
+
+
+    # 最近一个月
+    # 时间分布 6点~7点宿舍打卡
+    # 23点到5点打卡
+
+    # 图书，最近一个月图书馆次数，教学楼次数，需要教学楼二级分类？
+
+    # 好友 —— 等待好友结果
+
+    # 账单： 最近一月：
+    # 消费类型比例 concategory, conablilty, expenditure
+
+    # 滞纳金：penalty
+
+    return render_template('summarization.html',data=data)
+
+
 @app.route('/charts')
 def show_charts():
     return render_template('charts.html')
@@ -27,20 +52,22 @@ def show_charts():
 
 @app.route('/charts/expenditure')
 def show_chart_expenditure():
-    form = Form_UserDaterangeMode()
+    form = Form_User_DR_MD_MT()
     return render_template('chart-expenditure.html', form=form)
 
 
 @app.route('/charts/expenditure/getData', methods=['GET'])
 def refresh_chart_expenditure():
-    form = Form_UserDaterangeMode()
+    form = Form_User_DR_MD_MT()
     form.userID.data = request.args.get('userID')
     form.modeDate.data = request.args.get('modeDate')
+    form.modeTime.data = request.args.get('modeTime')
     form.dateRange.data = request.args.get('dateRange')
 
     if form.validate():
         userID = form.userID.data
         modeDate = int(form.modeDate.data)
+        modeTime = int(form.modeTime.data)
         startDate = form.dateRange.data[:10]
         endDate = form.dateRange.data[-10:]
 
@@ -65,7 +92,7 @@ def refresh_chart_expenditure():
         # json_dateTrend = jsonify(axisLabels=axisLabels, accumulatedVals=accumulatedVals, pointVals=pointVals)
 
         # Get and pack timeDistribution() return.
-        axisLabels, vals = process.get_time_distribution()
+        axisLabels, vals = process.get_time_distribution(modeTime)
         json_timeDistribution = {'axisLabels': axisLabels, 'vals':vals}
         # json_timeDistribution = jsonify(axisLabels=axisLabels, vals=vals)
 
@@ -78,53 +105,53 @@ def refresh_chart_expenditure():
 
 @app.route('/charts/acperiod')
 def show_chart_acperiod():
-    form = Form_UserDaterangeMode()
+    form = Form_User_DR_MD()
     return render_template('chart-acperiod.html', form=form)
 
 
-@app.route('/charts/acperiod/getData', methods=['GET'])
-def refresh_chart_acperiod():
-    form = Form_UserDaterangeMode()
-    form.userID.data = request.args.get('userID')
-    form.dateRange.data = request.args.get('dateRange')
-    form.modeDate.data = request.args.get('modeDate')
-
-    if form.validate():
-        userID = form.userID.data
-        startDate = form.dateRange.data[:10]
-        endDate = form.dateRange.data[-10:]
-        modeDate = int(form.modeDate.data)
-
-        # Query.
-        strQuery = db.session.query(acrec.ac_datetime).filter(acrec.user_id == userID).order_by(acrec.ac_datetime)
-        if len(startDate) != 0:
-            strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
-        results = strQuery.all()
-        res_datetimes = [result.ac_datetime for result in results]
-
-        # Process data.
-        from app.controls.DateTimeValueProcess import DateTimeValueProcess
-        process = DateTimeValueProcess(res_datetimes)
-
-        # 包装dateTrend 返回值。
-        # 这个功能暂时不需要连续值，但还是必须获取，逻辑模块写一起了。
-        axisLabels, accumulatedVals, pointVals = process.get_date_trend(modeDate)
-
-        json_dateTrend = {'axisLabels': axisLabels, 'pointVals': pointVals}
-
-        # timeDistribution 返回值
-        axisLabels, vals = process.get_time_distribution()
-        json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
-
-        json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
-    else:
-        json_response = jsonify(errMsg=form.errors)
-    return json_response
+# @app.route('/charts/acperiod/getData', methods=['GET'])
+# def refresh_chart_acperiod():
+#     form = Form_User_DR_MD()
+#     form.userID.data = request.args.get('userID')
+#     form.dateRange.data = request.args.get('dateRange')
+#     form.modeDate.data = request.args.get('modeDate')
+#
+#     if form.validate():
+#         userID = form.userID.data
+#         startDate = form.dateRange.data[:10]
+#         endDate = form.dateRange.data[-10:]
+#         modeDate = int(form.modeDate.data)
+#
+#         # Query.
+#         strQuery = db.session.query(acrec.ac_datetime).filter(acrec.user_id == userID).order_by(acrec.ac_datetime)
+#         if len(startDate) != 0:
+#             strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
+#         results = strQuery.all()
+#         res_datetimes = [result.ac_datetime for result in results]
+#
+#         # Process data.
+#         from app.controls.DateTimeValueProcess import DateTimeValueProcess
+#         process = DateTimeValueProcess(res_datetimes)
+#
+#         # 包装dateTrend 返回值。
+#         # 这个功能暂时不需要连续值，但还是必须获取，逻辑模块写一起了。
+#         axisLabels, accumulatedVals, pointVals = process.get_date_trend(modeDate)
+#
+#         json_dateTrend = {'axisLabels': axisLabels, 'pointVals': pointVals}
+#
+#         # timeDistribution 返回值
+#         axisLabels, vals = process.get_time_distribution()
+#         json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
+#
+#         json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
+#     else:
+#         json_response = jsonify(errMsg=form.errors)
+#     return json_response
 
 
 @app.route('/charts/acperiodcate')
 def show_chart_acperiodcate():
-    form = Form_UserDaterangeMode()
+    form = Form_User_DR_MD()
     return render_template('chart-acperiodcate.html', form=form)
 
 
@@ -134,7 +161,7 @@ def refresh_chart_acperiodcate():
     门禁分类日期趋势时间分布    -C
     Codes mainly in controls.ACPeriodCate.py.
     """
-    form = Form_UserDaterangeMode()
+    form = Form_User_DR_MD()
     form.userID.data = request.args.get('userID')
     form.dateRange.data = request.args.get('dateRange')
     form.modeDate.data = request.args.get('modeDate')
@@ -166,20 +193,22 @@ def refresh_chart_acperiodcate():
 
 @app.route('/charts/income')
 def show_chart_income():
-    form = Form_DevDaterangeMode()
+    form = Form_Dev_DR_MD_MT()
     return render_template('chart-income.html', form=form)
 
 
 @app.route('/charts/income/getData', methods=['GET'])
 def refresh_chart_income():
-    form = Form_DevDaterangeMode()
+    form = Form_Dev_DR_MD_MT()
     form.devID.data = request.args.get('devID')
     form.modeDate.data = request.args.get('modeDate')
+    form.modeTime.data = request.args.get('modeTime')
     form.dateRange.data = request.args.get('dateRange')
 
     if form.validate():
         devID = form.devID.data
         modeDate = int(form.modeDate.data)
+        modeTime = int(form.modeTime.data)
         startDate = form.dateRange.data[:10]
         endDate = form.dateRange.data[-10:]
 
@@ -203,7 +232,7 @@ def refresh_chart_income():
         json_dateTrend = {'axisLabels': axisLabels, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
 
         # Get and pack timeDistribution() return.
-        axisLabels, vals = process.get_time_distribution()
+        axisLabels, vals = process.get_time_distribution(modeTime)
         json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
 
         # 没有错误就不传errMsg
@@ -215,51 +244,41 @@ def refresh_chart_income():
 
 @app.route('/charts/foodIncome')
 def show_chart_foodIncome():
-    form = Form_DaterangeMode()
+    form = Form_MT()
     return render_template('chart-foodIncome.html', form=form)
 
 
 @app.route('/charts/foodIncome/getData', methods=['GET'])
 def refresh_chart_foodIncome():
-    # TODO: 查询太慢
     """
     获得设备地点表中分类为“餐饮”的地点的设备的金额总数。
     """
-    form = Form_DaterangeMode()
-    form.dateRange.data = request.args.get('dateRange')
-    form.modeDate.data = request.args.get('modeDate')
+    form = Form_MT()
+    form.modeTime.data = request.args.get('modeTime')
 
     if form.validate():
-        # 赋值给变量
-        startDate = form.dateRange.data[:10]
-        endDate = form.dateRange.data[-10:]
-        modeDate = form.modeDate.data
+        modeTime = int(form.modeTime.data)
 
         # Query.
-        strQuery = db.session.query(consumption.con_datetime, func.sum(consumption.amount)).filter(
-            and_(dev_loc.category=='food', dev_loc.node_id==device.node_id, device.dev_id==consumption.dev_id
-                 )).order_by(consumption.con_datetime)
-        if len(startDate) != 0:    # Date range.
-            strQuery = strQuery.filter(and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
+        if modeTime == 0:
+            strQuery = db.session.query(con_food_24h.sum_amount).order_by(con_food_24h.con_axis)
+            axisLabels = []
+            for i in range(24):
+                axisLabels.append(str((i + 1) % 24) + u'点')
+        elif modeTime == 1:
+            axisLabels = [u'周一', u'周二', u'周三', u'周四', u'周五', u'周六', u'周日', ]
+            strQuery = db.session.query(con_food_7d.con_axis, con_food_7d.sum_amount).order_by(con_food_7d.con_axis)
+        elif modeTime == 2:
+            axisLabels = [u'一月', u'二月', u'三月', u'四月', u'五月', u'六月', u'七月', u'八月', u'九月', u'十月', u'十一月', u'十二月', ]
+            strQuery = db.session.query(con_food_12m.con_axis, con_food_12m.sum_amount).order_by(con_food_12m.con_axis)
+
         results = strQuery.all()
 
         # Get columns.
-        res_datetimes = [result.con_datetime for result in results]
-        res_amounts = [result.amount for result in results]
+        vals = [float(result.sum_amount) for result in results]
 
-        # Process data.
-        from app.controls.DateTimeValueProcess import DateTimeValueProcess
-        process = DateTimeValueProcess(res_datetimes, res_amounts)
-
-        # Get and pack dateTrend() return.
-        axisLabels, accumulatedVals, pointVals = process.get_date_trend(modeDate)
-        json_dateTrend = {'axisLabels': axisLabels, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
-
-        # Get and pack timeDistribution() return.
-        axisLabels, vals = process.get_time_distribution()
         json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
-
-        json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
+        json_response = jsonify(json_timeDistribution=json_timeDistribution)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -267,13 +286,13 @@ def refresh_chart_foodIncome():
 
 @app.route('/charts/acvalid')
 def show_chart_acvalid():
-    form = Form_UserDaterange()
+    form = Form_User_DR()
     return render_template('chart-acvalid.html', form=form)
 
 
 @app.route('/charts/acvalid/getData')
 def refresh_chart_acvalid():
-    form = Form_UserDaterange()
+    form = Form_User_DR()
     form.userID.data = request.args.get('userID')
     form.dateRange.data = request.args.get('dateRange')
 
@@ -300,13 +319,13 @@ def refresh_chart_acvalid():
 
 @app.route('/charts/accategory')
 def show_chart_accategory():
-    form = Form_UserDaterange()
+    form = Form_User_DR()
     return render_template('chart-accategory.html', form=form)
 
 
 @app.route('/charts/accategory/getData')
 def refresh_chart_accategory():
-    form = Form_UserDaterange()
+    form = Form_User_DR()
     form.userID.data = request.args.get('userID')
     form.dateRange.data = request.args.get('dateRange')
 
@@ -334,13 +353,13 @@ def refresh_chart_accategory():
 
 @app.route('/charts/concategory')
 def show_chart_concategory():
-    form = Form_UserDaterange()
+    form = Form_User_DR()
     return render_template('chart-concategory.html', form=form)
 
 
 @app.route('/charts/concategory/getData')
 def refresh_chart_concategory():
-    form = Form_UserDaterange()
+    form = Form_User_DR()
     form.userID.data = request.args.get('userID')
     form.dateRange.data = request.args.get('dateRange')
 
@@ -444,46 +463,37 @@ def refresh_chart_number():
 
 @app.route('/charts/conwaterC')
 def show_chart_conWaterC():
-    form = Form_DaterangeMode()
+    form = Form_DR_MD_MT()
     return render_template('chart-conwaterC.html', form=form)
 
 
 @app.route('/charts/conwaterC/getData', methods=['GET'])
 def refresh_chart_conWaterC():
-    form = Form_DaterangeMode()
-    form.modeDate.data = request.args.get('modeDate')
-    form.dateRange.data = request.args.get('dateRange')
+    form = Form_MT()
+    form.modeTime.data = request.args.get('modeTime')
 
     if form.validate():
-        modeDate = int(form.modeDate.data)
-        startDate = form.dateRange.data[:10]
-        endDate = form.dateRange.data[-10:]
+        modeTime = int(form.modeTime.data)  # 赋值给变量
 
-        # Query. 所有用水消费信息
-        strQuery = db.session.query(con_water_simp.con_datetime, con_water_simp.amount)
-        if len(startDate) != 0:
-            strQuery = strQuery.filter(and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
+        # Query.
+        if modeTime == 0:
+            strQuery = db.session.query(con_food_24h.con_axis, con_food_24h.sum_amount).order_by(con_food_24h.con_axis)
+            axisLabels = []
+            for i in range(24):
+                axisLabels.append(str((i + 1) % 24) + u'点')
+        elif modeTime == 1:
+            axisLabels = [u'周一', u'周二', u'周三', u'周四', u'周五', u'周六', u'周日', ]
+            strQuery = db.session.query(con_food_7d.con_axis, con_food_7d.sum_amount).order_by(con_food_7d.con_axis)
+        elif modeTime == 2:
+            axisLabels = [u'一月', u'二月', u'三月', u'四月', u'五月', u'六月', u'七月', u'八月', u'九月', u'十月', u'十一月', u'十二月', ]
+            strQuery = db.session.query(con_food_12m.con_axis, con_food_12m.sum_amount).order_by(
+                con_food_12m.con_axis)
         results = strQuery.all()
 
-        # Get columns.
-        res_datetimes = [result.con_datetime for result in results]
-        res_amounts = [result.amount for result in results]
+        vals = [float(result.sum_amount) for result in results]
 
-        from app.controls.DateTimeValueProcess import DateTimeValueProcess
-        process = DateTimeValueProcess(res_datetimes, res_amounts)
-
-        # Get and pack dateTrend() return.
-        axisLabels, accumulatedVals, pointVals = process.get_date_trend(modeDate)
-        json_dateTrend = {'axisLabels': axisLabels, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
-        # json_dateTrend = jsonify(axisLabels=axisLabels, accumulatedVals=accumulatedVals, pointVals=pointVals)
-
-        # Get and pack timeDistribution() return.
-        axisLabels, vals = process.get_time_distribution()
         json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
-        # json_timeDistribution = jsonify(axisLabels=axisLabels, vals=vals)
-
-        # 没有错误就不传errMsg。前端通过检查errMsg是否存在来判断查询是否成功。
-        json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
+        json_response = jsonify(json_timeDistribution=json_timeDistribution)
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
@@ -511,7 +521,7 @@ def refresh_chart_conability():
         userAmount, role = results
 
         strQueryLine = db.session.query(conability_line.amount_avg, conability_line.num).filter(conability_line.role == role).order_by(conability_line.amount_avg)
-        resultsLine = strQueryLine.all();
+        resultsLine = strQueryLine.all()
 
         # process conability for all
         amount = []
@@ -527,6 +537,7 @@ def refresh_chart_conability():
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
+
 
 @app.route('/charts/conwater')
 def show_chart_conwater():
@@ -570,4 +581,3 @@ def refresh_chart_penalty():
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
-

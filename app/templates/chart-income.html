@@ -9,6 +9,11 @@
             {{ subfield }}{{ subfield.label }}
             &nbsp;&nbsp;
         {% endfor %}
+        {{ form.modeTime.label }}
+        {% for subfield in form.modeTime %}
+            {{ subfield }}{{ subfield.label }}
+            &nbsp;&nbsp;
+        {% endfor %}
         <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
     </form>
 
@@ -145,7 +150,7 @@
                 }
             ],
             series: [{
-                name: '收入总额',
+                name: '平均支出',
                 type: 'bar',
                 data: []
             }]

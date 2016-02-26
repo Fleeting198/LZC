@@ -154,7 +154,7 @@ class penalty(db.Model):
     user_id = db.Column(db.String(8), primary_key=True)
     amount = db.Column(db.DECIMAL())
 
-    def __init__(self, user_id, amount_avg, role):
+    def __init__(self, user_id, amount):
         self.user_id = user_id
         self.amount = amount
 
@@ -165,7 +165,31 @@ class penalty_line(db.Model):
     amount = db.Column(db.Integer(), primary_key=True)
     num = db.Column(db.Integer())
 
-    def __init__(self, amount_avg, num, role):
+    def __init__(self, amount_avg, num):
         self.amount_avg = amount_avg
         self.num = num
 
+# -C   用于查询食物和用水消费时间分布的现成表
+class con_food_12m(db.Model):
+    con_axis = db.Column(db.Integer(), primary_key=True)
+    sum_amount = db.Column(db.DECIMAL())
+
+class con_food_7d(db.Model):
+    con_axis = db.Column(db.Integer(), primary_key=True)
+    sum_amount = db.Column(db.DECIMAL())
+
+class con_food_24h(db.Model):
+    con_axis = db.Column(db.Integer(), primary_key=True)
+    sum_amount = db.Column(db.DECIMAL())
+
+class con_water_12m(db.Model):
+    con_axis = db.Column(db.Integer(), primary_key=True)
+    sum_amount = db.Column(db.DECIMAL())
+
+class con_water_7d(db.Model):
+    con_axis = db.Column(db.Integer(), primary_key=True)
+    sum_amount = db.Column(db.DECIMAL())
+
+class con_water_24h(db.Model):
+    con_axis = db.Column(db.Integer(), primary_key=True)
+    sum_amount = db.Column(db.DECIMAL())
