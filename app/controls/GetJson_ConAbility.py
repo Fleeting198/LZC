@@ -22,6 +22,7 @@ def GetJson_ConAbility(userID):
     # return
     json_userAmount = {'userAmount': str(userAmount)}
     json_conability = {'amount': amount, 'num': num}
+
     json_response = {'json_userAmount':json_userAmount, 'json_conability':json_conability}
 
     return json_response

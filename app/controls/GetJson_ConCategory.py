@@ -2,7 +2,6 @@
 # -*- coding: UTF-8 -*-
 
 from app.models import *
-
 from sqlalchemy import and_, func
 
 
@@ -13,12 +12,26 @@ def GetJson_ConCategory(userID, startDate, endDate):
              device.dev_id == consumption.dev_id)).group_by(dev_loc.category)
     if len(startDate) != 0:
         strQuery = strQuery.filter(and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
-
     results = strQuery.all()
 
     # Process data.
     from CategoryProcess import CategoryProcess
-    titles, seriesData = CategoryProcess(results)
+    titles, vals = CategoryProcess(results)
+
+    # seriesData = []  # [{value: , name: }, {value: , name: }, ...]
+    seriesData = []
+    for k, v in vals.iteritems():
+        seriesData.append({'value': v, 'name': k})
+
+    seriesData = sorted(seriesData, cmp_dictVN)[::-1]
 
     json_response = {'titles': titles, 'seriesData': seriesData}
     return json_response
+
+
+def cmp_dictVN(d1, d2):
+    if d1['value'] < d2['value']:
+        return -1
+    if d1['value'] > d2['value']:
+        return 1
+    return 0

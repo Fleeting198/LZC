@@ -29,9 +29,14 @@ def show_summary():
     startDate = ''
     endDate = ''
 
+    # =================================
+    # 门禁
+    # =================================
+    #
     # 最近一月 distinct门禁地点名数
     # 门禁地点数
-    # 地点类型比重第二高的 accategory
+    # 地点类型 accategory
+
     sql = "SELECT node_des,COUNT(acrec.node_des)as con from acrec where user_id='%s' GROUP BY node_des ORDER BY con DESC"%(userID)
     # sql = db.session.query(acrec.node_des, func.count(acrec.node_des)).filter(acrec.user_id==userID).(acrec.node_des)
     results = db.session.execute(sql).fetchall()
@@ -41,11 +46,19 @@ def show_summary():
     node_cate = []                                     # 地点分类
     total_count = sum(count)                           # 总门禁次数
 
+    ac_items = []
     for i in range(len(node_des)):
         sql = db.session.query(ac_loc.category).filter(ac_loc.node_des==node_des[i])
         node_cate.append(sql.first())
+        ac_items.append({'node_des': node_des[i], 'count': count[i], 'node_cate': node_cate[i]})
+
+    ret_access = {'count_nodes': len(node_des), 'total_count':total_count, 'ac_items': ac_items }
 
 
+    # =================================
+    # 生活习惯
+    # =================================
+    #
     # 最近一个月
     # 时间分布 6点~7点宿舍打卡
     # 23点到5点打卡  ACPeriodCate
@@ -59,34 +72,123 @@ def show_summary():
         dict_vals[item['name']] = item['data']
 
     df = DataFrame(dict_vals, index=range(24))
-    # print df
+
+    df['SUM'] = 0
+    for col, vals in df.iteritems():
+        if col == 'SUM': break
+        df['SUM'] += vals
+
+    count_early = df.loc[6]['dorm']  # 取 6 点宿舍值，总计早起次数
+    count_night = sum(df.loc[0:6]['SUM'].tolist()) + int(df.loc[23])  # 取23点 ~ 5点总门禁次数
+
+    ret_habit = {'count_early': count_early, 'count_night': count_night }
 
 
-    # 图书，最近一个月图书馆、教学楼次数
+    # =================================
+    # 学习
+    # =================================
+    #
+    # 最近一个月图书馆、教学楼次数
+
     from controls.GetJson_ACCategory import GetJson_ACCategory
     json_ACCategory = GetJson_ACCategory(userID,startDate,startDate)
 
-    print json_ACCategory['seriesData']
+    # print json_ACCategory['seriesData']
+
+    count_acad = count_lib = count_sci = 0
     for item in json_ACCategory['seriesData']:
         if item['name'] == 'acad':
             count_acad = item['value']
         elif item['name'] == 'lib':
             count_lib = item['value']
+        elif item['name'] == 'sci':
+            count_sci = item['value']
 
     # print count_acad
     # print count_lib
+    # print count_sci
+
+    ret_study = {'count_lib':count_lib, 'count_acad': count_acad, 'count_sci':count_sci}
 
 
+    # =================================
+    # 人际关系
+    # =================================
     # 好友 —— 等待好友结果
 
+
+    # ret_social = {'count_fris': }
+
+    # =================================
+    # 消费 bill
+    # =================================
+    #
     # 账单： 最近一月：
     # 消费类型比例 concategory, conablilty, expenditure
-    
+    # 一月消费总额
+
+    from controls.GetJson_expenditure import GetJson_expenditure
+    json_Expenditure = GetJson_expenditure(userID, 0, 2, startDate, endDate)
+    dateTrend = json_Expenditure['json_dateTrend']
+    total_expend = dateTrend['accumulatedVals'][-1]
+
+    # print total_expend
+
+
+    # 消费分类排名
+    from controls.GetJson_ConCategory import GetJson_ConCategory
+    json_ConCategory = GetJson_ConCategory(userID,startDate,endDate)
+
+    # [{'name': 'food', 'value': 2653.9}, {'name': 'shop', 'value': 177.5}, {'name': 'None', 'value': 56.5}, ...]
+    # print json_ConCategory['seriesData']
+
+
+    # 消费能力
+    # from controls.GetJson_ConAbility import GetJson_ConAbility
+    # json_ConAbility = GetJson_ConAbility(userID)
+    #
+    # print json_ConAbility['json_userAmount']['userAmount']    # 月均消费
+    # con_per_month = json_ConAbility['json_userAmount']['userAmount']
+    #
+    #
+    # ret_bill = {'total_expend':total_expend, 'con_items': json_ConCategory['seriesData'], 'con_per_month': con_per_month}
 
 
 
-    # 滞纳金：penalty
+    # =================================
+    # 滞纳金
+    # =================================
 
+    # from controls.GetJson_Penalty import GetJson_Penalty
+    # json_Penalty = GetJson_Penalty(userID)
+    #
+    # json_userAmount = json_Penalty['json_userAmount']
+    # json_penalty = json_Penalty['json_penalty']
+    #
+    # user_penalty = json_userAmount['userAmount']  # 总滞纳金
+    # amount = json_penalty['amount']
+    # num = json_penalty['num']
+    #
+    # idx_user = amount.index(user_penalty)
+    # count_less = sum(num[: idx_user])
+    # count_more = sum(num[idx_user: ])
+    # count_total = sum(num)
+    #
+    # percent_asc = float(count_less)/ count_total
+    # percent_desc = float(count_more)/ count_total
+    #
+    # # 滞纳金少于百分之x的总人数
+    #
+    # ret_penalty = {'user_penalty': user_penalty, 'percent_asc': percent_asc, 'percent_desc': percent_desc}
+
+
+    # =================================
+    # 打包
+
+    # vals_summary = {'ret_access': ret_access, 'ret_habit': ret_habit, 'ret_study': ret_study, 'ret_social': ret_social,
+    #                 'ret_bill': ret_bill, 'ret_penalty': ret_penalty }
+
+    # return render_template('summarization.html', vals_summary=vals_summary)
     return render_template('summarization.html')
 
 

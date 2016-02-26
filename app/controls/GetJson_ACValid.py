@@ -13,7 +13,12 @@ def GetJson_ACValid(userID, startDate, endDate):
 
     # Process data.
     from CategoryProcess import CategoryProcess
-    titles, seriesData = CategoryProcess(results)
+    titles, vals = CategoryProcess(results)
+
+    # seriesData = []  # [{value: , name: }, {value: , name: }, ...]
+    seriesData = []
+    for k, v in vals.iteritems():
+        seriesData.append({'value': v, 'name': k})
 
     json_response = {'titles': titles, 'seriesData': seriesData}
     return json_response

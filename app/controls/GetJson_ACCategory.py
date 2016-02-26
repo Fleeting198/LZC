@@ -5,7 +5,7 @@ from app.models import *
 from sqlalchemy import and_, func
 
 def GetJson_ACCategory(userID, startDate, endDate):
-     # Query.
+    # Query.
     strQuery = db.session.query(ac_loc.category, func.count('*')).filter(
         and_(ac_loc.node_des==acrec.node_des, acrec.user_id==userID)).group_by(ac_loc.category)
     if len(startDate) != 0:
@@ -14,7 +14,23 @@ def GetJson_ACCategory(userID, startDate, endDate):
 
     # Process data.
     from CategoryProcess import CategoryProcess
-    titles, seriesData = CategoryProcess(results)
+    titles, vals = CategoryProcess(results)
+
+    # seriesData = []  # [{value: , name: }, {value: , name: }, ...]
+    # From tmp_data to seriesData.
+    seriesData = []
+    for k, v in vals.iteritems():
+        seriesData.append({'value': v, 'name': k})
+
+    seriesData = sorted(seriesData, cmp_dictVN)[::-1]
 
     json_response = {'titles': titles, 'seriesData': seriesData}
     return json_response
+
+
+def cmp_dictVN(d1, d2):
+    if d1['value'] < d2['value']:
+        return -1
+    if d1['value'] > d2['value']:
+        return 1
+    return 0
