@@ -1,5 +1,5 @@
 import MySQLdb, re, thread
-import json
+import json, sys
 
 DEFAULT_CONFIG = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'passwd': 'root', 'db': 'witcampus', 'charset': 'utf8'}
 MAX_NUM = int(1e5)
@@ -31,14 +31,43 @@ class MysqlClient:
         self._cursor = self._connection.cursor()
         self._storedDataSource = None
         self._cursor.execute('set sql_notes = 0') # disable warnings
+    def set_emergency_mode():
+        self._cursor.execute('set global max_allowed_packet = 1024M')
+        self._cursor.execute('set global wait_timeout = 600')
     def query(self, sql):
         self._cursor.execute(sql)
         return self._cursor.fetchall()
-    def insert_data(self, tableName, **insertValues):
-        self._cursor.execute('create table if not exists %s (k text ,v longtext)'%(tableName))
-        for key, value in insertValues.items():
-            self._cursor.execute('insert into %s values("%s", "%s")'%(tableName, key, MySQLdb.escape_string(value)))
+    def insert_data(self, tableName, items = []):
+        items = ['"%s"'%item for item in items]
+        self._cursor.execute('insert into %s values(%s)'%(tableName,', '.join(items)))
         self._connection.commit()
+    def restruct_table(self, tableName, orderBy, restructedTableName = None):
+        if restructedTableName is None: restructedTableName = 'restructed_' + tableName
+        orderByString = ', '.join(['%s %s'%(key[0], key[1]) for key in orderBy])
+        self.query(self.query('show create table %s'%tableName)[0][1].replace(tableName, restructedTableName, 1))
+        sys.stdout.write('Restructuring the data storage...\r')
+        totalNum = self.query('select count(*) from %s'%tableName)[0][0]
+        s = self.data_source('select * from %s order by %s'%(tableName, orderByString))
+        count = 0
+        totalCount = 0
+        process = -1
+        while 1:
+            data = s()
+            if data is None: break
+            insertSql = 'insert into %s values (%s)'%(restructedTableName, ', '.join(['%s' for i in range(len(data))]))
+            self._cursor.execute(insertSql, data)
+            count += 1
+            totalCount += 1
+            if process < totalCount * 100 / totalNum:
+                process = totalCount * 100 / totalNum
+                sys.stdout.flush()
+                sys.stdout.write('Restructuring the data storage: %s%s\r'%(process, '%'))
+            if count >= MAX_NUM:
+                count = 0
+                self._connection.commit()
+        self._connection.commit()
+        print 'Restructuring Finished'
+        return restructedTableName
     @source_function
     def simple_data_source(self, sql): # return a function to provide one data at a time
         c = self._connection.cursor()
@@ -76,10 +105,14 @@ class MysqlClient:
 
 if __name__ == '__main__':
     mc = MysqlClient()
+    # mc.restruct_table('device', [('dev_id',''), ('node_des','desc')])
 
-    # a = {'a':'a'}
-    # mc.insert_data('con_friendmap', **{'json': json.dumps(a)})
+    # a = {'a':'1',}
+    # import datetime
+    # mc.insert_data('acrecenv', ['json', datetime.datetime.now(), MySQLdb.escape_string(json.dumps(a))])
+
     r = mc.data_source('select * from dev_loc order by node_id limit 300, 100')
     @get_data_from_source(r)
     def p(data): print str(data)
     p()
+
