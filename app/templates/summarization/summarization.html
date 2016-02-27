@@ -2,10 +2,12 @@
 {% block content %}
 
 <style>
+
     /* Custom CSS*/
     body {
         font-family: "microsoft yahei", "simhei", arial, helvetica;
     }
+
 </style>
 
 
@@ -15,12 +17,11 @@
         <div class="row">
             <div class="col-md-1 col-sm-1"></div>
             <div class="col-md-6 col-sm-6">
-                <img data-src="../static/pic/summary/header_boy.png" class="img-responsive center-block">
+                <img data-src="../static/pic/summary/header_boy.png">
             </div>
             <div class="col-md-4 col-sm-4">
                 <h1>
-{#						工号：{ABCDEFGH}，您好！#}
-                    工号：{{ vals_summary['user_id'] }}，您好！
+                    工号：{{ userID }}，您好！
                 </h1>
                 <p></br></p>
                 <h4>
@@ -38,7 +39,7 @@
                 <div class="row">
                     <div class="col-md-1 col-sm-1"></div>
                     <div class="col-md-5 col-sm-5">
-                        <img data-src="../static/pic/summary/section/section1Footprint.png" class="img-responsive center-block">
+                        <img data-src="../static/pic/summary/section/section1Footprint.png">
                     </div>
                     <div class="col-md-1 col-sm-1"></div>
                     <div class="col-md-4 col-sm-4">
@@ -71,9 +72,8 @@
         </div>
     </div>
     <div class="slide" id="slide1.2">
-        <h1>门禁记录表</h1>
         <!-- ACCategory -->
-
+    		<div id="chartACCategory" style="width: inherit; height: 350px;"></div>
     </div>
 </div>
 <div class="section" id="section2">
@@ -83,7 +83,7 @@
                 <div class="row">
                     <div class="col-md-1 col-sm-1"></div>
                     <div class="col-md-5 col-sm-5">
-                        <img data-src="../static/pic/summary/section/section2Schedule.png" class="img-responsive center-block">
+                        <img data-src="../static/pic/summary/section/section2Schedule.png">
                     </div>
                     <div class="col-md-1 col-sm-1"></div>
                     <div class="col-md-4 col-sm-4">
@@ -125,7 +125,7 @@
             <div class="row">
                 <div class="col-md-1 col-sm-1"></div>
                 <div class="col-md-5 col-sm-5">
-                    <img data-src="../static/pic/summary/section/section3Study.png" class="img-responsive center-block">
+                    <img data-src="../static/pic/summary/section/section3Study.png">
                 </div>
                 <div class="col-md-1 col-sm-1"></div>
                 <div class="col-md-4 col-sm-4">
@@ -191,7 +191,7 @@
                 <div class="row">
                     <div class="col-md-1 col-sm-1"></div>
                     <div class="col-md-5 col-sm-5">
-                        <img data-src="../static/pic/summary/section/section4Friends.png" class="img-responsive center-block">
+                        <img data-src="../static/pic/summary/section/section4Friends.png">
                     </div>
                     <div class="col-md-1 col-sm-1"></div>
                     <div class="col-md-4 col-sm-4">
@@ -227,7 +227,7 @@
                 <div class="row">
                     <div class="col-md-1 col-sm-1"></div>
                     <div class="col-md-5 col-sm-5">
-                        <img data-src="../static/pic/summary/section/section5Bill.png" class="img-responsive center-block">
+                        <img data-src="../static/pic/summary/section/section5Bill.png">
                     </div>
                     <div class="col-md-1 col-sm-1"></div>
                     <div class="col-md-4 col-sm-4">
@@ -268,7 +268,7 @@
                 <div class="row">
                     <div class="col-md-1 col-sm-1"></div>
                     <div class="col-md-5 col-sm-5">
-                        <img data-src="../static/pic/summary/section/section6Penalty.png" class="img-responsive center-block">
+                        <img data-src="../static/pic/summary/section/section6Penalty.png">
                     </div>
                     <div class="col-md-1 col-sm-1"></div>
                     <div class="col-md-4 col-sm-4">
@@ -315,9 +315,70 @@
 
 <script type="text/javascript">
 
+    var userID = '{{ userID }}';
+    var startDate = '{{ startDate }}';
+    var endDate = '{{ endDate }}';
+   // alert(userID);alert(startDate);
+    var chartInput = 'userID='+userID+'&startDate='+startDate+'&endDate='+endDate;
+
+	// ACCategory
+		
+	var chartACCategory = echarts.init(document.getElementById('chartACCategory'));
+	
+	var opt_chartACCategory = {
+	    title: {text: '时间段内门禁分类计数'},
+	    tooltip: {
+	        trigger: 'item',
+	        formatter: "{b} : {c} ({d}%)"
+	    },
+	    toolbox: {
+	        show: true,
+	        feature: {
+	            mark: {show: true},
+	            dataView: {show: true, readOnly: false},
+	            restore: {show: true},
+	            saveAsImage: {show: true}
+	        }
+	    },
+	    legend: {data: []},
+	    series: [{
+	        type: 'pie',
+	        radious: '55%',
+	        data: []
+	    }]
+	};
+	
+	chartACCategory.setOption(opt_chartACCategory);
+	
+refresh_chart_ACCategory = function () {
+            chartACCategory.showLoading();
+            $.get('/summary/GetJson_accategory?' + chartInput , function (json_response) {
+                chartACCategory.hideLoading();
+                if (!json_response.errMsg) {
+
+                    var titles;
+                    var seriesData;
+
+                    titles = json_response.titles;
+                    seriesData = json_response.seriesData;
+
+alert(seriesData);
+
+                    chartACCategory.setOption({
+                        legend: {data: titles},
+                        series: [{data: seriesData}]
+                    });
+                } else {
+                    for (err in json_response.errMsg) {
+                        alert(json_response.errMsg[err]);
+                    }
+                }
+            }, 'json')
+	};
+
 $(document).ready(function() {
     $('#fullpage').fullpage({
-        //Navigation
+        // Navigation
         menu: false,
         lockAnchors: false,
         anchors: [],
@@ -328,7 +389,7 @@ $(document).ready(function() {
         slidesNavigation: true,
         slidesNavPosition: 'bottom',
 
-        //Scrolling
+        // Scrolling
         css3: true,
         scrollingSpeed: 700,
         autoScrolling: true,
@@ -346,12 +407,12 @@ $(document).ready(function() {
         touchSensitivity: 5,
         normalScrollElementTouchThreshold: 5,
 
-        //Accessibility
+        // Accessibility
         keyboardScrolling: true,
         animateAnchor: true,
         recordHistory: false,
 
-        //Design
+        // Design
         controlArrows: true,
         verticalCentered: true,
         resize : true,
@@ -363,17 +424,25 @@ $(document).ready(function() {
         responsiveWidth: 0,
         responsiveHeight: 0,
 
-        //Custom selectors
+        // Custom selectors
         sectionSelector: '.section',
         slideSelector: '.slide',
 
-        //events
+        // events
         // onLeave: function(index, nextIndex, direction){},
         // afterLoad: function(anchorLink, index){},
         // afterRender: function(){},
         // afterResize: function(){},
         // afterSlideLoad: function(anchorLink, index, slideAnchor, slideIndex){},
-        // onSlideLeave: function(anchorLink, index, slideIndex, direction, nextSlideIndex){}
+		onSlideLeave: function(anchorLink, index, slideIndex, direction, nextSlideIndex) {
+			
+			// var leavingSlide = $(this);
+
+            // callback ACCategory
+            if(index == 2 && slideIndex == 0 && direction == 'right'){
+                refresh_chart_ACCategory();
+            }
+		}
     });
 
 });

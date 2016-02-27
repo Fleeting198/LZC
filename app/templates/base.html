@@ -4,18 +4,21 @@
         <meta charset="UTF-8">
         <title>Does this unit have a soul?</title>
 
-        <linkhref="{{url_for('static',filename='css/bootstrap.min.css')}}"rel="stylesheet"/>
-        <linkhref="{{url_for('static',filename='css/bootstrap-theme.min.css')}}"rel="stylesheet"/>
-        <linkhref="{{url_for('static',filename='css/daterangepicker.css')}}"rel="stylesheet"/>
-        <linkhref="{{url_for('static',filename='css/jquery.fullpage.min.css')}}"rel="stylesheet"/>
-        
-        <scriptsrc="{{url_for('static',filename='js/bootstrap.min.js')}}"></script>
-        <scriptsrc="{{url_for('static',filename='js/daterangepicker.js')}}"></script>
-        <scriptsrc="{{url_for('static',filename='js/echarts.min.js')}}"></script>
-        <scriptsrc="{{url_for('static',filename='js/jquery.fullpage.min.js')}}"></script>
-        <scriptsrc="{{url_for('static',filename='js/jquery-1.12.0.min.js')}}"></script>
-        <scriptsrc="{{url_for('static',filename='js/moment.min.js')}}"></script>
+        <link href="{{ url_for('static',filename='css/bootstrap.min.css') }}" rel="stylesheet"/>
+        <link href="{{ url_for('static',filename='css/bootstrap-theme.min.css') }}" rel="stylesheet"/>
+        <link href="{{ url_for('static',filename='css/daterangepicker.css') }}" rel="stylesheet"/>
+        <link href="{{ url_for('static',filename='css/jquery.fullpage.min.css') }}" rel="stylesheet"/>
 
+        <link href="{{ url_for('static',filename='less/bootstrap.less') }}" rel="stylesheet/less">
+        <link href="{{ url_for('static',filename='less/styles.less') }}" rel="stylesheet/less">
+
+        <script src="{{ url_for('static',filename='js/jquery-1.12.0.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/less.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/moment.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/daterangepicker.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/echarts.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/jquery.fullpage.min.js') }}"></script>
 
 	</head>
 	<body onload="load_number()">

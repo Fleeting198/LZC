@@ -30,13 +30,9 @@ def show_summary():
     # =================================
 
     userID = 'AQPTHHPQ'
-    startDate = ''
-    endDate = ''
-    # 若未设定日期，暂设一年
-    if len(startDate) == 0:
-        dayRange = 365
-    else:
-        dayRange = (datetime.strptime(endDate,'%Y-%m-%d') - datetime.strptime(startDate, '%Y-%m-%d')).day
+    startDate = '2015-5-15'
+    endDate = '2015-6-14'
+
 
     # =================================
     # 门禁
@@ -210,10 +206,10 @@ def show_summary():
     # =================================
     # 打包
 
-    vals_summary = {'user_id': userID, 'ret_access': ret_access, 'ret_habit': ret_habit, 'ret_study': ret_study,
+    vals_summary = {'ret_access': ret_access, 'ret_habit': ret_habit, 'ret_study': ret_study,
                     'ret_social': ret_social, 'ret_bill': ret_bill, 'ret_penalty': ret_penalty }
 
-    return render_template('summarization/summarization.html', vals_summary=vals_summary)
+    return render_template('summarization/summarization.html', userID=userID, startDate=startDate, endDate=endDate, vals_summary=vals_summary)
     # return render_template('summarization/summarization.html')
 
 
@@ -648,4 +644,112 @@ def refresh_chart_penalty():
         json_response = jsonify(json_response)
     else:
         json_response = jsonify(errMsg=form.errors)
+    return json_response
+
+
+# ============================
+# Summary 所用路由
+# ============================
+
+@app.route('/summary/GetJson_penalty', methods=['GET'])
+def refresh_summary_penalty():
+    userID = request.args.get('userID')
+
+    from controls.GetJson_Penalty import GetJson_Penalty
+    json_response = GetJson_Penalty(userID)
+    json_response = jsonify(json_response)
+    return json_response
+
+
+@app.route('/summary/GetJson_accategory', methods=['GET'])
+def refresh_summary_accategory():
+
+    userID = request.args.get('userID')
+    startDate = request.args.get('startDate')
+    endDate = request.args.get('startDate')
+
+    from controls.GetJson_ACCategory import GetJson_ACCategory
+    json_response = GetJson_ACCategory(userID, startDate, endDate)
+
+    # ==================
+    titles = json_response['titles']
+    seriesData = json_response['seriesData']
+
+    for datum in seriesData:
+        datum['name'] = helpers.translate(datum['name'])
+    titles = [helpers.translate(title) for title in titles]
+
+    json_response['titles'] = titles
+    json_response['seriesData'] = seriesData
+    # ==================
+
+    json_response = jsonify(json_response)
+    return json_response
+
+
+@app.route('/summary/GetJson_concategory', methods=['GET'])
+def refresh_summary_concategory():
+
+    userID = request.args.get('userID')
+    startDate = request.args.get('startDate')
+    endDate = request.args.get('startDate')
+
+    from controls.GetJson_ConCategory import GetJson_ConCategory
+
+    json_response = GetJson_ConCategory(userID, startDate, endDate)
+
+    # ==================
+    titles = json_response['titles']
+    seriesData = json_response['seriesData']
+
+    for datum in seriesData:
+        datum['name'] = helpers.translate(datum['name'])
+    titles = [helpers.translate(title) for title in titles]
+
+    json_response['titles'] = titles
+    json_response['seriesData'] = seriesData
+    # ==================
+
+    json_response = jsonify(json_response)
+    return json_response
+
+
+@app.route('/summary/GetJson_acperiodcate', methods=['GET'])
+def refresh_summary_acperiodcate():
+
+    userID = request.args.get('userID')
+    startDate = request.args.get('startDate')
+    endDate = request.args.get('endDate')
+
+    # TODO:
+    modeDate = 2
+
+    from controls.GetJson_ACPeriodCate import GetJson_ACPeriodCate
+
+    json_response = GetJson_ACPeriodCate(userID, modeDate, startDate, endDate)
+
+    # ===========================
+    # 解包，翻译，打包
+    legendLabels = json_response['json_dateTrend']['legendLabels']
+    seriesData = json_response['json_dateTrend']['seriesData']
+
+    legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+    for datum in seriesData:
+        datum['name'] = helpers.translate(datum['name'])
+
+    json_response['json_dateTrend']['legendLabels'] = legendLabels
+    json_response['json_dateTrend']['seriesData'] = seriesData
+
+    legendLabels = json_response['json_timeDistribution']['legendLabels']
+    seriesData = json_response['json_timeDistribution']['seriesData']
+
+    legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+    for datum in seriesData:
+        datum['name'] = helpers.translate(datum['name'])
+
+    json_response['json_timeDistribution']['legendLabels'] = legendLabels
+    json_response['json_timeDistribution']['seriesData'] = seriesData
+    # ===========================
+
+    json_response = jsonify(json_response)
     return json_response
