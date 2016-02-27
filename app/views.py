@@ -649,11 +649,3 @@ def refresh_chart_penalty():
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
-<<<<<<< HEAD
-=======
-
-
-@app.route('/summary')
-def show_summary():
-    return render_template('summarization.html')
->>>>>>> L
