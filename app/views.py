@@ -509,7 +509,7 @@ def refresh_chart_concategory():
 
 @app.route('/charts/number')
 def show_chart_number():
-    # return render_template('chart-number.html')
+    # return render_template('charts/chart-number.html')
     return render_template('charts/chart-numberBar.html')
 
 
