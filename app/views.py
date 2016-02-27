@@ -38,7 +38,7 @@ def show_summary():
     # 地点类型 accategory
 
     sql = "SELECT node_des,COUNT(acrec.node_des)as con from acrec where user_id='%s' GROUP BY node_des ORDER BY con DESC"%(userID)
-    # sql = db.session.query(acrec.node_des, func.count(acrec.node_des)).filter(acrec.user_id==userID).(acrec.node_des)
+    # sql = db.session.query(acrec.node_des, func.count(acrec.node_des)).filter(acrec.user_id==userID)
     results = db.session.execute(sql).fetchall()
 
     node_des = [result.node_des for result in results] # 地点名
@@ -78,8 +78,10 @@ def show_summary():
         if col == 'SUM': break
         df['SUM'] += vals
 
+    print df
+
     count_early = df.loc[6]['dorm']  # 取 6 点宿舍值，总计早起次数
-    count_night = sum(df.loc[0:6]['SUM'].tolist()) + int(df.loc[23])  # 取23点 ~ 5点总门禁次数
+    count_night = sum(df.loc[0:6]['SUM'].tolist()) + df.loc[23]['SUM']  # 取23点 ~ 5点总门禁次数
 
     ret_habit = {'count_early': count_early, 'count_night': count_night }
 
@@ -117,7 +119,7 @@ def show_summary():
     # 好友 —— 等待好友结果
 
 
-    # ret_social = {'count_fris': }
+    ret_social = {'count_fris': []}
 
     # =================================
     # 消费 bill
@@ -144,14 +146,14 @@ def show_summary():
 
 
     # 消费能力
-    # from controls.GetJson_ConAbility import GetJson_ConAbility
-    # json_ConAbility = GetJson_ConAbility(userID)
-    #
-    # print json_ConAbility['json_userAmount']['userAmount']    # 月均消费
-    # con_per_month = json_ConAbility['json_userAmount']['userAmount']
-    #
-    #
-    # ret_bill = {'total_expend':total_expend, 'con_items': json_ConCategory['seriesData'], 'con_per_month': con_per_month}
+    from controls.GetJson_ConAbility import GetJson_ConAbility
+    json_ConAbility = GetJson_ConAbility(userID)
+
+    print json_ConAbility['json_userAmount']['userAmount']    # 月均消费
+    con_per_month = json_ConAbility['json_userAmount']['userAmount']
+
+
+    ret_bill = {'total_expend':total_expend, 'con_items': json_ConCategory['seriesData'], 'con_per_month': con_per_month}
 
 
 
@@ -159,34 +161,34 @@ def show_summary():
     # 滞纳金
     # =================================
 
-    # from controls.GetJson_Penalty import GetJson_Penalty
-    # json_Penalty = GetJson_Penalty(userID)
-    #
-    # json_userAmount = json_Penalty['json_userAmount']
-    # json_penalty = json_Penalty['json_penalty']
-    #
-    # user_penalty = json_userAmount['userAmount']  # 总滞纳金
-    # amount = json_penalty['amount']
-    # num = json_penalty['num']
-    #
-    # idx_user = amount.index(user_penalty)
-    # count_less = sum(num[: idx_user])
-    # count_more = sum(num[idx_user: ])
-    # count_total = sum(num)
-    #
-    # percent_asc = float(count_less)/ count_total
-    # percent_desc = float(count_more)/ count_total
-    #
-    # # 滞纳金少于百分之x的总人数
-    #
-    # ret_penalty = {'user_penalty': user_penalty, 'percent_asc': percent_asc, 'percent_desc': percent_desc}
+    from controls.GetJson_Penalty import GetJson_Penalty
+    json_Penalty = GetJson_Penalty(userID)
+
+    json_userAmount = json_Penalty['json_userAmount']
+    json_penalty = json_Penalty['json_penalty']
+
+    user_penalty = json_userAmount['userAmount']  # 总滞纳金
+    amount = json_penalty['amount']
+    num = json_penalty['num']
+
+    idx_user = amount.index(user_penalty)
+    count_less = sum(num[: idx_user])
+    count_more = sum(num[idx_user: ])
+    count_total = sum(num)
+
+    percent_asc = float(count_less)/ count_total
+    percent_desc = float(count_more)/ count_total
+
+    # 滞纳金少于百分之x的总人数
+
+    ret_penalty = {'user_penalty': user_penalty, 'percent_asc': percent_asc, 'percent_desc': percent_desc}
 
 
     # =================================
     # 打包
 
-    # vals_summary = {'ret_access': ret_access, 'ret_habit': ret_habit, 'ret_study': ret_study, 'ret_social': ret_social,
-    #                 'ret_bill': ret_bill, 'ret_penalty': ret_penalty }
+    vals_summary = {'user_id': userID, 'ret_access': ret_access, 'ret_habit': ret_habit, 'ret_study': ret_study,
+                    'ret_social': ret_social, 'ret_bill': ret_bill, 'ret_penalty': ret_penalty }
 
     # return render_template('summarization.html', vals_summary=vals_summary)
     return render_template('summarization.html')

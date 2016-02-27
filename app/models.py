@@ -138,12 +138,12 @@ class conability_line(db.Model):
     """
     月消费能力统计：月平均消费金额(取整),人数,角色[老师，学生]
     """
-    amount_avg = db.Column(db.Integer(), primary_key=True)
+    amount = db.Column(db.Integer(), primary_key=True)
     num = db.Column(db.Integer())
     role = db.Column(db.String(3))
 
-    def __init__(self, amount_avg, num, role):
-        self.amount_avg = amount_avg
+    def __init__(self, amount, num, role):
+        self.amount = amount
         self.num = num
         self.role = role
 

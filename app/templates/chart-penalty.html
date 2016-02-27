@@ -14,7 +14,14 @@
 
         var optionChartPenalty = {
             title: {text: '滞纳金缴纳'},
-            tooltip: {trigger: 'axis'},
+            tooltip: {
+                trigger: 'axis',
+                formatter: function (params) {
+                    var str_return = '总 ' + params[0].name + ' 元<br/>';
+                    str_return += params[0].seriesName + ' : ' + params[0].value + ' 人<br/>';
+                    return str_return;
+                }
+            },
             toolbox: {
                 show: true,
                 feature: {
@@ -27,6 +34,7 @@
             },
             xAxis: {
                 type: 'category',
+                name: '滞纳金总额',
                 boundaryGap: false,
                 data: []
             },

@@ -11,12 +11,12 @@ def GetJson_ConAbility(userID):
     # unpacking results
     userAmount, role = results
 
-    strQueryLine = db.session.query(conability_line.amount_avg, conability_line.num).filter(
-        conability_line.role == role).order_by(conability_line.amount_avg)
+    strQueryLine = db.session.query(conability_line.amount, conability_line.num).filter(
+        conability_line.role == role).order_by(conability_line.amount)
     resultsLine = strQueryLine.all()
 
     # process conability for all
-    amount = [result.amount_avg for result in resultsLine]
+    amount = [float(result.amount) for result in resultsLine]
     num = [result.num for result in resultsLine]
 
     # return
