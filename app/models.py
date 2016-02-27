@@ -90,7 +90,6 @@ class acrec(db.Model):
     def is_legal(self):
         return True if self.legal == 1 else False
 
-
 class consumption(db.Model):
     """
     消费记录：工号(外键：个体 工号)，日期时间，设备号(外键：设备 设备号)，金额
@@ -105,8 +104,6 @@ class consumption(db.Model):
         self.dev_id = dev_id
         self.con_datetime = con_datetime
         self.amount = amount
-
-
 
 class con_water_simp(db.Model):
     """
@@ -193,3 +190,12 @@ class con_water_7d(db.Model):
 class con_water_24h(db.Model):
     con_axis = db.Column(db.Integer(), primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
+
+# 用以查询图书馆、科研、教学楼访问次数的现成表
+class ac_count(db.Model):
+    user_id = db.Column(db.Integer(), primary_key=True)
+    count_acad = db.Column(db.Integer())
+    count_lib = db.Column(db.Integer())
+    count_sci = db.Column(db.Integer())
+    sum = db.Column(db.Integer())
+    sum_per_month = db.Column(db.Integer())

@@ -1,34 +1,12 @@
-{% extends "charts.html" %}
-{% block chartField %}
-
-    <form id="form-ipt" class="form-inline">
-        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='A9F035CD') }}
-        {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
-        <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
-    </form>
+{% extends "summarization/summarization.html" %}
+{% block chart_accategory %}
 
     <div id="chartACCategory" style="width: inherit; height: 350px;"></div>
 
     <script>
-        var dateRangePicker = $("input[name='dateRange']");
-        dateRangePicker.daterangepicker({
-            autoUpdateInput: false,
-            locale: {
-                format: 'YYYY-MM-DD',
-                cancelLabel: 'Clear'
-            }
-        });
-        dateRangePicker.on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' ~ ' + picker.endDate.format('YYYY-MM-DD'));
-        });
-        dateRangePicker.on('cancel.daterangepicker', function (ev, picker) {
-            $(this).val('');
-        });
-
-        // 图表初始化。
         var chartACCategory = echarts.init(document.getElementById('chartACCategory'));
 
-        var optionChartACCategory = {
+        var opt_chartACCategory = {
             title: {text: '时间段内门禁分类计数'},
             tooltip: {
                 trigger: 'item',
@@ -51,16 +29,17 @@
             }]
         };
 
-        chartACCategory.setOption(optionChartACCategory);
+        chartACCategory.setOption(opt_chartACCategory);
 
-        var titles;
-        var seriesData;
 
-        refresh_chart = function () {
+        refresh_chart_ACCategory = function () {
             chartACCategory.showLoading();
             $.get('/charts/accategory/getData?' + $("#form-ipt").serialize(), function (json_response) {
                 chartACCategory.hideLoading();
                 if (!json_response.errMsg) {
+
+                    var titles;
+                    var seriesData;
 
                     titles = json_response.titles;
                     seriesData = json_response.seriesData;

@@ -1,32 +1,9 @@
-{% extends "charts.html" %}
-{% block chartField %}
-
-    <form id="form-ipt" class="form-inline">
-        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='AQPHPWPQ') }}
-        {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
-        <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
-    </form>
+{% extends "summarization/summarization.html" %}
+{% block chart_conategory %}
 
     <div id="chartConCategory" style="width: inherit; height: 400px;"></div>
 
     <script>
-        // Init dateRange.
-        var dateRangePicker = $("input[name='dateRange']");
-        dateRangePicker.daterangepicker({
-            autoUpdateInput: false,
-            locale: {
-                format: 'YYYY-MM-DD',
-                cancelLabel: 'Clear'
-            }
-        });
-        dateRangePicker.on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' ~ ' + picker.endDate.format('YYYY-MM-DD'));
-        });
-        dateRangePicker.on('cancel.daterangepicker', function (ev, picker) {
-            $(this).val('');
-        });
-
-        // Init charts.
         var chartConCategory = echarts.init(document.getElementById('chartConCategory'));
 
         var optionChartConCategory = {
@@ -61,14 +38,15 @@
 
         chartConCategory.setOption(optionChartConCategory);
 
-        var titles;
-        var seriesData;
 
-        refresh_chart = function () {
+        refresh_chart_ConCategory = function () {
             chartConCategory.showLoading();
             $.get('/charts/concategory/getData?' + $("#form-ipt").serialize(), function (json_response) {
                 chartConCategory.hideLoading();
                 chartConCategory.setOption(optionChartConCategory);
+
+                var titles;
+                var seriesData;
 
                 if (!json_response.errMsg) {
 

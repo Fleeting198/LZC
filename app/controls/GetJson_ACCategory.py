@@ -20,7 +20,7 @@ def GetJson_ACCategory(userID, startDate, endDate):
     # From tmp_data to seriesData.
     seriesData = []
     for k, v in vals.iteritems():
-        seriesData.append({'value': v, 'name': k})
+        seriesData.append({'value': int(v), 'name': k})
 
     seriesData = sorted(seriesData, cmp_dictVN)[::-1]
 

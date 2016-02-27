@@ -1,10 +1,9 @@
-{% extends "charts.html" %}
+{% extends "charts/charts.html" %}
 {% block chartField %}
 
-    <form id="form-ipt" class="form-inline" xmlns="http://www.w3.org/1999/html">
-        {{ form.userID(class="form-control", maxlength='8', placeholder='工号' ,value='TPPZLPHY') }}
+    <form id="form-ipt" class="form-inline" >
+        {{ form.devID(class="form-control", maxlength='10', placeholder='设备号', value='YQSH1826') }}
         {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
-        </br>
         {{ form.modeDate.label }}
         {% for subfield in form.modeDate %}
             {{ subfield }}{{ subfield.label }}
@@ -42,69 +41,7 @@
         var chartTimeDistribution = echarts.init(document.getElementById('chartTimeDistribution'));
 
         var optionChartDate = {
-            title: {text: '支出趋势'},
-            tooltip: {
-                trigger: 'axis',
-                formatter: function (params) {
-                    var str_return = params[0].name + '<br/>';
-                    for (var i = 0; i < params.length; i++) {
-                            str_return += params[i].seriesName + ' : ' + params[i].value.toFixed(2) + ' 元<br/>'
-                    }
-                    return str_return;
-                }
-            },
-            toolbox: {
-                show: true,
-                feature: {
-                    mark: {show: true},
-                    dataView: {show: true, readOnly: false},
-                    magicType: {show: true, type: ['line', 'bar']},
-                    restore: {show: true},
-                    saveAsImage: {show: true}
-                }
-            },
-            legend: {data: ['累积支出','节点支出']},
-            xAxis: {
-                type: 'category',
-                boundaryGap: true,
-                data: []
-            },
-            yAxis: {
-                type: 'value',
-                name: '支出',
-                axisLabel: {
-                    formatter: '{value} 元'
-                }
-            },
-            dataZoom: [
-                {
-                    type: 'inside',
-                    xAxisIndex: [0],
-                    start: 0,
-                    end: 100
-                },
-                {
-                    type: 'slider',
-                    xAxisIndex: [0],
-                    start: 0,
-                    end: 100
-                }
-            ],
-            series: [
-                {
-                    name: '累积支出',
-                    type: 'line',
-                    data: []
-                },
-                {
-                    name: '节点支出',
-                    type: 'bar',
-                    data: []
-                }
-            ]
-        };
-        var optionChartTime = {
-            title: {text: '支出分布'},
+            title: {text: '收入趋势'},
             tooltip: {
                 trigger: 'axis',
                 formatter: function (params) {
@@ -125,7 +62,7 @@
                     saveAsImage: {show: true}
                 }
             },
-            legend: {data: ['平均支出']},
+            legend: {data: ['累积收入', '节点收入']},
             xAxis: {
                 type: 'category',
                 boundaryGap: true,
@@ -133,7 +70,67 @@
             },
             yAxis: {
                 type: 'value',
-                name: '平均支出',
+                name: '收入',
+                axisLabel: {
+                    formatter: '{value} 元'
+                }
+            },
+            dataZoom: [
+                {
+                    type: 'inside',
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 100
+                },
+                {
+                    type: 'slider',
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 100
+                }
+            ],
+            series: [
+                {   name: '累积收入',
+                    type: 'line',
+                    data: []
+                },
+                {   name: '节点收入',
+                    type: 'bar',
+                    data: []
+                }
+            ]
+        };
+        var optionChartTime = {
+            title: {text: '收入分布'},
+            tooltip:{
+                trigger: 'axis',
+                formatter: function (params) {
+                    var str_return = params[0].name + '<br/>';
+                    for (var i = 0; i < params.length; i++) {
+                        str_return += params[i].seriesName + ' : ' + params[i].value.toFixed(2) + ' 元<br/>'
+                    }
+                    return str_return;
+                }
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: {show: true},
+                    dataView: {show: true, readOnly: false},
+                    magicType: {show: true, type: ['line', 'bar']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            legend: {data: ['收入总额']},
+            xAxis: {
+                type: 'category',
+                boundaryGap: true,
+                data: []
+            },
+            yAxis: {
+                type: 'value',
+                name: '平均收入',
                 axisLabel: {
                     formatter: '{value} 元'
                 }
@@ -166,29 +163,32 @@
         var json_timeDistribution;
 
         // get向后端请求json刷新图表。
-        refresh_chart = function(){
+        refresh_chart = function () {
             chartDateTrend.showLoading();
             chartTimeDistribution.showLoading();
-            $.get('/charts/expenditure/getData?'+$("#form-ipt").serialize(), function(json_response){
+
+            $.get('/charts/income/getData?' + $("#form-ipt").serialize(), function (json_response) {
                 chartDateTrend.hideLoading();
                 chartTimeDistribution.hideLoading();
-
-                chartDateTrend.setOption(optionChartDate);
-                chartTimeDistribution.setOption(optionChartTime);
 
                 json_dateTrend = json_response.json_dateTrend;
                 json_timeDistribution = json_response.json_timeDistribution;
 
-                if(!json_response.errMsg){
+                chartDateTrend.setOption(optionChartDate);
+                chartTimeDistribution.setOption(optionChartTime);
+
+                if (!json_response.errMsg) {
                     chartDateTrend.setOption({
                         xAxis: [{
                             data: json_dateTrend.axisLabels
                         }],
                         series: [
-                            { name: '累积支出',
+                            {
+                                name: '累积收入',
                                 data: json_dateTrend.accumulatedVals
                             },
-                            {name: '节点支出',
+                            {
+                                name: '节点收入',
                                 data: json_dateTrend.pointVals
                             }
                         ]
@@ -201,12 +201,13 @@
                             data: json_timeDistribution.vals
                         }]
                     });
-                }else{
-                    for(err in json_response.errMsg){
+
+                } else {
+                    for (err in json_response.errMsg) {
                         alert(json_response.errMsg[err]);
                     }
                 }
-            },'json')
+            }, 'json')
         };
     </script>
 {% endblock %}

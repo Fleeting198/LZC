@@ -1,24 +1,25 @@
-{% extends "charts.html" %}
+{% extends "charts/charts.html" %}
 {% block chartField %}
 
     <form id="form-ipt" class="form-inline" >
-        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='XQXXQQTQ')}}
+        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='NLPANWPQ')}}
         <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
     </form>
 
-    <div id="chartPenalty" style="width: inherit; height: 350px;"></div>
+    <div id="chartConAbility" style="width: inherit; height: 350px;"></div>
 
     <script>
 
-        var chartPenalty = echarts.init(document.getElementById('chartPenalty'));
+        // 图表初始化。
+        var chartConAbility = echarts.init(document.getElementById('chartConAbility'));
 
-        var optionChartPenalty = {
-            title: {text: '滞纳金缴纳'},
+        var optionChartConAbility = {
+            title: {text: '消费能力'},
             tooltip: {
                 trigger: 'axis',
                 formatter: function (params) {
-                    var str_return = '总 ' + params[0].name + ' 元<br/>';
-                    str_return += params[0].seriesName + ' : ' + params[0].value + ' 人<br/>';
+                    var str_return = '月均 ' + params[0].name + ' 元<br/>';
+                        str_return += params[0].seriesName + ' : ' + params[0].value  + ' 人<br/>';
                     return str_return;
                 }
             },
@@ -34,8 +35,8 @@
             },
             xAxis: {
                 type: 'category',
-                name: '滞纳金总额',
                 boundaryGap: false,
+                name: '平均月消费',
                 data: []
             },
             yAxis: {
@@ -55,9 +56,6 @@
                     },
                     data: [],
                     markPoint: {
-                            itemStyle: {
-                                normal: {}
-                        },
                         data : []
                         }
                     }
@@ -65,43 +63,52 @@
             dataZoom: []
         };
 
-        chartPenalty.setOption(optionChartPenalty);
+        chartConAbility.setOption(optionChartConAbility);
 
         refresh_chart = function () {
 
-            chartPenalty.showLoading();
+            chartConAbility.showLoading();
 
-            $.get('/charts/penalty/getData?' + $("#form-ipt").serialize(), function (json_response) {
+            $.get('/charts/conability/getData?' + $("#form-ipt").serialize(), function (json_response) {
 
-                json_userAmount = json_response.json_userAmount;
-                json_penalty = json_response.json_penalty;
+                var userAmount = json_response.userAmount;
+                var amount = json_response.amount;
+                var num = json_response.num;
+                var index_userAmount = 0;
 
-                chartPenalty.hideLoading();
+                alert(parseInt(userAmount));
+
+                for (var i = 0; i < amount.length; i++) {
+                    if (amount[i].toString() == parseInt(userAmount).toString()) {
+                        index_userAmount = i;
+                        break;
+                    }
+                }
+
+                chartConAbility.hideLoading();
 
                 if (!json_response.errMsg) {
 
-                    var startPoint = (parseInt(json_userAmount.userAmount) - 33 > 0) ? (parseInt(json_userAmount.userAmount) - 33): 0;
-                    var endPoint = (parseInt(json_userAmount.userAmount) + 33 > json_penalty.amount[json_penalty.amount.length - 1]) ? json_penalty.amount[json_penalty.amount.length - 1] : (parseInt(json_userAmount.userAmount) + 33);
+                    var startPoint = (parseInt(userAmount) - 77 > 0) ? (parseInt(userAmount) - 77): 0;
+                    var endPoint = (parseInt(userAmount) + 77 > amount[amount.length - 1]) ? amount[amount.length - 1] : (parseInt(userAmount) + 77);
 
-                    chartPenalty.setOption({
+                    chartConAbility.setOption({
                         xAxis: [{
-                            data: json_penalty.amount
+                            data: amount
                         }],
                         series: [{
-                                data: json_penalty.num,
+                                data: num,
                                 markPoint: {
+                                    label: {
+                                        normal: {
+                                            formatter: function () {return userAmount.toString();},
+                                            textStyle: {fontSize: 10}
+                                        }
+                                    },
                                     data: [
                                     {
-                                        label: {
-                                            normal: {
-                                                formatter: json_userAmount.userAmount,
-                                                textStyle: {
-                                                    fontSize: 10
-                                                }
-                                            }
-                                        },
-                                        value: parseFloat(json_userAmount.userAmount),
-                                        coord: [parseFloat(json_userAmount.userAmount), 0]
+                                        name: '此人',
+                                        coord: [index_userAmount, num[index_userAmount]]
                                     }]
                                 }
                         }],

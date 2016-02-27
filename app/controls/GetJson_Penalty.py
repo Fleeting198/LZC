@@ -11,15 +11,13 @@ def GetJson_Penalty(userID):
     resultsLine = strQueryLine.all()
 
     # unpacking results
-    userAmount = results[0]
+    userAmount = float(results[0])
 
     # process conability for all
-    amount = [result.amount for result in resultsLine]
-    num = [result.num for result in resultsLine]
+    amount = [float(result.amount) for result in resultsLine]
+    num = [int(result.num) for result in resultsLine]
 
     # return
-    json_userAmount = {'userAmount': str(userAmount)}
-    json_penalty = {'amount': amount, 'num': num}
-    json_response = {'json_userAmount':json_userAmount, 'json_penalty':json_penalty}
+    json_response = {'userAmount': userAmount, 'amount': amount, 'num': num}
 
     return json_response

@@ -10,7 +10,7 @@ from app import app
 from flask import render_template, request, jsonify
 from app.models import *
 from app.forms import *
-
+from datetime import datetime
 from sqlalchemy import and_, func, distinct
 import types
 from pandas import Series, DataFrame
@@ -25,9 +25,18 @@ def show_index():
 @app.route('/summary')
 def show_summary():
 
+    # =================================
+    # 工号，日期设定
+    # =================================
+
     userID = 'AQPTHHPQ'
     startDate = ''
     endDate = ''
+    # 若未设定日期，暂设一年
+    if len(startDate) == 0:
+        dayRange = 365
+    else:
+        dayRange = (datetime.strptime(endDate,'%Y-%m-%d') - datetime.strptime(startDate, '%Y-%m-%d')).day
 
     # =================================
     # 门禁
@@ -49,7 +58,7 @@ def show_summary():
     ac_items = []
     for i in range(len(node_des)):
         sql = db.session.query(ac_loc.category).filter(ac_loc.node_des==node_des[i])
-        node_cate.append(sql.first())
+        node_cate.append(helpers.translate(sql.first()))
         ac_items.append({'node_des': node_des[i], 'count': count[i], 'node_cate': node_cate[i]})
 
     ret_access = {'count_nodes': len(node_des), 'total_count':total_count, 'ac_items': ac_items }
@@ -78,7 +87,7 @@ def show_summary():
         if col == 'SUM': break
         df['SUM'] += vals
 
-    print df
+    # print df
 
     count_early = df.loc[6]['dorm']  # 取 6 点宿舍值，总计早起次数
     count_night = sum(df.loc[0:6]['SUM'].tolist()) + df.loc[23]['SUM']  # 取23点 ~ 5点总门禁次数
@@ -105,12 +114,23 @@ def show_summary():
             count_lib = item['value']
         elif item['name'] == 'sci':
             count_sci = item['value']
+    count_total = count_sci + count_acad + count_lib
 
-    # print count_acad
-    # print count_lib
-    # print count_sci
+    sql = db.session.query(ac_count.sum_per_month).order_by(ac_count.sum_per_month)
+    results = sql.all()
 
-    ret_study = {'count_lib':count_lib, 'count_acad': count_acad, 'count_sci':count_sci}
+    sum_per_month = [result.sum_per_month for result in results]
+
+    # 获取个体在全体数据中排名
+    idx_user = len(sum_per_month)
+    for i in range(len(sum_per_month)):
+        if int(sum_per_month[i]) > count_total:
+            idx_user = i
+            break
+
+    percent_asc = float(sum(sum_per_month[: idx_user])) / sum(sum_per_month)
+
+    ret_study = {'count_lib':count_lib, 'count_acad': count_acad, 'count_sci':count_sci, 'percent_asc': percent_asc}
 
 
     # =================================
@@ -141,19 +161,23 @@ def show_summary():
     from controls.GetJson_ConCategory import GetJson_ConCategory
     json_ConCategory = GetJson_ConCategory(userID,startDate,endDate)
 
+    con_items = json_ConCategory['seriesData']
+    for datum in con_items:
+        datum['name'] = helpers.translate(datum['name'])
+    json_ConCategory['seriesData'] = con_items
+
     # [{'name': 'food', 'value': 2653.9}, {'name': 'shop', 'value': 177.5}, {'name': 'None', 'value': 56.5}, ...]
-    # print json_ConCategory['seriesData']
 
 
     # 消费能力
     from controls.GetJson_ConAbility import GetJson_ConAbility
     json_ConAbility = GetJson_ConAbility(userID)
 
-    print json_ConAbility['json_userAmount']['userAmount']    # 月均消费
-    con_per_month = json_ConAbility['json_userAmount']['userAmount']
+    # print json_ConAbility['userAmount']    # 月均消费
+    con_per_month = json_ConAbility['userAmount']
 
 
-    ret_bill = {'total_expend':total_expend, 'con_items': json_ConCategory['seriesData'], 'con_per_month': con_per_month}
+    ret_bill = {'total_expend':total_expend, 'con_items': con_items, 'con_per_month': con_per_month}
 
 
 
@@ -164,24 +188,23 @@ def show_summary():
     from controls.GetJson_Penalty import GetJson_Penalty
     json_Penalty = GetJson_Penalty(userID)
 
-    json_userAmount = json_Penalty['json_userAmount']
-    json_penalty = json_Penalty['json_penalty']
+    # json_userAmount = json_Penalty['json_userAmount']
+    # json_penalty = json_Penalty['json_penalty']
 
-    user_penalty = json_userAmount['userAmount']  # 总滞纳金
-    amount = json_penalty['amount']
-    num = json_penalty['num']
+    user_penalty = json_Penalty['userAmount']  # 总滞纳金
+    amount = json_Penalty['amount']
+    num = json_Penalty['num']
 
-    idx_user = amount.index(user_penalty)
-    count_less = sum(num[: idx_user])
-    count_more = sum(num[idx_user: ])
-    count_total = sum(num)
+    # 获取个体在全体数据中排名
+    idx_user = len(amount)
+    for i in range(len(amount)):
+        if int(amount[i]) > user_penalty:
+            idx_user = i
+            break
+    # idx_user = amount.index(int(user_penalty))
+    percent_asc = float(sum(num[: idx_user]))/ sum(num)
 
-    percent_asc = float(count_less)/ count_total
-    percent_desc = float(count_more)/ count_total
-
-    # 滞纳金少于百分之x的总人数
-
-    ret_penalty = {'user_penalty': user_penalty, 'percent_asc': percent_asc, 'percent_desc': percent_desc}
+    ret_penalty = {'user_penalty': user_penalty, 'percent_asc': percent_asc}
 
 
     # =================================
@@ -190,19 +213,19 @@ def show_summary():
     vals_summary = {'user_id': userID, 'ret_access': ret_access, 'ret_habit': ret_habit, 'ret_study': ret_study,
                     'ret_social': ret_social, 'ret_bill': ret_bill, 'ret_penalty': ret_penalty }
 
-    # return render_template('summarization.html', vals_summary=vals_summary)
-    return render_template('summarization.html')
+    return render_template('summarization/summarization.html', vals_summary=vals_summary)
+    # return render_template('summarization/summarization.html')
 
 
 @app.route('/charts')
 def show_charts():
-    return render_template('charts.html')
+    return render_template('charts/charts.html')
 
 
 @app.route('/charts/expenditure')
 def show_chart_expenditure():
     form = Form_User_DR_MD_MT()
-    return render_template('chart-expenditure.html', form=form)
+    return render_template('charts/chart-expenditure.html', form=form)
 
 
 @app.route('/charts/expenditure/getData', methods=['GET'])
@@ -277,7 +300,7 @@ def refresh_chart_expenditure():
 @app.route('/charts/acperiodcate')
 def show_chart_acperiodcate():
     form = Form_User_DR_MD()
-    return render_template('chart-acperiodcate.html', form=form)
+    return render_template('charts/chart-acperiodcate.html', form=form)
 
 
 @app.route('/charts/acperiodcate/getData', methods=['GET'])
@@ -332,7 +355,7 @@ def refresh_chart_acperiodcate():
 @app.route('/charts/income')
 def show_chart_income():
     form = Form_Dev_DR_MD_MT()
-    return render_template('chart-income.html', form=form)
+    return render_template('charts/chart-income.html', form=form)
 
 
 @app.route('/charts/income/getData', methods=['GET'])
@@ -361,7 +384,7 @@ def refresh_chart_income():
 @app.route('/charts/foodIncome')
 def show_chart_foodIncome():
     form = Form_MT()
-    return render_template('chart-foodIncome.html', form=form)
+    return render_template('charts/chart-foodIncome.html', form=form)
 
 
 @app.route('/charts/foodIncome/getData', methods=['GET'])
@@ -386,7 +409,7 @@ def refresh_chart_foodIncome():
 @app.route('/charts/acvalid')
 def show_chart_acvalid():
     form = Form_User_DR()
-    return render_template('chart-acvalid.html', form=form)
+    return render_template('charts/chart-acvalid.html', form=form)
 
 
 @app.route('/charts/acvalid/getData')
@@ -411,7 +434,7 @@ def refresh_chart_acvalid():
 @app.route('/charts/accategory')
 def show_chart_accategory():
     form = Form_User_DR()
-    return render_template('chart-accategory.html', form=form)
+    return render_template('charts/chart-accategory.html', form=form)
 
 
 @app.route('/charts/accategory/getData')
@@ -449,7 +472,7 @@ def refresh_chart_accategory():
 @app.route('/charts/concategory')
 def show_chart_concategory():
     form = Form_User_DR()
-    return render_template('chart-concategory.html', form=form)
+    return render_template('charts/chart-concategory.html', form=form)
 
 
 @app.route('/charts/concategory/getData')
@@ -487,7 +510,7 @@ def refresh_chart_concategory():
 @app.route('/charts/number')
 def show_chart_number():
     # return render_template('chart-number.html')
-    return render_template('chart-numberBar.html')
+    return render_template('charts/chart-numberBar.html')
 
 
 @app.route('/charts/number/getData', methods=['GET'])
@@ -562,7 +585,7 @@ def refresh_chart_number():
 @app.route('/charts/conwatertime')
 def show_chart_conWaterTime():
     form = Form_DR_MD_MT()
-    return render_template('chart-conwatertime.html', form=form)
+    return render_template('charts/chart-conwatertime.html', form=form)
 
 
 @app.route('/charts/conwatertime/getData', methods=['GET'])
@@ -583,7 +606,7 @@ def refresh_chart_conWaterTime():
 @app.route('/charts/conability')
 def show_chart_conability():
     form = Form_User()
-    return render_template('chart-conability.html', form=form)
+    return render_template('charts/chart-conability.html', form=form)
 
 
 @app.route('/charts/conability/getData', methods=['GET'])
@@ -604,13 +627,13 @@ def refresh_chart_conability():
 
 @app.route('/charts/conwater')
 def show_chart_conwater():
-    return render_template('chart-conwater.html')
+    return render_template('charts/chart-conwater.html')
 
 
 @app.route('/charts/penalty')
 def show_chart_penalty():
     form = Form_User()
-    return render_template('chart-penalty.html', form=form)
+    return render_template('charts/chart-penalty.html', form=form)
 
 
 @app.route('/charts/penalty/getData', methods=['GET'])

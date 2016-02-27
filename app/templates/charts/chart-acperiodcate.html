@@ -1,0 +1,211 @@
+{% extends "charts/charts.html" %}
+{% block chartField %}
+
+    <form id="form-ipt" class="form-inline" >
+        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='AQPTHHPQ')}}
+        {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
+        {{ form.modeDate.label }}
+        {% for subfield in form.modeDate %}
+            {{ subfield }}{{ subfield.label }}
+            &nbsp;&nbsp;
+        {% endfor %}
+        <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
+    </form>
+
+    <div id="chartDateTrend" style="width: inherit; height: 350px;"></div>
+    <div id="chartTimeDistribution" style="width: inherit; height: 350px;"></div>
+
+    <script>
+        var dateRangePicker = $("input[name='dateRange']");
+        dateRangePicker.daterangepicker({
+            autoUpdateInput: false,
+            locale: {
+                format: 'YYYY-MM-DD',
+                cancelLabel: 'Clear'
+            }
+        });
+        dateRangePicker.on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('YYYY-MM-DD')+' ~ '+picker.endDate.format('YYYY-MM-DD'));
+        });
+        dateRangePicker.on('cancel.daterangepicker', function (ev, picker) {
+            $(this).val('');
+        });
+
+        // 图表初始化。
+        var chartDateTrend = echarts.init(document.getElementById('chartDateTrend'));
+        var chartTimeDistribution = echarts.init(document.getElementById('chartTimeDistribution'));
+
+        var optionChartDate = {
+            title: {text: '门禁类型日期趋势'},
+            tooltip: {
+                trigger: 'axis',
+                formatter: function(params){
+                    var str_return = params[0].name + '<br/>';
+                    for (var i=0; i<params.length; i++){
+                        if(params[i].seriesName != '宿舍比重'){
+                            str_return += params[i].seriesName + ' : ' + params[i].value + ' 次<br/>'
+                        }else
+                            str_return += params[i].seriesName + ' : ' + (params[i].value*100).toFixed(2) + ' %<br/>'
+                    }
+                    return str_return;
+                }
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: {show: true},
+                    dataView: {show: true, readOnly: false},
+                    magicType: {show: true, type: ['line', 'bar']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            legend: {data: []},
+            xAxis: {
+                type: 'category',
+                boundaryGap: true,
+                data: []
+            },
+            yAxis:[
+                {   type: 'value',
+                    name: '次数',
+                    axisLabel: {
+                        formatter: '{value} 次'
+                    }
+                },
+                {   type: 'value',
+                    name: '比例',
+                    axisLabel: {
+                        formatter: function(value){
+                            value *= 100;
+                            return value+"%";
+                        }
+                    }
+                }
+            ],
+            dataZoom: [
+                {   type: 'inside',
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 100
+                },
+                {   type: 'slider',
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 100
+                }
+            ],
+            series: []
+        };
+        var optionChartTime = {
+            title: {text: '门禁类型时间分布'},
+            tooltip: {trigger: 'axis'},
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: {show: true},
+                    dataView: {show: true, readOnly: false},
+                    magicType: {show: true, type: ['line', 'bar']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            legend: {data: []},
+            xAxis: {
+                type: 'category',
+                boundaryGap: true,
+                data: []
+            },
+            yAxis: {
+                type: 'value',
+                name: '次数',
+                axisLabel: {
+                    formatter: '{value} 次'
+                }
+            },
+            series: []
+        };
+
+        chartDateTrend.setOption(optionChartDate);
+        chartTimeDistribution.setOption(optionChartTime);
+
+        var json_dateTrend;
+        var json_timeDistribution;
+
+        refresh_chart = function () {
+            chartDateTrend.showLoading();
+            chartTimeDistribution.showLoading();
+            $.get('/charts/acperiodcate/getData?' + $("#form-ipt").serialize(), function (json_response) {
+                chartDateTrend.hideLoading();
+                chartTimeDistribution.hideLoading();
+
+                // 还原图表选项
+                chartDateTrend.setOption(optionChartDate);
+                chartTimeDistribution.setOption(optionChartTime);
+
+                json_dateTrend = json_response.json_dateTrend;
+                json_timeDistribution = json_response.json_timeDistribution;
+
+                if (!json_response.errMsg) {
+                    // 日期趋势图表设定。
+                    chartDateTrend.setOption({
+                        legend: {data: json_dateTrend.legendLabels},
+                        xAxis: [{
+                            data: json_dateTrend.axisLabels
+                        }]
+                    });
+                    for(var i=0; i< json_dateTrend.seriesData.length;i++){
+                        var tmp_option = chartDateTrend.getOption();
+                        if (json_dateTrend.seriesData[i].name == '宿舍比重'){
+                            tmp_option.series.push({
+                                        name: json_dateTrend.seriesData[i].name,
+                                        type: 'line',
+                                        data: json_dateTrend.seriesData[i].data,
+                                        yAxisIndex: 1,
+                                        smooth: true,
+                            });
+                        }else if(json_dateTrend.seriesData[i].name == '总和'){
+                            tmp_option.series.push({
+                                        name: json_dateTrend.seriesData[i].name,
+                                        type: 'bar',
+                                        barWidth: 5,
+                                        data: json_dateTrend.seriesData[i].data
+                            });
+                        }else{
+                            tmp_option.series.push({
+                                        name: json_dateTrend.seriesData[i].name,
+                                        stack: 'ac',
+                                        type: 'bar',
+                                        data: json_dateTrend.seriesData[i].data
+                            });
+                        }
+                        chartDateTrend.setOption(tmp_option);
+                    }
+
+                    // 时间分布图表设定。
+                    chartTimeDistribution.setOption({
+                        legend: {data: json_timeDistribution.legendLabels },
+                        xAxis: [{data: json_timeDistribution.axisLabels }]
+                    });
+
+                    for (var i = 0; i < json_timeDistribution.seriesData.length; i++) {
+                        var tmp_option = chartTimeDistribution.getOption();
+                        tmp_option.series.push({
+                                    name: json_timeDistribution.seriesData[i].name,
+                                    stack: 'ac',
+                                    type: 'bar',
+                                    data: json_timeDistribution.seriesData[i].data
+                        });
+                        chartTimeDistribution.setOption(tmp_option);
+                    }
+
+                } else {
+                    for (err in json_response.errMsg) {
+                        alert(json_response.errMsg[err]);
+                    }
+                }
+            }, 'json')
+        };
+    </script>
+
+{% endblock %}

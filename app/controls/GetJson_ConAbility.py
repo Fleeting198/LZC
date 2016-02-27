@@ -10,6 +10,7 @@ def GetJson_ConAbility(userID):
 
     # unpacking results
     userAmount, role = results
+    userAmount = float(userAmount)
 
     strQueryLine = db.session.query(conability_line.amount, conability_line.num).filter(
         conability_line.role == role).order_by(conability_line.amount)
@@ -20,9 +21,6 @@ def GetJson_ConAbility(userID):
     num = [result.num for result in resultsLine]
 
     # return
-    json_userAmount = {'userAmount': str(userAmount)}
-    json_conability = {'amount': amount, 'num': num}
-
-    json_response = {'json_userAmount':json_userAmount, 'json_conability':json_conability}
+    json_response = {'userAmount': userAmount, 'amount':amount, 'num': num}
 
     return json_response

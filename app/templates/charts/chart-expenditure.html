@@ -1,13 +1,17 @@
-<-- Replaced by chart-acperiodcate.html on 02-23 -->
-
-{% extends "charts.html" %}
+{% extends "charts/charts.html" %}
 {% block chartField %}
 
-    <form id="form-ipt" class="form-inline" >
-        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='AQPTHHPQ')}}
+    <form id="form-ipt" class="form-inline" xmlns="http://www.w3.org/1999/html">
+        {{ form.userID(class="form-control", maxlength='8', placeholder='工号' ,value='TPPZLPHY') }}
         {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
+        </br>
         {{ form.modeDate.label }}
         {% for subfield in form.modeDate %}
+            {{ subfield }}{{ subfield.label }}
+            &nbsp;&nbsp;
+        {% endfor %}
+        {{ form.modeTime.label }}
+        {% for subfield in form.modeTime %}
             {{ subfield }}{{ subfield.label }}
             &nbsp;&nbsp;
         {% endfor %}
@@ -27,7 +31,7 @@
             }
         });
         dateRangePicker.on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('YYYY-MM-DD')+' ~ '+picker.endDate.format('YYYY-MM-DD'));
+            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' ~ ' + picker.endDate.format('YYYY-MM-DD'));
         });
         dateRangePicker.on('cancel.daterangepicker', function (ev, picker) {
             $(this).val('');
@@ -38,8 +42,17 @@
         var chartTimeDistribution = echarts.init(document.getElementById('chartTimeDistribution'));
 
         var optionChartDate = {
-            title: {text: '门禁趋势'},
-            tooltip: {trigger: 'axis'},
+            title: {text: '支出趋势'},
+            tooltip: {
+                trigger: 'axis',
+                formatter: function (params) {
+                    var str_return = params[0].name + '<br/>';
+                    for (var i = 0; i < params.length; i++) {
+                            str_return += params[i].seriesName + ' : ' + params[i].value.toFixed(2) + ' 元<br/>'
+                    }
+                    return str_return;
+                }
+            },
             toolbox: {
                 show: true,
                 feature: {
@@ -50,7 +63,7 @@
                     saveAsImage: {show: true}
                 }
             },
-            legend: {data: ['节点门禁次数']},
+            legend: {data: ['累积支出','节点支出']},
             xAxis: {
                 type: 'category',
                 boundaryGap: true,
@@ -58,9 +71,71 @@
             },
             yAxis: {
                 type: 'value',
-                name: '次数',
+                name: '支出',
                 axisLabel: {
-                    formatter: '{value} 次'
+                    formatter: '{value} 元'
+                }
+            },
+            dataZoom: [
+                {
+                    type: 'inside',
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 100
+                },
+                {
+                    type: 'slider',
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 100
+                }
+            ],
+            series: [
+                {
+                    name: '累积支出',
+                    type: 'line',
+                    data: []
+                },
+                {
+                    name: '节点支出',
+                    type: 'bar',
+                    data: []
+                }
+            ]
+        };
+        var optionChartTime = {
+            title: {text: '支出分布'},
+            tooltip: {
+                trigger: 'axis',
+                formatter: function (params) {
+                    var str_return = params[0].name + '<br/>';
+                    for (var i = 0; i < params.length; i++) {
+                        str_return += params[i].seriesName + ' : ' + params[i].value.toFixed(2) + ' 元<br/>'
+                    }
+                    return str_return;
+                }
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: {show: true},
+                    dataView: {show: true, readOnly: false},
+                    magicType: {show: true, type: ['line', 'bar']},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            legend: {data: ['平均支出']},
+            xAxis: {
+                type: 'category',
+                boundaryGap: true,
+                data: []
+            },
+            yAxis: {
+                type: 'value',
+                name: '平均支出',
+                axisLabel: {
+                    formatter: '{value} 元'
                 }
             },
             dataZoom: [
@@ -78,35 +153,7 @@
                 }
             ],
             series: [{
-                    name: '节点门禁次数',
-                    type: 'bar',
-                    data: []
-            }]
-        };
-        var optionChartTime = {
-            title: {text: '门禁时间段分布'},
-            tooltip: {trigger: 'axis'},
-            toolbox: {
-                show: true,
-                feature: {
-                    mark: {show: true},
-                    dataView: {show: true, readOnly: false},
-                    magicType: {show: true, type: ['line', 'bar']},
-                    restore: {show: true},
-                    saveAsImage: {show: true}
-                }
-            },
-            legend: {data: ['门禁平均计数']},
-            xAxis: {
-                type: 'category',
-                boundaryGap: true,
-                data: []
-            },
-            yAxis: {
-                type: 'value'
-            },
-            series: [{
-                name: '门禁平均计数',
+                name: '平均支出',
                 type: 'bar',
                 data: []
             }]
@@ -118,28 +165,33 @@
         var json_dateTrend;
         var json_timeDistribution;
 
-        refresh_chart = function () {
+        // get向后端请求json刷新图表。
+        refresh_chart = function(){
             chartDateTrend.showLoading();
             chartTimeDistribution.showLoading();
-            $.get('/charts/acperiod/getData?' + $("#form-ipt").serialize(), function (json_response) {
+            $.get('/charts/expenditure/getData?'+$("#form-ipt").serialize(), function(json_response){
                 chartDateTrend.hideLoading();
                 chartTimeDistribution.hideLoading();
 
-                // 还原图表选项
                 chartDateTrend.setOption(optionChartDate);
                 chartTimeDistribution.setOption(optionChartTime);
 
                 json_dateTrend = json_response.json_dateTrend;
                 json_timeDistribution = json_response.json_timeDistribution;
 
-                if (!json_response.errMsg) {
+                if(!json_response.errMsg){
                     chartDateTrend.setOption({
                         xAxis: [{
                             data: json_dateTrend.axisLabels
                         }],
-                        series: [{
+                        series: [
+                            { name: '累积支出',
+                                data: json_dateTrend.accumulatedVals
+                            },
+                            {name: '节点支出',
                                 data: json_dateTrend.pointVals
-                        }]
+                            }
+                        ]
                     });
                     chartTimeDistribution.setOption({
                         xAxis: [{
@@ -149,14 +201,12 @@
                             data: json_timeDistribution.vals
                         }]
                     });
-
-                } else {
-                    for (err in json_response.errMsg) {
+                }else{
+                    for(err in json_response.errMsg){
                         alert(json_response.errMsg[err]);
                     }
                 }
-            }, 'json')
+            },'json')
         };
     </script>
-
 {% endblock %}
