@@ -57,11 +57,60 @@
 
 // Custom my class
 
+// Color Swatches
+@clouds:                 #ECF0F1;
+
+@alizarin:               #E74C3C;
+@carrot:                 #E67E22;
+@sunFlower:              #F1C40F;
+@emerald:                #2ECC71;
+@turquoise:              #1ABC9C;
+@peterRiver:             #3498DB;
+@amethyst:               #9B59B6;
+
+@wetAsphalt:             #34495E;
+
 // Font
-@font-family-sans-serif:  "microsoft yahei", "simhei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+@font-family-sans-serif: "microsoft yahei", "simhei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+// h* color
+@headings-color:          @clouds;
+
+// p 
+p {
+	color:                @clouds;
+	font-size:            @font-size-h3;
+}
+
+// span
+#p1-1 > span {
+	background:           @clouds;
+	color:                @carrot;
+	font-size:            @font-size-h2;
+}
+#p2-1 > span {
+	background:           @clouds;
+	color:                @wetAsphalt;
+	font-size:            @font-size-h2;
+}
+#p3-1 > span {
+	background:           @clouds;
+	color:                @emerald;
+	font-size:            @font-size-h2;
+}
+#p5-1 > span {
+	background:           @clouds;
+	color:                @peterRiver;
+	font-size:            @font-size-h2;
+}
 
 // Responsive image & Center-align
 img {
   .img-responsive();
   .center-block();
+}
+
+// try adjust Arrow
+.fp-controlArrow.fp-next {
+    right: 50px;
 }

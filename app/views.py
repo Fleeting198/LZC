@@ -29,9 +29,9 @@ def show_summary():
     # 工号，日期设定
     # =================================
 
-    userID = 'AQPTHHPQ'
-    startDate = '2015-5-15'
-    endDate = '2015-6-14'
+    userID = 'PPPWQHXW'
+    startDate = ''
+    endDate = ''
 
 
     # =================================
@@ -85,7 +85,10 @@ def show_summary():
 
     # print df
 
-    count_early = df.loc[6]['dorm']  # 取 6 点宿舍值，总计早起次数
+    if 'dorm' in df:
+        count_early = df.loc[6]['dorm']  # 取 6 点宿舍值，总计早起次数
+    else:
+        count_early = 0
     count_night = sum(df.loc[0:6]['SUM'].tolist()) + df.loc[23]['SUM']  # 取23点 ~ 5点总门禁次数
 
     ret_habit = {'count_early': count_early, 'count_night': count_night }

@@ -11,19 +11,20 @@
             </div>
             <div class="col-md-4 col-sm-4">
                 <h1>
-                    工号：{{ userID }}，您好！
+                    工号：{{ userID }}，</br>
+                    您好！
                 </h1>
                 <p></br></p>
-                <h4>
+                <p>
                     下滑开启成长日记：
-                </h4>
+                </p>
             </div>
             <div class="col-md-1 col-sm-1"></div>
         </div>
     </div>
 </div>
 <div class="section" id="section1">
-    <div class="slide" id="slide1-1">
+    <div class="slide" id="slidel1-1">
         <div class="content">
             <div class="container-fluid">
                 <div class="row">
@@ -31,30 +32,32 @@
                     <div class="col-md-5 col-sm-5">
                         <img data-src="../static/pic/summary/section/section1Footprint.png">
                     </div>
-                    <div class="col-md-1 col-sm-1"></div>
-                    <div class="col-md-4 col-sm-4">
-                        <h1>
-                            我的足迹
-                        </h1>
-                        <p></br></p>
-                        <h4>
-                            在过去的一个月中，我曾在 {{ vals_summary['ret_access']['count_nodes'] }} 个地方留下过足迹，
-                            拿下 {{ vals_summary['ret_access']['total_count'] }} 次门禁记录。</br>
+                    <!-- <div class="col-md-1 col-sm-1"></div> -->
+                    <div class="col-md-5 col-sm-5">
+                        <div style="margin-left: 30px">
+                            <h1>
+                                我的足迹
+                            </h1>
+                            <p></br></p>
+                            <p id="p1-1">
+                                在过去的一个月中，我曾在 <span>{{ vals_summary['ret_access']['count_nodes'] }}</span> 个地方留下过足迹，
+                                拿下 <span>{{ vals_summary['ret_access']['total_count'] }}</span> 次门禁记录。</br>
 
-                            <!-- 此处应有地点种类数量判断， -->
-                            {% if vals_summary['ret_access']['ac_items'][1] is defined %}
-                                除了访问了{{ vals_summary['ret_access']['ac_items'][0]['count'] }}
-                                次的 {{ vals_summary['ret_access']['ac_items'][0]['node_des'] }} 之外，
+                                <!-- 此处应有地点种类数量判断， -->
+                                {% if vals_summary['ret_access']['ac_items'][1] is defined %}
+                                    除了访问了 <span>{{ vals_summary['ret_access']['ac_items'][0]['count'] }}</span>
+                                    次的 <span>{{ vals_summary['ret_access']['ac_items'][0]['node_des'] }}</span> 之外，
+                                    </br>
+                                    我最爱的是 <span>{{ vals_summary['ret_access']['ac_items'][1]['node_des'] }}</span> ，
+                                    在那留下了 <span>{{ vals_summary['ret_access']['ac_items'][1]['count'] }}</span> 次记录。
+                                {% else %}
+                                    我最爱的是 <span>{{ vals_summary['ret_access']['ac_items'][0]['node_des'] }}</span> ，
+                                    在那留下了 <span>{{ vals_summary['ret_access']['ac_items'][0]['count'] }}</span> 次记录。
+                                {% endif %}
                                 </br>
-                                我最爱的是 {{ vals_summary['ret_access']['ac_items'][1]['node_des'] }} ，
-                                在那留下了 {{ vals_summary['ret_access']['ac_items'][1]['count'] }} 次记录。
-                            {% else %}
-                                我最爱的是 {{ vals_summary['ret_access']['ac_items'][0]['node_des'] }} ，
-                                在那留下了 {{ vals_summary['ret_access']['ac_items'][0]['count'] }} 次记录。
-                            {% endif %}
-                            </br>
-                            我的一小步，人类一大步。
-                        </h4>
+                                我的一小步，人类一大步。
+                            </p>
+                        </div>
                     </div>
                     <div class="col-md-1 col-sm-1"></div>
                 </div>
@@ -65,12 +68,12 @@
         <div class="content">
         		<div class="container-fluid">
         			<div class="row">
-        				<div class="col-md-2 col-sm-2"></div>
-        				<div class="col-md-8 col-sm-8">
+                        <div class="col-md-1 col-sm-1"></div>
+        				<div class="col-md-10 col-sm-10">
                             <!-- ACCategory -->
-                            <div id="chartACCategory" class="center-block" style="width: inherit; height: 350px;"></div>
+                            <div id="chartACCategory" class="center-block" style="width: inherit; height: 474.65px;"></div>
+                        <div class="col-md-1 col-sm-1"></div>
 				  	</div>
-				  	<div class="col-md-2 col-sm-2"></div>
 			  	</div>
 		  </div>
         </div>
@@ -87,25 +90,25 @@
                     </div>
                     <div class="col-md-1 col-sm-1"></div>
                     <div class="col-md-4 col-sm-4">
-                        <h1>
+                        <h1 style="color: #2C3E50">
                             我的作息
                         </h1>
                         <p></br></p>
-                        <h4>
+                        <p id="p2-1" style="color: #2C3E50">
                             又到了起床靠毅力的季节了，</br>
 
                             {% if vals_summary['ret_habit']['count_early'] == 0 %}
                                 我的被子上可能存在不知名的结界，从未在早晨7点前解开。
                             {% else %}
-                                我早起 {{ vals_summary['ret_habit']['count_early'] }} 次，
+                                我早起 <span>{{ vals_summary['ret_habit']['count_early'] }}</span> 次，
                             {% endif %}
                             </br>
                             {% if vals_summary['ret_habit']['count_night'] == 0 %}
                                 无晚归记录，习惯良好！
                             {% else %}
-                                曾在晚上 11 点～早上 6 点之间访问门禁 {{ vals_summary['ret_habit']['count_night'] }} 次，注意早点休息哟～
+                                曾在晚上 11 点～早上 6 点之间访问门禁 <span>{{ vals_summary['ret_habit']['count_night'] }}</span> 次，注意早点休息哟～
                             {% endif %}
-                        </h4>
+                        </p>
                     </div>
                     <div class="col-md-1 col-sm-1"></div>
                 </div>
@@ -119,7 +122,7 @@
         				<div class="col-md-2 col-sm-2"></div>
         				<div class="col-md-8 col-sm-8">
                             <!-- ACPeriodCate -->
-                            <div id="chartACPeriodCateTime" class="center-block" style="width: inherit; height: 350px;"></div>
+                            <div id="chartACPeriodCateTime" class="center-block" style="width: inherit; height: 474.65px;"></div>
 				  	</div>
 				  	<div class="col-md-2 col-sm-2"></div>
 			  	</div>
@@ -140,39 +143,39 @@
                     我的学习
                 </h1>
                 <p></br></p>
-                <h4>
+                <p id="p3-1">
                     <!-- ret_study = {'count_lib':count_lib, 'count_acad': count_acad, 'count_sci':count_sci} -->
 
                     上个月中，我
                     {% if vals_summary['ret_study']['count_acad'] != 0 %}
-                        去过教学楼 {{ vals_summary['ret_study']['count_acad'] }} 次，
+                        去过教学楼 <span>{{ vals_summary['ret_study']['count_acad'] }}</span> 次，
                     {% else %}
                         没有去过教学楼，
                     {% endif %}
 
                     {% if vals_summary['ret_study']['count_lib'] != 0 %}
-                        成功泡图书馆 {{ vals_summary['ret_study']['count_lib'] }} 次，
+                        成功泡图书馆 <span>{{ vals_summary['ret_study']['count_lib'] }}</span> 次，
                     {% else %}
                         没有进入图书馆，
                     {% endif %}
 
                     {% if vals_summary['ret_study']['count_sci'] != 0 %}
-                        宅实验室 {{ vals_summary['ret_study']['count_sci'] }} 次。
+                        宅实验室 <span>{{ vals_summary['ret_study']['count_sci'] }}</span> 次。
                     {% else %}
                         远离实验室。
                     {% endif %}
 
                     </br>
                     {% if vals_summary['ret_study']['percent_asc'] > 0.9 %}
-                        比全校 {{ vals_summary['ret_study']['percent_asc']|round(2)*100 }} ％的人都更加努力，可以被称为五星级准学霸！
+                        比全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(2)*100 }}</span> ％的人都更加努力，可以被称为五星级准学霸！
                     {% elif vals_summary['ret_study']['percent_asc'] > 0.5 %}
-                        比全校 {{ vals_summary['ret_study']['percent_asc']|round(2)*100 }} ％的人都更加努力，
+                        比全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(2)*100 }}</span> ％的人都更加努力，
                     {% elif vals_summary['ret_study']['percent_asc'] > 0.3 %}
-                        比全校 {{ vals_summary['ret_study']['percent_asc']|round(2)*100 }} ％的人都更加努力
+                        比全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(2)*100 }}</span> ％的人都更加努力
                     {% else %}
-                        比全校 {{ (1-vals_summary['ret_study']['percent_asc']|round(2))*100 }} ％的人更悠闲。
+                        比全校 <span>{{ (1-vals_summary['ret_study']['percent_asc']|round(2))*100 }}</span> ％的人更悠闲。
                     {% endif %}
-                </h4>
+                </p>
             </div>
             <div class="col-md-1 col-sm-1"></div>
         </div>
@@ -193,10 +196,10 @@
                             我的朋友
                         </h1>
                         <p></br></p>
-                        <h4>
+                        <p>
                             奋斗的路上有更多同伴才更有动力，有｛｝位同学曾与我擦肩而过。</br>
                             ｛｝童鞋，我们｛｝次不断相遇，难道是缘分，难道是天意。
-                        </h4>
+                        </p>
                     </div>
                     <div class="col-md-1 col-sm-1"></div>
                 </div>
@@ -229,14 +232,14 @@
                             我的账单
                         </h1>
                         <p></br></p>
-                        <h4>
+                        <p id="p5-1">
                             <!-- ret_bill = {'total_expend':total_expend, 'con_items': json_ConCategory['seriesData'],
                             'con_per_month': con_per_month} -->
 
-                            最近一个月来，我总共花了 {{ vals_summary['ret_bill']['total_expend'] }} 元，</br>
-                            {{ vals_summary['ret_bill']['con_items'][0]['name'] }} 打榜成功，成为我的消费分类TOP 1。</br>
-                            根据长期统计，我的月均支出是 {{ vals_summary['ret_bill']['con_per_month'] }} 元。
-                        </h4>
+                            最近一个月来，我总共花了 <span>{{ vals_summary['ret_bill']['total_expend'] }}</span> 元，</br>
+                            <span>{{ vals_summary['ret_bill']['con_items'][0]['name'] }}</span> 打榜成功，成为我的消费分类TOP 1。</br>
+                            根据长期统计，我的月均支出是 <span>{{ vals_summary['ret_bill']['con_per_month'] }}</span> 元。
+                        </p>
                     </div>
                     <div class="col-md-1 col-sm-1"></div>
                 </div>
@@ -249,7 +252,7 @@
         				<div class="col-md-2 col-sm-2"></div>
         				<div class="col-md-8 col-sm-8">
                             <!-- chart_concategory -->
-                            <div id="chartConCategory" class="center-block" style="width: inherit; height: 350px;"></div>
+                            <div id="chartConCategory" class="center-block" style="width: inherit; height: 474.65px;"></div>
                         </div>
 				  	    <div class="col-md-2 col-sm-2"></div>
                     </div>
@@ -273,7 +276,7 @@
                             我的信用
                         </h1>
                         <p></br></p>
-                        <h4>
+                        <p>
                             <!-- ret_penalty = {'user_penalty': user_penalty, 'percent_asc': percent_asc} -->
 
                             在这一年里，我
@@ -289,7 +292,7 @@
                                 信用记录落后于 {{ vals_summary['ret_penalty']['percent_asc']|round(2)*100 }} ％的同学，记得及时还书哟～
                             {% endif %}
 
-                        </h4>
+                        </p>
                     </div>
                     <div class="col-md-1 col-sm-1"></div>
                 </div>
@@ -302,7 +305,7 @@
         				<div class="col-md-2 col-sm-2"></div>
         				<div class="col-md-8 col-sm-8">
                             <!-- chart_penalty -->
-                            <div id="chartPenalty" class="center-block" style="width: inherit; height: 350px;"></div>
+                            <div id="chartPenalty" class="center-block" style="width: inherit; height: 474.65px;"></div>
                         </div>
 				  	    <div class="col-md-2 col-sm-2"></div>
                     </div>
@@ -326,7 +329,19 @@
 	var chartACCategory = echarts.init(document.getElementById('chartACCategory'));
 	
 	var opt_chartACCategory = {
-	    title: {text: '时间段内门禁分类计数'},
+	    title: {
+	        text: '门禁分类计数',
+	        textStyle: {
+	            color: '#ECF0F1',
+	            fontSize: 30
+            },
+            x:'right'
+	    },
+	    color: ['#FCD781', '#FFB35C', '#FF9447', '#FF7530'],
+	    textStyle: {
+	        color: '#ECF0F1',
+	        fontSize: 14
+        },
 	    tooltip: {
 	        trigger: 'item',
 	        formatter: "{b} : {c} ({d}%)"
@@ -338,12 +353,22 @@
 	            dataView: {show: true, readOnly: false},
 	            restore: {show: true},
 	            saveAsImage: {show: true}
-	        }
+	        },
+            top: '10%',
+            right: 0,
 	    },
-	    legend: {data: []},
+	    legend: {
+	        data: [],
+	        textStyle: {
+	            color: '#ECF0F1',
+	            fontSize: 18
+            },
+            x: 'left',
+            orient: 'vertical'
+        },
 	    series: [{
 	        type: 'pie',
-	        radious: '55%',
+	        radius: [0, '60%'],
 	        data: []
 	    }]
 	};
@@ -379,7 +404,16 @@ refresh_chart_ACCategory = function () {
     var chartACPeriodCateTime = echarts.init(document.getElementById('chartACPeriodCateTime'));
 
     var opt_chartACPeriodCateTime = {
-        title: {text: '门禁类型时间分布'},
+        title: {
+            text: '门禁类型时间分布',
+            textStyle: {
+                color: '#34495E'
+            }
+        },
+        textStyle: {
+            color: '#34495E'
+        },
+        color: ['#29A9FF', '#0066FF' ,'#27446E'],
         tooltip: {trigger: 'axis'},
         toolbox: {
             show: true,
@@ -391,7 +425,12 @@ refresh_chart_ACCategory = function () {
                 saveAsImage: {show: true}
             }
         },
-        legend: {data: []},
+        legend: {
+            data: [],
+            textStyle: {
+                color: '#34495E'
+            }
+        },
         xAxis: {
             type: 'category',
             boundaryGap: true,
@@ -507,6 +546,9 @@ refresh_chart_ACCategory = function () {
                     titles = json_response.titles;
                     seriesData = json_response.seriesData;
 
+                    alert(titles);
+                    alert(seriesData);
+
                     chartConCategory.setOption({
                         legend: {data: titles },
                         series: [{data: seriesData}]
@@ -525,6 +567,7 @@ refresh_chart_ACCategory = function () {
 
         var opt_chartPenalty = {
             title: {text: '滞纳金缴纳'},
+            color: ['#E3ECFF', '#D7E2FA', '#C8D8FA', '#B9CEFA', '#A2BEFA'],
             tooltip: {
                 trigger: 'axis',
                 formatter: function (params) {
@@ -715,12 +758,13 @@ refresh_chart_ACCategory = function () {
 	            }
 
 	            // callback ConCategory
-	            if(index == 5 && slideIndex == 0 && direction == 'right') {
+	            if(index == 6 && slideIndex == 0 && direction == 'right') {
+	                alert();
 	                refresh_chart_ConCategory();
 	            }
 
 	            // callback Penalty
-	            if(index == 6 && slideIndex == 0 && direction == 'right') {
+	            if(index == 7 && slideIndex == 0 && direction == 'right') {
 	                refresh_chart_Penalty();
                 }
 
