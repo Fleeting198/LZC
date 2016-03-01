@@ -159,8 +159,7 @@
         chartDateTrend.setOption(optionChartDate);
         chartTimeDistribution.setOption(optionChartTime);
 
-        var json_dateTrend;
-        var json_timeDistribution;
+
 
         // get向后端请求json刷新图表。
         refresh_chart = function () {
@@ -171,13 +170,16 @@
                 chartDateTrend.hideLoading();
                 chartTimeDistribution.hideLoading();
 
-                json_dateTrend = json_response.json_dateTrend;
-                json_timeDistribution = json_response.json_timeDistribution;
-
                 chartDateTrend.setOption(optionChartDate);
                 chartTimeDistribution.setOption(optionChartTime);
 
                 if (!json_response.errMsg) {
+
+                    var json_dateTrend;
+                    var json_timeDistribution;
+                    json_dateTrend = json_response.json_dateTrend;
+                    json_timeDistribution = json_response.json_timeDistribution;
+
                     chartDateTrend.setOption({
                         xAxis: [{
                             data: json_dateTrend.axisLabels

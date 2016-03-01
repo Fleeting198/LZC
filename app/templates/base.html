@@ -16,7 +16,6 @@
         <script src="{{ url_for('static',filename='js/echarts.min.js') }}"></script>
         <script src="{{ url_for('static',filename='js/jquery.fullpage.min.js') }}"></script>
 
-
 	</head>
 	<body onload="load_number()">
 
@@ -30,14 +29,14 @@
             </nav>
         {% endblock %}</div>
 
-        <div>{% block content %}{% endblock %}</div>
+        <div style="overflow: hidden;">{% block content %}{% endblock %}</div>
 
-        <div id="footer">{% block footer %}
-            <div class="container">
-                <p>
-                    This is footer.
-                </p>
-            </div>
-        {% endblock %}</div>
+{#        <div id="footer" style="clear:left">{% block footer %}#}
+{#            <div class="container">#}
+{#                <p>#}
+{#                    This is footer.#}
+{#                </p>#}
+{#            </div>#}
+{#        {% endblock %}</div>#}
 	</body>
 </html>

@@ -33,11 +33,13 @@ class Cvs2MySQL:
     path_consumption = "csv/consumption.csv"
     num_oncecommit = 10000
 
+
     def __init__(self):
         """
         初始化 MySql 连接
         """
         self._mysql = MySQL.MySQL()
+
 
     def device2MySQL(self):
         """
@@ -52,6 +54,7 @@ class Cvs2MySQL:
                 strsql = "insert into device(location, dev_id) values('" + LOCATION + "','" + DEVID + "')"
                 self._mysql.insert(strsql)
         print "消费地点对应表录入完成"
+
 
     def acl2mysqlfile1(self):
         """
@@ -95,7 +98,7 @@ class Cvs2MySQL:
 
         print "门禁表一及其中个体录入完成。"
 
-    ''''''
+
     def acl2mysqlfile2(self):
         """
         录入门禁数据2
@@ -140,6 +143,7 @@ class Cvs2MySQL:
 
         print "门禁表二录入完成。"
 
+
     def consumption2mysql(self):
         """
         录入消费数据
@@ -174,5 +178,6 @@ class Cvs2MySQL:
             # 最后提交
             self._mysql._cur.executemany(strsql, list_data)
             self._mysql.commit()
+
 
         print "消费表录入完成"

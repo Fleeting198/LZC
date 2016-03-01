@@ -3,18 +3,38 @@
 
     <!--place divs for charts-->
     <div id="chartNumberTotal" style="width: inherit; height: 350px;"></div>
-    <div id="chartNumberGradeB" style="width: inherit; height: 350px;"></div>
-    <div id="chartNumberGradePg" style="width: inherit; height: 350px;"></div>
-    <div id="chartNumberGradeDr" style="width: inherit; height: 350px;"></div>
 
+    <div class="row" style="height: 400px;">
+    <div id="chartNumberGradeB" class="col-xs-3" style="height: inherit;"></div>
+    <div id="chartNumberGradePg" class="col-xs-3" style="height: inherit;"></div>
+    <div id="chartNumberGradeDr" class="col-xs-3"style="height: inherit;"></div>
+    </div>
+
+{#    <div id="chartNumberGradeB" style="width: inherit; height: 350px;"></div>#}
+{#    <div id="chartNumberGradePg" style="width: inherit; height: 350px;"></div>#}
+{#    <div id="chartNumberGradeDr" style="width: inherit; height: 350px;"></div>#}
 
     <script>
-
         <!--init charts-->
         var chartNumberTotal = echarts.init(document.getElementById('chartNumberTotal'));
         var chartNumberGradeB = echarts.init(document.getElementById('chartNumberGradeB'));
         var chartNumberGradePg = echarts.init(document.getElementById('chartNumberGradePg'));
         var chartNumberGradeDr = echarts.init(document.getElementById('chartNumberGradeDr'));
+
+        // 不知道怎么把事件放在一起。
+        window.onresize = chartNumberTotal.resize;
+        window.onresize = function(){
+            chartNumberTotal.resize;
+            chartNumberGradeB.resize;
+            chartNumberGradePg.resize;
+            chartNumberGradeDr.resize;
+        }
+
+{#        window.onresize = chartNumberTotal.resize;#}
+{#        window.onresize = chartNumberGradeB.resize;#}
+{#        window.onresize = chartNumberGradePg.resize;#}
+{#        window.onresize = chartNumberGradeDr.resize;#}
+
 
         <!--start options for charts-->
         var optionChartNumberTotal = {
@@ -76,7 +96,7 @@
             series: [{
                 name: '年级比例',
                 type: 'pie',
-                radious: '50%',
+                radius: '70%',
                 center: ['50%', '50%'],
                 data: []
             }]

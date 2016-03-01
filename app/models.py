@@ -105,18 +105,15 @@ class consumption(db.Model):
         self.con_datetime = con_datetime
         self.amount = amount
 
-class con_water_simp(db.Model):
-    """
-    消费表的water 类消费子表，为了减小查询时间开销而查询得到 -C
-    丢弃了用户id ，设备id 和主键信息
-    """
-    id = db.Column(db.Integer, primary_key=True)
-    con_datetime = db.Column(db.DateTime)
-    amount = db.Column(db.DECIMAL(5, 2))
 
-    def __init__(self, con_datetime, amount):
-        self.con_datetime = con_datetime
-        self.amount = amount
+class acr_friendlist(db.Model):
+    """
+    来自门禁表的人际关系字典
+    """
+    user_id = db.Column(db.String(8), db.ForeignKey('individual.user_id'), primary_key=True)
+
+
+
 
 class conability(db.Model):
     """

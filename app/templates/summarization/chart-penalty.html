@@ -61,7 +61,7 @@
 
             chartPenalty.showLoading();
 
-            $.get('/charts/penalty/getData?' + $("#form-ipt").serialize(), function (json_response) {
+            $.get('/summary/GetJson_penalty?' + $("#form-ipt").serialize(), function (json_response) {
                 // json_response = {'userAmount': userAmount, 'amount': amount, 'num': num}
 
                 var userAmount = json_response.userAmount;

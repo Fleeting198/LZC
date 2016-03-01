@@ -6,7 +6,7 @@
         <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
     </form>
 
-    <div id="chartConAbility" style="width: inherit; height: 350px;"></div>
+    <div id="chartConAbility" style="width: inherit;"></div>
 
     <script>
 
@@ -66,7 +66,6 @@
         chartConAbility.setOption(optionChartConAbility);
 
         refresh_chart = function () {
-
             chartConAbility.showLoading();
 
             $.get('/charts/conability/getData?' + $("#form-ipt").serialize(), function (json_response) {
@@ -75,8 +74,6 @@
                 var amount = json_response.amount;
                 var num = json_response.num;
                 var index_userAmount = 0;
-
-                alert(parseInt(userAmount));
 
                 for (var i = 0; i < amount.length; i++) {
                     if (amount[i].toString() == parseInt(userAmount).toString()) {

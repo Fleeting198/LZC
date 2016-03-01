@@ -75,7 +75,6 @@
 
         chartTimeDistribution.setOption(optionChartTime);
 
-        var json_timeDistribution;
 
         // get向后端请求json刷新图表。
         refresh_chart = function () {
@@ -83,10 +82,12 @@
 
             $.get('/charts/foodIncome/getData?' + $("#form-ipt").serialize(), function (json_response) {
                 chartTimeDistribution.hideLoading();
-                json_timeDistribution = json_response.json_timeDistribution;
                 chartTimeDistribution.setOption(optionChartTime);
 
                 if (!json_response.errMsg) {
+                    var json_timeDistribution;
+                    json_timeDistribution = json_response.json_timeDistribution;
+
                     chartTimeDistribution.setOption({
                         xAxis: [{
                             data: json_timeDistribution.axisLabels

@@ -34,7 +34,12 @@ def ACPeriodCate(res_datetimes, res_categorys, mode_date):
     df['SUM'] = 0
     for i in range(len(cols_name)):
         df['SUM'] += df[cols_name[i]]
-    df['PER_DORM'] = df['dorm']/df['SUM']
+
+    # 仅当存在宿舍值时才计算宿舍比重
+    if 'dorm' in df:
+        df['PER_DORM'] = df['dorm']/df['SUM']
+    else:
+        df['PER_DORM'] = 0
 
     axisLabels = map(lambda x: x.strftime('%Y-%m-%d'), df.index.tolist())
 

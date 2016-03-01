@@ -103,11 +103,10 @@
         chartACPeriodCateTime.setOption(opt_chartACPeriodCateTime);
 
 
-
         refresh_chart_ACPeriodCate = function () {
             chartACPeriodCateDate.showLoading();
             chartACPeriodCateTime.showLoading();
-            $.get('/charts/acperiodcate/getData?' + $("#form-ipt").serialize(), function (json_response) {
+            $.get('/summary/GetJson_acperiodcate?' + $("#form-ipt").serialize(), function (json_response) {
                 chartACPeriodCateDate.hideLoading();
                 chartACPeriodCateTime.hideLoading();
 
@@ -115,13 +114,14 @@
                 chartACPeriodCateDate.setOption(opt_chartACPeriodCateDate);
                 chartACPeriodCateTime.setOption(opt_chartACPeriodCateTime);
 
-                var json_dateTrend;
-                var json_timeDistribution;
-
-                json_dateTrend = json_response.json_dateTrend;
-                json_timeDistribution = json_response.json_timeDistribution;
-
                 if (!json_response.errMsg) {
+
+                    var json_dateTrend;
+                    var json_timeDistribution;
+
+                    json_dateTrend = json_response.json_dateTrend;
+                    json_timeDistribution = json_response.json_timeDistribution;
+
                     // 日期趋势图表设定。
                     chartACPeriodCateDate.setOption({
                         legend: {data: json_dateTrend.legendLabels},

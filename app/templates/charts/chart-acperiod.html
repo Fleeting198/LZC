@@ -115,8 +115,6 @@
         chartDateTrend.setOption(optionChartDate);
         chartTimeDistribution.setOption(optionChartTime);
 
-        var json_dateTrend;
-        var json_timeDistribution;
 
         refresh_chart = function () {
             chartDateTrend.showLoading();
@@ -129,10 +127,13 @@
                 chartDateTrend.setOption(optionChartDate);
                 chartTimeDistribution.setOption(optionChartTime);
 
-                json_dateTrend = json_response.json_dateTrend;
-                json_timeDistribution = json_response.json_timeDistribution;
-
                 if (!json_response.errMsg) {
+
+                    var json_dateTrend;
+                    var json_timeDistribution;
+                    json_dateTrend = json_response.json_dateTrend;
+                    json_timeDistribution = json_response.json_timeDistribution;
+
                     chartDateTrend.setOption({
                         xAxis: [{
                             data: json_dateTrend.axisLabels

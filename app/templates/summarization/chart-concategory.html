@@ -41,15 +41,14 @@
 
         refresh_chart_ConCategory = function () {
             chartConCategory.showLoading();
-            $.get('/charts/concategory/getData?' + $("#form-ipt").serialize(), function (json_response) {
+            $.get('/summary/GetJson_concategory?' + $("#form-ipt").serialize(), function (json_response) {
                 chartConCategory.hideLoading();
                 chartConCategory.setOption(optionChartConCategory);
 
-                var titles;
-                var seriesData;
-
                 if (!json_response.errMsg) {
 
+                    var titles;
+                    var seriesData;
                     titles = json_response.titles;
                     seriesData = json_response.seriesData;
 

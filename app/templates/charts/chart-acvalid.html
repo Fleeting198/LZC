@@ -7,7 +7,7 @@
         <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
     </form>
 
-    <div id="chartACValid" style="width: inherit; height: 400px;"></div>
+    <div id="chartACValid" style="width: inherit; height: 90%;"></div>
 
     <script>
         var dateRangePicker = $("input[name='dateRange']");
@@ -27,9 +27,12 @@
 
         // 图表初始化。
         var chartACValid = echarts.init(document.getElementById('chartACValid'));
+        window.onresize = chartACValid.resize;
 
         var optionChartACValid = {
-            title: {text: '门禁合法比例'},
+            title: {
+                text: '门禁合法比例',
+            },
             tooltip: {
                 trigger: 'item',
                 formatter: "{b} : {c} ({d}%)"
@@ -45,23 +48,21 @@
             },
             legend: {
                 show: true,
-                orient: 'horizontal',
-                left: 'center',
+                orient: 'vertical',
+                left: 'left',
+                top: '30%',
                 data: []
             },
             series: [{
-                name: '门禁合法比例',
+                name: '消费分布',
                 type: 'pie',
-                radious: '50%',
-                center: ['50%', '50%'],
+                radius: '50%',
+                center: ['45%', '45%'],
                 data: []
             }]
         };
 
         chartACValid.setOption(optionChartACValid);
-
-        var titles;
-        var seriesData;
 
         refresh_chart = function () {
             chartACValid.showLoading();
@@ -70,7 +71,8 @@
                 chartACValid.setOption(optionChartACValid);
 
                 if (!json_response.errMsg) {
-
+                    var titles;
+                    var seriesData;
                     titles = json_response.titles;
                     seriesData = json_response.seriesData;
 

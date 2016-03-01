@@ -34,8 +34,10 @@
 
         refresh_chart_ACCategory = function () {
             chartACCategory.showLoading();
-            $.get('/charts/accategory/getData?' + $("#form-ipt").serialize(), function (json_response) {
+            $.get('/summary/GetJson_accategory?' + $("#form-ipt").serialize(), function (json_response) {
                 chartACCategory.hideLoading();
+                chartACCategory.setOption(opt_chartACCategory);
+
                 if (!json_response.errMsg) {
 
                     var titles;

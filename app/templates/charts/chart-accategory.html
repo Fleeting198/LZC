@@ -7,7 +7,7 @@
         <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
     </form>
 
-    <div id="chartACCategory" style="width: inherit; height: 350px;"></div>
+    <div id="chartACCategory" style="width: inherit; height: 90%;"></div>
 
     <script>
         var dateRangePicker = $("input[name='dateRange']");
@@ -27,6 +27,7 @@
 
         // 图表初始化。
         var chartACCategory = echarts.init(document.getElementById('chartACCategory'));
+        window.onresize = chartACCategory.resize;
 
         var optionChartACCategory = {
             title: {text: '时间段内门禁分类计数'},
@@ -43,25 +44,33 @@
                     saveAsImage: {show: true}
                 }
             },
-            legend: {data: []},
+            legend: {
+                show: true,
+                orient: 'vertical',
+                left: 'left',
+                top: '30%',
+                data: []
+            },
             series: [{
+                name: '消费分布',
                 type: 'pie',
-                radious: '55%',
+                radius: '50%',
+                center: ['45%', '45%'],
                 data: []
             }]
         };
 
         chartACCategory.setOption(optionChartACCategory);
 
-        var titles;
-        var seriesData;
-
         refresh_chart = function () {
             chartACCategory.showLoading();
             $.get('/charts/accategory/getData?' + $("#form-ipt").serialize(), function (json_response) {
                 chartACCategory.hideLoading();
-                if (!json_response.errMsg) {
+                chartACCategory.setOption(optionChartACCategory);
 
+                if (!json_response.errMsg) {
+                    var titles;
+                    var seriesData;
                     titles = json_response.titles;
                     seriesData = json_response.seriesData;
 
