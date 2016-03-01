@@ -8,6 +8,7 @@ def GetJson_ConAbility(userID):
     strQuery = db.session.query(conability.amount_avg, conability.role).filter(conability.user_id == userID)
     results = strQuery.first()
 
+    print results
     # unpacking results
     userAmount, role = results
     userAmount = float(userAmount)

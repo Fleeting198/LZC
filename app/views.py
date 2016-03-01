@@ -30,14 +30,10 @@ def show_summary():
     # 工号，日期设定
     # =================================
 
-    userID = 'AQPTHHPQ'
+    userID = 'PPPWQHXW'
     startDate = ''
     endDate = ''
-    # 若未设定日期，暂设一年
-    if len(startDate) == 0:
-        dayRange = 365
-    else:
-        dayRange = (datetime.strptime(endDate,'%Y-%m-%d') - datetime.strptime(startDate, '%Y-%m-%d')).day
+
 
     # =================================
     # 门禁
@@ -89,6 +85,7 @@ def show_summary():
         df['SUM'] += vals
 
     # print df
+
     if 'dorm' in df:
         count_early = df.loc[6]['dorm']  # 取 6 点宿舍值，总计早起次数
     else:
@@ -214,10 +211,10 @@ def show_summary():
     # =================================
     # 打包
 
-    vals_summary = {'user_id': userID, 'ret_access': ret_access, 'ret_habit': ret_habit, 'ret_study': ret_study,
+    vals_summary = {'ret_access': ret_access, 'ret_habit': ret_habit, 'ret_study': ret_study,
                     'ret_social': ret_social, 'ret_bill': ret_bill, 'ret_penalty': ret_penalty }
 
-    return render_template('summarization/summarization.html', vals_summary=vals_summary)
+    return render_template('summarization/summarization.html', userID=userID, startDate=startDate, endDate=endDate, vals_summary=vals_summary)
     # return render_template('summarization/summarization.html')
 
 
@@ -669,7 +666,6 @@ def refresh_chart_penalty():
     return json_response
 
 
-
 # =====================================
 # Summary 所用图表获取json返回的路由
 # =====================================
@@ -775,4 +771,6 @@ def refresh_summary_acperiodcate():
     # ===========================
 
     json_response = jsonify(json_response)
+
     return json_response
+
