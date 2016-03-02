@@ -139,8 +139,17 @@ def show_summary():
     # =================================
     # 好友 —— 等待好友结果
 
+    # 奋斗的路上有更多同伴才更有动力，有｛｝位同学曾与我擦肩而过。</br>
+    #｛｝童鞋，我们｛｝次不断相遇，难道是缘分，难道是天意。
 
-    ret_social = {'count_fris': []}
+    from controls.GetJson_ACRelation import GetJson_ACRelation
+    json_ACRelation = GetJson_ACRelation(userID)
+
+    num_relations = len(json_ACRelation['nodes'])
+    top_name = json_ACRelation['nodes'][0]['name']
+    top_value = int(json_ACRelation['nodes'][0]['value'])
+
+    ret_social = {'num_relations': num_relations, 'top_name':top_name, 'top_value':top_value }
 
     # =================================
     # 消费 bill
@@ -806,33 +815,7 @@ def refresh_summary_relation():
     userID = request.args.get('userID')
 
     from controls.GetJson_ACRelation import GetJson_ACRelation
-
-
-
-    # dict_relation = GetJson_ACRelation(userID)
-    #
-    # print dict_relation
-    # source = userID
-    #
-    # # 生成nodes 队列
-    # nodes = [{'name': source, 'value': 1000}]
-    # links = []
-    #
-    # for k, v in dict_relation.iteritems():
-    #     node = {'name': k, 'value': v}
-    #     nodes.append(node)
-    #     link = {'source': source, 'target': k}
-    #     links.append(link)
-    #
-    # json_response = {'nodes': nodes, 'links': links}
-    #
-    # print json_response
-    #
-    # # 总与多少同学相遇
-    # print len(nodes) - 1
-
-
-
+    json_response = GetJson_ACRelation(userID)
 
     json_response = jsonify(json_response)
     return json_response

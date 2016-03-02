@@ -197,8 +197,9 @@
                         </h1>
                         <p></br></p>
                         <p>
-                            奋斗的路上有更多同伴才更有动力，有｛｝位同学曾与我擦肩而过。</br>
-                            ｛｝童鞋，我们｛｝次不断相遇，难道是缘分，难道是天意。
+                            <!-- ret_social = {'num_relations': num_relations, 'top_name':top_name, 'top_value':top_value } -->
+                            奋斗的路上有更多同伴才更有动力，有 {{ vals_summary['ret_social']['num_relations'] }} 位同学曾与我擦肩而过。</br>
+                            {{ vals_summary['ret_social']['top_name'] }} 童鞋，我们 {{ vals_summary['ret_social']['top_value'] }} 次不断相遇，难道是缘分，难道是天意。
                         </p>
                     </div>
                     <div class="col-md-1 col-sm-1"></div>

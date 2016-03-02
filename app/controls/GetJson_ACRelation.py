@@ -17,7 +17,7 @@ def GetJson_ACRelation(userID):
     min_size = 10
 
     # 初始化节点和边队列
-    nodes = [{'name': source, 'value': round(max_val * 1.2, 0),
+    nodes = [{'name': source, 'value': int(max_val * 1.2),
               'symbolSize': (min_size * max_val - max_size + (max_size - min_size) * (max_val + 10)) / (max_val - 1)}]
     links = []
 
@@ -31,7 +31,7 @@ def GetJson_ACRelation(userID):
             index += 1
         return -1
 
-    max_concern = 148
+    max_concern = 50
     for i in range(len(list_relation)):
         if i < max_concern:
             item = list_relation[i]
@@ -99,7 +99,7 @@ def query_list_relation(userID):
     # 排序
     list_relation = []
     for k, v in dict_relation.iteritems():
-        list_relation.append([k, v])
+        list_relation.append([k, int(v)])
 
     del dict_relation
 

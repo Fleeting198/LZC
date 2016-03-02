@@ -4,19 +4,29 @@
     <div class="col-xs-2 btn-group-vertical">
         {% block sideList %}
 
-            <input type="button" class="btn btn-default" value="个体支出趋势与分布" onclick="window.location.href='{{ url_for('show_chart_expenditure') }}'"/>
-            <input type="button" class="btn btn-default" value="个体门禁类型时间分布" onclick="window.location.href='{{ url_for('show_chart_acperiodcate') }}'"/>
-            <input type="button" class="btn btn-default" value="刷卡机收入趋势与分布" onclick="window.location.href='{{ url_for('show_chart_income') }}'"/>
-            <input type="button" class="btn btn-default" value="餐饮收入趋势与分布" onclick="window.location.href='{{ url_for('show_chart_foodIncome') }}'"/>
-            <input type="button" class="btn btn-default" value="个体合法门禁比例" onclick="window.location.href='{{ url_for('show_chart_acvalid') }}'"/>
-            <input type="button" class="btn btn-default" value="个体门禁分类分布" onclick="window.location.href='{{ url_for('show_chart_accategory') }}'"/>
-            <input type="button" class="btn btn-default" value="个体消费分类分布" onclick="window.location.href='{{ url_for('show_chart_concategory') }}'"/>
-            <input type="button" class="btn btn-default" value="人数统计" onclick="window.location.href='{{ url_for('show_chart_number') }}'"/>
-            <input type="button" class="btn btn-default" value="水消费规律" onclick="window.location.href='{{ url_for('show_chart_conWaterTime') }}'"/>
-            <input type="button" class="btn btn-default" value="个体消费能力认定" onclick="window.location.href='{{ url_for('show_chart_conability') }}'"/>
-            <input type="button" class="btn btn-default" value="男女生用水情况" onclick="window.location.href='{{ url_for('show_chart_conwater') }}'"/>
-            <input type="button" class="btn btn-default" value="个体滞纳金缴费情况" onclick="window.location.href='{{ url_for('show_chart_penalty') }}'"/>
-            <input type="button" class="btn btn-default" value="人际关系" onclick="window.location.href='{{ url_for('show_chart_relation') }}'"/>
+            {% macro nav_side(url_fun, value) -%}
+                {% if request.path == url_for(url_fun) %}
+                    <input type="button" class="btn btn-info" value={{ value }}
+                           onclick="window.location.href='{{ url_for(url_fun) }}'"/>
+                {% else %}
+                    <input type="button" class="btn btn-default" value={{ value }}
+                           onclick="window.location.href='{{ url_for(url_fun) }}'"/>
+                {% endif %}
+            {%- endmacro %}
+
+            {{ nav_side('show_chart_expenditure','个体支出趋势与分布') }}
+            {{ nav_side('show_chart_acperiodcate','个体门禁类型时间分布') }}
+            {{ nav_side('show_chart_income','刷卡机收入趋势与分布') }}
+            {{ nav_side('show_chart_foodIncome','餐饮收入趋势与分布') }}
+            {{ nav_side('show_chart_acvalid','个体合法门禁比例') }}
+            {{ nav_side('show_chart_accategory','个体门禁分类分布') }}
+            {{ nav_side('show_chart_concategory','个体消费分类分布') }}
+            {{ nav_side('show_chart_number','人数统计') }}
+            {{ nav_side('show_chart_conWaterTime','水消费规律') }}
+            {{ nav_side('show_chart_conability','个体消费能力认定') }}
+            {{ nav_side('show_chart_conwater','男女生用水情况') }}
+            {{ nav_side('show_chart_penalty','个体滞纳金缴费情况') }}
+            {{ nav_side('show_chart_relation','人际关系') }}
 
         {% endblock %}
     </div>
