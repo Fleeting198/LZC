@@ -666,6 +666,32 @@ def refresh_chart_penalty():
     return json_response
 
 
+@app.route('/charts/relation')
+def show_chart_relation():
+    form = Form_User()
+    return render_template('charts/chart-relation.html', form=form)
+
+
+@app.route('/charts/relation/getData', methods=['GET'])
+def refresh_chart_relation():
+    form = Form_User()
+    form.userID.data = request.args.get('userID')
+
+    if form.validate():
+        userID = form.userID.data
+
+        from controls.GetJson_ACRelation import GetJson_ACRelation
+        json_response = GetJson_ACRelation(userID)
+
+        # 总与多少同学相遇
+        # print len(nodes) - 1
+
+        json_response = jsonify(json_response)
+    else:
+        json_response = jsonify(errMsg=form.errors)
+    return json_response
+
+
 # =====================================
 # Summary 所用图表获取json返回的路由
 # =====================================
@@ -774,3 +800,39 @@ def refresh_summary_acperiodcate():
 
     return json_response
 
+
+@app.route('/summary/GetJson_relation', methods=['GET'])
+def refresh_summary_relation():
+    userID = request.args.get('userID')
+
+    from controls.GetJson_ACRelation import GetJson_ACRelation
+
+
+
+    # dict_relation = GetJson_ACRelation(userID)
+    #
+    # print dict_relation
+    # source = userID
+    #
+    # # 生成nodes 队列
+    # nodes = [{'name': source, 'value': 1000}]
+    # links = []
+    #
+    # for k, v in dict_relation.iteritems():
+    #     node = {'name': k, 'value': v}
+    #     nodes.append(node)
+    #     link = {'source': source, 'target': k}
+    #     links.append(link)
+    #
+    # json_response = {'nodes': nodes, 'links': links}
+    #
+    # print json_response
+    #
+    # # 总与多少同学相遇
+    # print len(nodes) - 1
+
+
+
+
+    json_response = jsonify(json_response)
+    return json_response

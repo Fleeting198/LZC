@@ -1,0 +1,71 @@
+{% extends "charts/charts.html" %}
+{% block chartField %}
+
+    <form id="form-ipt" class="form-inline">
+        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='XQXXQQTQ') }}
+        <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
+    </form>
+
+    <div id="chartRelation" style="width: inherit; height: 90%;"></div>
+
+    <script>
+
+        var chartRelation = echarts.init(document.getElementById('chartRelation'));
+        var optionChartRelation = {
+            legend: {
+                data: []
+            },
+            series: []
+        };
+        chartRelation.setOption(optionChartRelation);
+
+
+        refresh_chart = function () {
+            chartRelation.showLoading();
+            $.get('/charts/relation/getData?' + $("#form-ipt").serialize(), function (json_response) {
+                chartRelation.setOption(optionChartRelation);
+                chartRelation.hideLoading();
+
+                if (!json_response.errMsg) {
+
+                    chartRelation.setOption({
+
+                        series: [{
+                            type: 'graph',
+                            layout: 'force',
+                            animation: false,
+                            label: {
+                                normal: {
+                                    position: 'right',
+                                    formatter: '{b}:{c}',
+                                    textStyle: {
+                                        color: '#000'
+                                    }
+                                }
+                            },
+                            draggable: true,
+                            data: json_response.nodes.map(function (node, idx) {
+{#                                alert(node);#}
+{#                                alert(idx);#}
+                                node.id = idx;
+                                return node;
+                            }),
+                            force: {
+                                initLayout: 'circular',
+                                // gravity: 0,
+                                edgeLength: 200,
+                                repulsion: 200
+                            },
+                            edges: json_response.links
+                        }]
+                    });
+                } else {
+                    for (err in json_response.errMsg) {
+                        alert(json_response.errMsg[err]);
+                    }
+                }
+            }, 'json')
+        };
+    </script>
+
+{% endblock %}

@@ -90,6 +90,7 @@ class acrec(db.Model):
     def is_legal(self):
         return True if self.legal == 1 else False
 
+
 class consumption(db.Model):
     """
     消费记录：工号(外键：个体 工号)，日期时间，设备号(外键：设备 设备号)，金额
@@ -111,8 +112,15 @@ class acr_friendlist(db.Model):
     来自门禁表的人际关系字典
     """
     user_id = db.Column(db.String(8), db.ForeignKey('individual.user_id'), primary_key=True)
+    str_relation = db.Column(db.String)
 
+    def __init__(self, user_id, str_relation):
+        self.user_id = user_id
+        self.str_relation = str_relation
 
+    def str_relation_to_dict(self):
+        dict_relation = eval(self.str_relation)
+        return dict_relation
 
 
 class conability(db.Model):
@@ -127,6 +135,7 @@ class conability(db.Model):
         self.user_id = user_id
         self.amount_avg = amount_avg
         self.role = role
+
 
 class conability_line(db.Model):
     """
