@@ -27,7 +27,9 @@
 
         // 图表初始化。
         var chartACValid = echarts.init(document.getElementById('chartACValid'));
-        window.onresize = chartACValid.resize;
+        $(window).resize(function () {
+            chartACValid.resize();
+        });
 
         var optionChartACValid = {
             title: {

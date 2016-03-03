@@ -55,7 +55,7 @@ def GetJson_ACRelation(userID):
         for i in range(len(list_relation)):
             if i < max_concern:
                 item = list_relation[i]
-                k = item[0]; v = item[1]
+                k = item[0]; # v = item[1]
                 idx_k = index_of_name(k)
                 if idx_k != -1:
                     link = {'source': i, 'target': idx_k}

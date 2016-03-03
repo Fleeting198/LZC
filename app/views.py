@@ -692,9 +692,6 @@ def refresh_chart_relation():
         from controls.GetJson_ACRelation import GetJson_ACRelation
         json_response = GetJson_ACRelation(userID)
 
-        # 总与多少同学相遇
-        # print len(nodes) - 1
-
         json_response = jsonify(json_response)
     else:
         json_response = jsonify(errMsg=form.errors)

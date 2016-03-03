@@ -18,8 +18,8 @@
         <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
     </form>
 
-    <div id="chartDateTrend" style="width: inherit; height: 350px;"></div>
-    <div id="chartTimeDistribution" style="width: inherit; height: 350px;"></div>
+    <div id="chartDateTrend" style="width: inherit; height: 50%;"></div>
+    <div id="chartTimeDistribution" style="width: inherit; height: 50%;"></div>
 
     <script>
         var dateRangePicker = $("input[name='dateRange']");
@@ -40,6 +40,11 @@
         // 图表初始化。
         var chartDateTrend = echarts.init(document.getElementById('chartDateTrend'));
         var chartTimeDistribution = echarts.init(document.getElementById('chartTimeDistribution'));
+
+        $(window).resize(function () {
+            chartDateTrend.resize();
+            chartTimeDistribution.resize();
+        });
 
         var optionChartDate = {
             title: {text: '支出趋势'},

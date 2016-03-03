@@ -11,11 +11,19 @@
     <script>
 
         var chartRelation = echarts.init(document.getElementById('chartRelation'));
+        $(window).resize(function () {
+            chartRelation.resize()
+        });
+
         var optionChartRelation = {
+            title: {
+                text: '人脉关系'
+            },
             legend: {
                 data: []
             },
-            series: []
+            series: [],
+
         };
         chartRelation.setOption(optionChartRelation);
 

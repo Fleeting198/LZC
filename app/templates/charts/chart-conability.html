@@ -12,6 +12,9 @@
 
         // 图表初始化。
         var chartConAbility = echarts.init(document.getElementById('chartConAbility'));
+        $(window).resize(function () {
+            chartConAbility.resize();
+        });
 
         var optionChartConAbility = {
             title: {text: '消费能力'},

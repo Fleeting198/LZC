@@ -4,18 +4,21 @@
     <form id="form-ipt" class="form-inline">
         {{ form.modeTime.label }}
         {% for subfield in form.modeTime %}
-            {{ subfield }}{{ subfield.label }}
+            {{ subfield(onchange="refresh_chart()") }}{{ subfield.label }}
             &nbsp;&nbsp;
         {% endfor %}
-        <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
+        <input class="btn btn-primary" type="button" value="刷新" onclick="refresh_chart()"/>
     </form>
 
-    <div id="chartTimeDistribution" style="width: inherit; height: 350px;"></div>
+    <div id="chartTimeDistribution" style="width: inherit; height: 90%;"></div>
 
     <script>
 
         // 图表初始化。
         var chartTimeDistribution = echarts.init(document.getElementById('chartTimeDistribution'));
+        $(window).resize(function () {
+            chartTimeDistribution.resize();
+        });
 
         var optionChartTime = {
             title: {text: '餐饮收入分布'},
@@ -104,5 +107,13 @@
                 }
             }, 'json')
         };
+
+
+        // 页面载入后就刷新一次。
+        refresh_chart();
+
+
     </script>
+
+
 {% endblock %}
