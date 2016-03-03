@@ -183,7 +183,7 @@
 						<div class="col-md-1 col-sm-1"></div>
 						<div class="col-md-10 col-sm-10">
 							<!-- chart_relation -->
-							人际关系
+							<div id="chartRelation" class="center-block" style="width: inherit; height: 474.65px;"></div>
 						</div>
 						<div class="col-md-1 col-sm-1">
 						</div>
@@ -508,6 +508,55 @@
 			}
 		}, 'json')
 	};
+	// chart_relation
+	var chartRelation = echarts.init(document.getElementById('chartRelation'));
+	window.onresize = chartRelation.resize;
+    var optionChartRelation = {
+    		color: ['#ECF0F1'],
+        legend: {
+            data: []
+        },
+        series: []
+    };
+    chartRelation.setOption(optionChartRelation);
+    refresh_chart_Relation = function () {
+        chartRelation.showLoading();
+        $.get('/summary/GetJson_relation?' + chartInput, function (json_response) {
+            chartRelation.setOption(optionChartRelation);
+            chartRelation.hideLoading();
+            if (!json_response.errMsg) {
+                chartRelation.setOption({
+                    series: [{
+                        type: 'graph',
+                        layout: 'force',
+                        animation: false,
+                        lineStyle: {
+				    			normal: {
+				    				color: '#ECF0F1',
+				    				curveness: 0.1
+				    			}
+				    		},
+				    		draggable: true,
+                        data: json_response.nodes.map(function (node, idx) {
+                            node.id = idx;
+                            return node;
+                        }),
+                        force: {
+                            initLayout: 'circular',
+                            // gravity: 0,
+                            edgeLength: 200,
+                            repulsion: 200
+                        },
+                        edges: json_response.links
+                    }]
+                });
+            } else {
+                for (err in json_response.errMsg) {
+                    alert(json_response.errMsg[err]);
+                }
+            }
+        }, 'json')
+    };
 	// chart_conategory
 	var chartConCategory = echarts.init(document.getElementById('chartConCategory'));
 	window.onresize = chartConCategory.resize;
@@ -915,6 +964,10 @@
 				// callback ACPeriodCate
 				if (index == 3 && slideIndex == 0 && direction == 'right') {
 					refresh_chart_ACPeriodCate();
+				}
+				// callback Relation
+				if (index == 5 && slideIndex == 0 && direction == 'right') {
+					refresh_chart_Relation();
 				}
 				// callback ConCategory
 				if (index == 6 && slideIndex == 0 && direction == 'right') {
