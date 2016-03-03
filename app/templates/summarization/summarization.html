@@ -5,19 +5,16 @@
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-md-1 col-sm-1"></div>
-				<div class="col-md-6 col-sm-6">
+				<div class="col-md-5 col-sm-5">
 					<img data-src="../static/pic/summary/header_boy.png">
 				</div>
-				<div class="col-md-4 col-sm-4">
+				<div class="col-md-5 col-sm-5">
 					<h1>
-                    工号：{{ userID }}，</br>
-                    您好！
-                </h1>
+		                您好，工号：{{ userID }}，您的2015年总结：
+		            </h1>
+    					<div id="chartRadar" class="center-block" style="height: 300px;"></div>
 					<p>
-						</br>
-					</p>
-					<p>
-						下滑开启成长日记：
+						下滑翻看详情：
 					</p>
 				</div>
 				<div class="col-md-1 col-sm-1"></div>
@@ -290,20 +287,20 @@
 			</div>
 		</div>
 	</div>
-	<div class="section" id="section7">
+	<!--<div class="section" id="section7">
 		<div class="content">
 			<div class="container-fluid">
 				<div class="row">
 					<div class="col-md-1 col-sm-1"></div>
-					<div class="col-md-10 col-sm-10">
+					<div class="col-md-10 col-sm-10">-->
 						<!-- chart_radar -->
-						<div id="chartRadar" class="center-block" style="width: inherit; height: 474.65px;"></div>
+						<!--<div id="chartRadar" class="center-block" style="width: inherit; height: 474.65px;"></div>
 					</div>
 					<div class="col-md-1 col-sm-1"></div>
 				</div>
 			</div>
 		</div>
-	</div>
+	</div>-->
 </div>
 
 <script type="text/javascript">
@@ -778,13 +775,13 @@
 	values.push(value_ConCategory);
 	values.push(value_penalty);
 	var opt_chartRadar = {
-		title: {
-			text: '截至2015年我在校园的成就',
-			textStyle: {
-				color: '#ECF0F1',
-				fontSize: 30
-			}
-		},
+//		title: {
+//			text: '截至2015年我在校园的成就',
+//			textStyle: {
+//				color: '#ECF0F1',
+//				fontSize: 30
+//			}
+//		},
 		color: ['#ECF0F1'],
 		textStyle: {
 			color: '#ECF0F1',
@@ -793,31 +790,31 @@
 		tooltip: {
 			trigger: 'axis'
 		},
-		toolbox: {
-			show: true,
-			feature: {
-				mark: {
-					show: true
-				},
-				dataView: {
-					show: true,
-					readOnly: false
-				},
-				restore: {
-					show: true
-				},
-				saveAsImage: {
-					show: true
-				}
-			},
-			iconStyle: {
-				normal: {
-					borderColor: '#ECF0F1'
-				}
-			},
-			top: '10%',
-			right: 0
-		},
+//		toolbox: {
+//			show: true,
+//			feature: {
+//				mark: {
+//					show: true
+//				},
+//				dataView: {
+//					show: true,
+//					readOnly: false
+//				},
+//				restore: {
+//					show: true
+//				},
+//				saveAsImage: {
+//					show: true
+//				}
+//			},
+//			iconStyle: {
+//				normal: {
+//					borderColor: '#ECF0F1'
+//				}
+//			},
+//			top: '10%',
+//			right: 0
+//		},
 		calculable: true,
 		polar: [{
 			indicator: [{
@@ -839,7 +836,7 @@
 				text: '信用',
 				max: 10
 			}],
-			radius: '60%'
+//			radius: '100%'
 		}],
 		series: [{
 			type: 'radar',
