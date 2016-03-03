@@ -84,7 +84,7 @@ def query_list_relation(userID):
     strQuery = acr_friendlist.query.filter(acr_friendlist.user_id == userID)
     dict_relation = strQuery.first().str_relation_to_dict()
 
-    # Stage 0 completion: dict_relation queried.
+    # Stage 0 completed: dict_relation queried.
     # =======================
 
 
@@ -92,7 +92,7 @@ def query_list_relation(userID):
     if userID in dict_relation:
         del dict_relation[userID]
 
-    # Stage 1 completion: dict_relation without self inside.
+    # Stage 1 completed: dict_relation without self inside.
     # =======================
 
 
@@ -105,7 +105,7 @@ def query_list_relation(userID):
 
     list_relation = sorted(list_relation, cmp_list_item)[::-1]
 
-    # Stage 2 completion: sorted list_relation.
+    # Stage 2 completed: sorted list_relation.
     # =======================
 
     return list_relation

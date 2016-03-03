@@ -772,7 +772,6 @@ def refresh_summary_acperiodcate():
     startDate = request.args.get('startDate')
     endDate = request.args.get('endDate')
 
-    # TODO:
     modeDate = 2
 
     from controls.GetJson_ACPeriodCate import GetJson_ACPeriodCate
