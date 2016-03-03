@@ -1,780 +1,934 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 
 <div id="fullpage">
-<div class="section" id="section0">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-1 col-sm-1"></div>
-            <div class="col-md-6 col-sm-6">
-                <img data-src="../static/pic/summary/header_boy.png">
-            </div>
-            <div class="col-md-4 col-sm-4">
-                <h1>
+	<div class="section" id="section0">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-md-1 col-sm-1"></div>
+				<div class="col-md-6 col-sm-6">
+					<img data-src="../static/pic/summary/header_boy.png">
+				</div>
+				<div class="col-md-4 col-sm-4">
+					<h1>
                     工号：{{ userID }}，</br>
                     您好！
                 </h1>
-                <p></br></p>
-                <p>
-                    下滑开启成长日记：
-                </p>
-            </div>
-            <div class="col-md-1 col-sm-1"></div>
-        </div>
-    </div>
-</div>
-<div class="section" id="section1">
-    <div class="slide" id="slidel1-1">
-        <div class="content">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-1 col-sm-1"></div>
-                    <div class="col-md-5 col-sm-5">
-                        <img data-src="../static/pic/summary/section/section1Footprint.png">
-                    </div>
-                    <!-- <div class="col-md-1 col-sm-1"></div> -->
-                    <div class="col-md-5 col-sm-5">
-                        <div style="margin-left: 30px">
-                            <h1>
+					<p>
+						</br>
+					</p>
+					<p>
+						下滑开启成长日记：
+					</p>
+				</div>
+				<div class="col-md-1 col-sm-1"></div>
+			</div>
+		</div>
+	</div>
+	<div class="section" id="section1">
+		<div class="slide" id="slidel1-1">
+			<div class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-1 col-sm-1"></div>
+						<div class="col-md-5 col-sm-5">
+							<img data-src="../static/pic/summary/section/section1Footprint.png">
+						</div>
+						<div class="col-md-5 col-sm-5">
+							<div style="margin-left: 30px">
+								<h1>
                                 我的足迹
                             </h1>
-                            <p></br></p>
-                            <p id="p1-1">
-                                在过去的一个月中，我曾在 <span>{{ vals_summary['ret_access']['count_nodes'] }}</span> 个地方留下过足迹，
-                                拿下 <span>{{ vals_summary['ret_access']['total_count'] }}</span> 次门禁记录。</br>
+								<p>
+									</br>
+								</p>
+								<p id="p1-1">
+									在过去的一个月中，我曾在 <span>{{ vals_summary['ret_access']['count_nodes'] }}</span> 个地方留下过足迹， 拿下 <span>{{ vals_summary['ret_access']['total_count'] }}</span> 次门禁记录。</br>
 
-                                <!-- 此处应有地点种类数量判断， -->
-                                {% if vals_summary['ret_access']['ac_items'][1] is defined %}
-                                    除了访问了 <span>{{ vals_summary['ret_access']['ac_items'][0]['count'] }}</span>
-                                    次的 <span>{{ vals_summary['ret_access']['ac_items'][0]['node_des'] }}</span> 之外，
-                                    </br>
-                                    我最爱的是 <span>{{ vals_summary['ret_access']['ac_items'][1]['node_des'] }}</span> ，
-                                    在那留下了 <span>{{ vals_summary['ret_access']['ac_items'][1]['count'] }}</span> 次记录。
-                                {% else %}
-                                    我最爱的是 <span>{{ vals_summary['ret_access']['ac_items'][0]['node_des'] }}</span> ，
-                                    在那留下了 <span>{{ vals_summary['ret_access']['ac_items'][0]['count'] }}</span> 次记录。
-                                {% endif %}
-                                </br>
-                                我的一小步，人类一大步。
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-md-1 col-sm-1"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="slide" id="slide1-2">
-        <div class="content">
-        		<div class="container-fluid">
-        			<div class="row">
-                        <div class="col-md-1 col-sm-1"></div>
-        				<div class="col-md-10 col-sm-10">
-                            <!-- ACCategory -->
-                            <div id="chartACCategory" class="center-block" style="width: inherit; height: 474.65px;"></div>
-                        <div class="col-md-1 col-sm-1"></div>
-				  	</div>
-			  	</div>
-		  </div>
-        </div>
-    </div>
-</div>
-<div class="section" id="section2">
-    <div class="slide" id="slide2-1">
-        <div class="content">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-1 col-sm-1"></div>
-                    <div class="col-md-5 col-sm-5">
-                        <img data-src="../static/pic/summary/section/section2Schedule.png">
-                    </div>
-                    <div class="col-md-1 col-sm-1"></div>
-                    <div class="col-md-4 col-sm-4">
-                        <h1 style="color: #2C3E50">
-                            我的作息
-                        </h1>
-                        <p></br></p>
-                        <p id="p2-1" style="color: #2C3E50">
-                            又到了起床靠毅力的季节了，</br>
+									<!-- 此处应有地点种类数量判断， -->
+									{% if vals_summary['ret_access']['ac_items'][1] is defined %} 除了访问了 <span>{{ vals_summary['ret_access']['ac_items'][0]['count'] }}</span> 次的 <span>{{ vals_summary['ret_access']['ac_items'][0]['node_des'] }}</span> 之外，
+									</br>
+									我最爱的是 <span>{{ vals_summary['ret_access']['ac_items'][1]['node_des'] }}</span> ， 在那留下了 <span>{{ vals_summary['ret_access']['ac_items'][1]['count'] }}</span> 次记录。 {% else %} 我最爱的是 <span>{{ vals_summary['ret_access']['ac_items'][0]['node_des'] }}</span>									， 在那留下了 <span>{{ vals_summary['ret_access']['ac_items'][0]['count'] }}</span> 次记录。 {% endif %}
+									</br>
+									我的一小步，人类一大步。
+								</p>
+							</div>
+						</div>
+						<div class="col-md-1 col-sm-1"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="slide" id="slide1-2">
+			<div class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-1 col-sm-1"></div>
+						<div class="col-md-10 col-sm-10">
+							<!-- ACCategory -->
+							<div id="chartACCategory" class="center-block" style="width: inherit; height: 474.65px;"></div>
+						</div>
+						<div class="col-md-1 col-sm-1"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section" id="section2">
+		<div class="slide" id="slide2-1">
+			<div class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-1 col-sm-1"></div>
+						<div class="col-md-5 col-sm-5">
+							<img data-src="../static/pic/summary/section/section2Schedule.png">
+						</div>
+						<div class="col-md-5 col-sm-5">
+							<div style="margin-left: 30px">
+								<h1 style="color: #2C3E50">
+                                我的作息
+                            </h1>
+								<p>
+									</br>
+								</p>
+								<p id="p2-1" style="color: #2C3E50">
+									又到了起床靠毅力的季节了，</br>
 
-                            {% if vals_summary['ret_habit']['count_early'] == 0 %}
-                                我的被子上可能存在不知名的结界，从未在早晨7点前解开。
-                            {% else %}
-                                我早起 <span>{{ vals_summary['ret_habit']['count_early'] }}</span> 次，
-                            {% endif %}
-                            </br>
-                            {% if vals_summary['ret_habit']['count_night'] == 0 %}
-                                无晚归记录，习惯良好！
-                            {% else %}
-                                曾在晚上 11 点～早上 6 点之间访问门禁 <span>{{ vals_summary['ret_habit']['count_night'] }}</span> 次，注意早点休息哟～
-                            {% endif %}
-                        </p>
-                    </div>
-                    <div class="col-md-1 col-sm-1"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="slide" id="slide2-2">
+									{% if vals_summary['ret_habit']['count_early'] == 0 %} 我的被子上可能存在不知名的结界，从未在早晨7点前解开。 {% else %} 我早起 <span>{{ vals_summary['ret_habit']['count_early'] }}</span> 次， {% endif %}
+									</br>
+									{% if vals_summary['ret_habit']['count_night'] == 0 %} 无晚归记录，习惯良好！ {% else %} 曾在晚上 11 点～早上 6 点之间访问门禁 <span>{{ vals_summary['ret_habit']['count_night'] }}</span> 次，注意早点休息哟～ {% endif %}
+								</p>
+							</div>
+						</div>
+						<div class="col-md-1 col-sm-1"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="slide" id="slide2-2">
+			<div class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-1 col-sm-1"></div>
+						<div class="col-md-10 col-sm-10">
+							<!-- ACPeriodCate -->
+							<div id="chartACPeriodCateTime" class="center-block" style="width: inherit; height: 474.65px;"></div>
+						</div>
+						<div class="col-md-1 col-sm-2"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section" id="section3">
 		<div class="content">
-        		<div class="container-fluid">
-        			<div class="row">
-        				<div class="col-md-2 col-sm-2"></div>
-        				<div class="col-md-8 col-sm-8">
-                            <!-- ACPeriodCate -->
-                            <div id="chartACPeriodCateTime" class="center-block" style="width: inherit; height: 474.65px;"></div>
-				  	</div>
-				  	<div class="col-md-2 col-sm-2"></div>
-			  	</div>
-		  </div>
-        </div>
-    </div>
-</div>
-<div class="section" id="section3">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-1 col-sm-1"></div>
-            <div class="col-md-5 col-sm-5">
-                <img data-src="../static/pic/summary/section/section3Study.png">
-            </div>
-            <div class="col-md-1 col-sm-1"></div>
-            <div class="col-md-4 col-sm-4">
-                <h1>
-                    我的学习
-                </h1>
-                <p></br></p>
-                <p id="p3-1">
-                    <!-- ret_study = {'count_lib':count_lib, 'count_acad': count_acad, 'count_sci':count_sci} -->
-
-                    上个月中，我
-                    {% if vals_summary['ret_study']['count_acad'] != 0 %}
-                        去过教学楼 <span>{{ vals_summary['ret_study']['count_acad'] }}</span> 次，
-                    {% else %}
-                        没有去过教学楼，
-                    {% endif %}
-
-                    {% if vals_summary['ret_study']['count_lib'] != 0 %}
-                        成功泡图书馆 <span>{{ vals_summary['ret_study']['count_lib'] }}</span> 次，
-                    {% else %}
-                        没有进入图书馆，
-                    {% endif %}
-
-                    {% if vals_summary['ret_study']['count_sci'] != 0 %}
-                        宅实验室 <span>{{ vals_summary['ret_study']['count_sci'] }}</span> 次。
-                    {% else %}
-                        远离实验室。
-                    {% endif %}
-
-                    </br>
-                    {% if vals_summary['ret_study']['percent_asc'] > 0.9 %}
-                        比全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(2)*100 }}</span> ％的人都更加努力，可以被称为五星级准学霸！
-                    {% elif vals_summary['ret_study']['percent_asc'] > 0.5 %}
-                        比全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(2)*100 }}</span> ％的人都更加努力，
-                    {% elif vals_summary['ret_study']['percent_asc'] > 0.3 %}
-                        比全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(2)*100 }}</span> ％的人都更加努力
-                    {% else %}
-                        比全校 <span>{{ (1-vals_summary['ret_study']['percent_asc']|round(2))*100 }}</span> ％的人更悠闲。
-                    {% endif %}
-                </p>
-            </div>
-            <div class="col-md-1 col-sm-1"></div>
-        </div>
-    </div>
-</div>
-<div class="section" id="section4">
-    <div class="content">
-        <div class="slide" id="slide4-1">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-1 col-sm-1"></div>
-                    <div class="col-md-5 col-sm-5">
-                        <img data-src="../static/pic/summary/section/section4Friends.png">
-                    </div>
-                    <div class="col-md-1 col-sm-1"></div>
-                    <div class="col-md-4 col-sm-4">
-                        <h1>
-                            我的朋友
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-1 col-sm-1"></div>
+					<div class="col-md-5 col-sm-5">
+						<img data-src="../static/pic/summary/section/section3Study.png">
+					</div>
+					<div class="col-md-5 col-sm-5">
+						<div style="margin-left: 30px">
+							<h1>
+                            我的学习
                         </h1>
-                        <p></br></p>
-                        <p>
-                            
-                            <!-- ret_social = {'num_relations': num_relations, 'top_name':top_name, 'top_value':top_value } -->
-                            奋斗的路上有更多同伴才更有动力，有 {{ vals_summary['ret_social']['num_relations'] }} 位同学曾与我擦肩而过。</br>
-                            {{ vals_summary['ret_social']['top_name'] }} 童鞋，我们 {{ vals_summary['ret_social']['top_value'] }} 次不断相遇，难道是缘分，难道是天意。
-                        </p>
-                    </div>
-                    <div class="col-md-1 col-sm-1"></div>
-                </div>
-            </div>
-        </div>
-        <div class="slide" id="slide4-2">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-12 col-sm-12">
-                        人际关系
-                    </div>
-                </div>
-            </div>
-            <!-- chart_relation -->
-        </div>
-    </div>
-</div>
-<div class="section" id="section5">
-    <div class="content">
-        <div class="slide" id="slide5-1">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-1 col-sm-1"></div>
-                    <div class="col-md-5 col-sm-5">
-                        <img data-src="../static/pic/summary/section/section5Bill.png">
-                    </div>
-                    <div class="col-md-1 col-sm-1"></div>
-                    <div class="col-md-4 col-sm-4">
-                        <h1>
-                            我的账单
-                        </h1>
-                        <p></br></p>
-                        <p id="p5-1">
-                            <!-- ret_bill = {'total_expend':total_expend, 'con_items': json_ConCategory['seriesData'],
-                            'con_per_month': con_per_month} -->
+							<p>
+								</br>
+							</p>
+							<p id="p3-1">
+								<!-- ret_study = {'count_lib':count_lib, 'count_acad': count_acad, 'count_sci':count_sci} -->
 
-                            最近一个月来，我总共花了 <span>{{ vals_summary['ret_bill']['total_expend'] }}</span> 元，</br>
-                            <span>{{ vals_summary['ret_bill']['con_items'][0]['name'] }}</span> 打榜成功，成为我的消费分类TOP 1。</br>
-                            根据长期统计，我的月均支出是 <span>{{ vals_summary['ret_bill']['con_per_month'] }}</span> 元。
-                        </p>
-                    </div>
-                    <div class="col-md-1 col-sm-1"></div>
-                </div>
-            </div>
-        </div>
-        <div class="slide" id="slide5-2">
-            <div class="content">
-        		<div class="container-fluid">
-        			<div class="row">
-        				<div class="col-md-2 col-sm-2"></div>
-        				<div class="col-md-8 col-sm-8">
-                            <!-- chart_concategory -->
-                            <div id="chartConCategory" class="center-block" style="width: inherit; height: 474.65px;"></div>
-                        </div>
-				  	    <div class="col-md-2 col-sm-2"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="section" id="section6">
-    <div class="content">
-        <div class="slide" id="slide6-1">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-1 col-sm-1"></div>
-                    <div class="col-md-5 col-sm-5">
-                        <img data-src="../static/pic/summary/section/section6Penalty.png">
-                    </div>
-                    <div class="col-md-1 col-sm-1"></div>
-                    <div class="col-md-4 col-sm-4">
-                        <h1>
-                            我的信用
-                        </h1>
-                        <p></br></p>
-                        <p>
-                            <!-- ret_penalty = {'user_penalty': user_penalty, 'percent_asc': percent_asc} -->
+								上个月中，我 {% if vals_summary['ret_study']['count_acad'] != 0 %} 去过教学楼 <span>{{ vals_summary['ret_study']['count_acad'] }}</span> 次， {% else %} 没有去过教学楼， {% endif %} {% if vals_summary['ret_study']['count_lib'] != 0 %} 成功泡图书馆 <span>{{ vals_summary['ret_study']['count_lib'] }}</span>								次， {% else %} 没有进入图书馆， {% endif %} {% if vals_summary['ret_study']['count_sci'] != 0 %} 宅实验室 <span>{{ vals_summary['ret_study']['count_sci'] }}</span> 次。 {% else %} 远离实验室。 {% endif %}
 
-                            在这一年里，我
-                            {% if vals_summary['ret_penalty']['user_penalty'] == 0 %}
-                                从未超期还书。
-                            {% else %}
-                                产生了 {{ vals_summary['ret_penalty']['user_penalty'] }} 元滞纳金。
-                            {% endif %}
-                            </br>
-                            {% if vals_summary['ret_penalty']['percent_asc'] < 0.3 %}
-                                信用记录打败了 {{ (1-vals_summary['ret_penalty']['percent_asc']|round(2))*100 }} ％的同学，继续保持噢～
-                            {% elif vals_summary['ret_penalty']['percent_asc'] >= 0.6 %}
-                                信用记录落后于 {{ vals_summary['ret_penalty']['percent_asc']|round(2)*100 }} ％的同学，记得及时还书哟～
-                            {% endif %}
+								</br>
+								{% if vals_summary['ret_study']['percent_asc'] > 0.9 %} 比全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(2)*100 }}</span> ％的人都更加努力，可以被称为五星级准学霸！ {% elif vals_summary['ret_study']['percent_asc'] > 0.5 %} 比全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(2)*100 }}</span>								％的人都更加努力， {% elif vals_summary['ret_study']['percent_asc'] > 0.3 %} 比全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(2)*100 }}</span> ％的人都更加努力 {% else %} 比全校 <span>{{ (1-vals_summary['ret_study']['percent_asc']|round(2))*100 }}</span>								％的人更悠闲。 {% endif %}
+							</p>
+						</div>
+					</div>
+					<div class="col-md-1 col-sm-1"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section" id="section4">
+		<div class="slide" id="slide4-1">
+			<div class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-1 col-sm-1"></div>
+						<div class="col-md-5 col-sm-5">
+							<img data-src="../static/pic/summary/section/section4Friends.png">
+						</div>
+						<div class="col-md-5 col-sm-5">
+							<div style="margin-left: 30px">
+								<h1>
+                                我的朋友
+                            </h1>
+								<p>
+									</br>
+								</p>
+								<p id="p4-1">
+		                            <!-- ret_social = {'num_relations': num_relations, 'top_name':top_name, 'top_value':top_value } -->
+		                            奋斗的路上有更多同伴才更有动力，有 <span>{{ vals_summary['ret_social']['num_relations'] }}</span> 位同学曾与我擦肩而过。</br>
+		                            <span>{{ vals_summary['ret_social']['top_name'] }}</span> 童鞋，我们 <span>{{ vals_summary['ret_social']['top_value'] }}</span> 次不断相遇，难道是缘分，难道是天意。
+		                        </p>
+							</div>
+						</div>
+						<div class="col-md-1 col-sm-1"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="slide" id="slide4-2">
+			<div class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-1 col-sm-1"></div>
+						<div class="col-md-10 col-sm-10">
+							<!-- chart_relation -->
+							人际关系
+						</div>
+						<div class="col-md-1 col-sm-1">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section" id="section5">
+		<div class="slide" id="slide5-1">
+			<div class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-1 col-sm-1"></div>
+						<div class="col-md-5 col-sm-5">
+							<img data-src="../static/pic/summary/section/section5Bill.png">
+						</div>
+						<div class="col-md-5 col-sm-5">
+							<div style="margin-left: 30px">
+								<h1>
+	                            我的账单
+	                        </h1>
+								<p>
+									</br>
+								</p>
+								<p id="p5-1">
+									<!-- ret_bill = {'total_expend':total_expend, 'con_items': json_ConCategory['seriesData'],
+	                            'con_per_month': con_per_month} -->
 
-                        </p>
-                    </div>
-                    <div class="col-md-1 col-sm-1"></div>
-                </div>
-            </div>
-        </div>
-        <div class="slide" id="slide6-2">
-            <div class="content">
-        		<div class="container-fluid">
-        			<div class="row">
-        				<div class="col-md-2 col-sm-2"></div>
-        				<div class="col-md-8 col-sm-8">
-                            <!-- chart_penalty -->
-                            <div id="chartPenalty" class="center-block" style="width: inherit; height: 474.65px;"></div>
-                        </div>
-				  	    <div class="col-md-2 col-sm-2"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+									最近一个月来，我总共花了 <span>{{ vals_summary['ret_bill']['total_expend'] }}</span> 元，</br>
+									<span>{{ vals_summary['ret_bill']['con_items'][0]['name'] }}</span> 打榜成功，成为我的消费分类TOP 1。</br>
+									根据长期统计，我的月均支出是 <span>{{ vals_summary['ret_bill']['con_per_month'] }}</span> 元。
+								</p>
+							</div>
+						</div>
+						<div class="col-md-1 col-sm-1"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="slide" id="slide5-2">
+			<div class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-1 col-sm-1"></div>
+						<div class="col-md-10 col-sm-10">
+							<!-- chart_concategory -->
+							<div id="chartConCategory" class="center-block" style="width: inherit; height: 474.65px;"></div>
+						</div>
+						<div class="col-md-1 col-sm-1"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section" id="section6">
+		<div class="slide" id="slide6-1">
+			<div class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-1 col-sm-1"></div>
+						<div class="col-md-5 col-sm-5">
+							<img data-src="../static/pic/summary/section/section6Penalty.png">
+						</div>
+						<div class="col-md-5 col-sm-5">
+							<div style="margin-left: 30px">
+								<h1>
+	                            我的信用
+	                        </h1>
+								<p>
+									</br>
+								</p>
+								<p id="p6-1">
+									<!-- ret_penalty = {'user_penalty': user_penalty, 'percent_asc': percent_asc} -->
+
+									在这一年里，我 {% if vals_summary['ret_penalty']['user_penalty'] == 0 %} 从未超期还书。 {% else %} 产生了 <span>{{ vals_summary['ret_penalty']['user_penalty'] }}</span> 元滞纳金。 {% endif %}
+									</br>
+									{% if vals_summary['ret_penalty']['percent_asc']
+									< 0.3 %} 信用记录打败了 <span>{{ (1-vals_summary[ 'ret_penalty'][ 'percent_asc']|round(2))*100 }}</span> ％的同学，继续保持噢～ {% elif vals_summary[ 'ret_penalty'][ 'percent_asc']>= 0.6 %} 信用记录落后于 <span>{{ vals_summary['ret_penalty']['percent_asc']|round(2)*100 }}</span> ％的同学，记得及时还书哟～
+										{% endif %}
+								</p>
+							</div>
+						</div>
+						<div class="col-md-1 col-sm-1"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="slide" id="slide6-2">
+			<div class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-1 col-sm-1"></div>
+						<div class="col-md-10 col-sm-10">
+							<!-- chart_penalty -->
+							<div id="chartPenalty" class="center-block" style="width: inherit; height: 474.65px;"></div>
+						</div>
+						<div class="col-md-1 col-sm-1"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section" id="section7">
+		<div class="content">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-md-1 col-sm-1"></div>
+					<div class="col-md-10 col-sm-10">
+						<!-- chart_radar -->
+						<div id="chartRadar" class="center-block" style="width: inherit; height: 474.65px;"></div>
+					</div>
+					<div class="col-md-1 col-sm-1"></div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <script type="text/javascript">
-
-    var userID = '{{ userID }}';
-    var startDate = '{{ startDate }}';
-    var endDate = '{{ endDate }}';
-   // alert(userID);alert(startDate);
-    var chartInput = 'userID='+userID+'&startDate='+startDate+'&endDate='+endDate;
-
+	var userID = '{{ userID }}';
+	var startDate = '{{ startDate }}';
+	var endDate = '{{ endDate }}';
+	var chartInput = 'userID=' + userID + '&startDate=' + startDate + '&endDate=' + endDate;
 	// ACCategory
-		
 	var chartACCategory = echarts.init(document.getElementById('chartACCategory'));
-	
+	window.onresize = chartACCategory.resize;
 	var opt_chartACCategory = {
-	    title: {
-	        text: '门禁分类计数',
-	        textStyle: {
-	            color: '#ECF0F1',
-	            fontSize: 30
-            },
-            x:'right'
-	    },
-	    color: ['#FCD781', '#FFB35C', '#FF9447', '#FF7530'],
-	    textStyle: {
-	        color: '#ECF0F1',
-	        fontSize: 14
-        },
-	    tooltip: {
-	        trigger: 'item',
-	        formatter: "{b} : {c} ({d}%)"
-	    },
-	    toolbox: {
-	        show: true,
-	        feature: {
-	            mark: {show: true},
-	            dataView: {show: true, readOnly: false},
-	            restore: {show: true},
-	            saveAsImage: {show: true}
-	        },
-            top: '10%',
-            right: 0,
-	    },
-	    legend: {
-	        data: [],
-	        textStyle: {
-	            color: '#ECF0F1',
-	            fontSize: 18
-            },
-            x: 'left',
-            orient: 'vertical'
-        },
-	    series: [{
-	        type: 'pie',
-	        radius: [0, '60%'],
-	        data: []
-	    }]
+		title: {
+			text: '门禁分类计数',
+			textStyle: {
+				color: '#ECF0F1',
+				fontSize: 30
+			},
+			x: 'right'
+		},
+		color: ['#FCD781', '#FFB35C', '#FF9447', '#FF7530'],
+		textStyle: {
+			color: '#ECF0F1',
+			fontSize: 14
+		},
+		tooltip: {
+			trigger: 'item',
+			formatter: "{b} : {c} ({d}%)"
+		},
+		toolbox: {
+			show: true,
+			feature: {
+				mark: {
+					show: true
+				},
+				dataView: {
+					show: true,
+					readOnly: false
+				},
+				restore: {
+					show: true
+				},
+				saveAsImage: {
+					show: true
+				}
+			},
+			iconStyle: {
+				normal: {
+					borderColor: '#ECF0F1'
+				}
+			},
+			top: '10%',
+			right: 0
+		},
+		legend: {
+			data: [],
+			textStyle: {
+				color: '#ECF0F1',
+				fontSize: 18
+			},
+			x: 'left',
+			orient: 'vertical'
+		},
+		series: [{
+			type: 'pie',
+			radius: [0, '60%'],
+			data: []
+		}]
 	};
-	
 	chartACCategory.setOption(opt_chartACCategory);
-	
-refresh_chart_ACCategory = function () {
-            chartACCategory.showLoading();
-            $.get('/summary/GetJson_accategory?' + chartInput, function (json_response) {
-                chartACCategory.hideLoading();
-                if (!json_response.errMsg) {
-
-                    var titles;
-                    var seriesData;
-
-                    titles = json_response.titles;
-                    seriesData = json_response.seriesData;
-
-                    chartACCategory.setOption({
-                        legend: {data: titles},
-                        series: [{data: seriesData}]
-                    });
-                } else {
-                    for (err in json_response.errMsg) {
-                        alert(json_response.errMsg[err]);
-                    }
-                }
-            }, 'json')
-	};
-	
-	// ACPeriodCate
-	
-    var chartACPeriodCateTime = echarts.init(document.getElementById('chartACPeriodCateTime'));
-
-    var opt_chartACPeriodCateTime = {
-        title: {
-            text: '门禁类型时间分布',
-            textStyle: {
-                color: '#34495E'
-            }
-        },
-        textStyle: {
-            color: '#34495E'
-        },
-        color: ['#29A9FF', '#0066FF' ,'#27446E'],
-        tooltip: {trigger: 'axis'},
-        toolbox: {
-            show: true,
-            feature: {
-                mark: {show: true},
-                dataView: {show: true, readOnly: false},
-                magicType: {show: true, type: ['line', 'bar']},
-                restore: {show: true},
-                saveAsImage: {show: true}
-            }
-        },
-        legend: {
-            data: [],
-            textStyle: {
-                color: '#34495E'
-            }
-        },
-        xAxis: {
-            type: 'category',
-            boundaryGap: true,
-            data: []
-        },
-        yAxis: {
-            type: 'value',
-            name: '次数',
-            axisLabel: {
-                formatter: '{value} 次'
-            }
-        },
-        series: []
-    };
-
-    chartACPeriodCateTime.setOption(opt_chartACPeriodCateTime);
-
-    refresh_chart_ACPeriodCate = function () {
-    	
-        chartACPeriodCateTime.showLoading();
-        $.get('/summary/GetJson_acperiodcate?' + chartInput, function (json_response) {
-            
-            chartACPeriodCateTime.hideLoading();
-
-            // 还原图表选项
-            chartACPeriodCateTime.setOption(opt_chartACPeriodCateTime);
-
-            var json_dateTrend;
-            var json_timeDistribution;
-
-            json_dateTrend = json_response.json_dateTrend;
-            json_timeDistribution = json_response.json_timeDistribution;
-
-            if (!json_response.errMsg) {
-                
-                // 时间分布图表设定。
-                chartACPeriodCateTime.setOption({
-                    legend: {data: json_timeDistribution.legendLabels },
-                    xAxis: [{data: json_timeDistribution.axisLabels }]
-                });
-
-                for (var i = 0; i < json_timeDistribution.seriesData.length; i++) {
-                    var tmp_option = chartACPeriodCateTime.getOption();
-                    tmp_option.series.push({
-                                name: json_timeDistribution.seriesData[i].name,
-                                stack: 'ac',
-                                type: 'bar',
-                                data: json_timeDistribution.seriesData[i].data
-                    });
-                    chartACPeriodCateTime.setOption(tmp_option);
-                }
-
-            } else {
-                for (err in json_response.errMsg) {
-                    alert(json_response.errMsg[err]);
-                }
-            }
-        }, 'json')
-    };
-
-    // chart_conategory
-
-    var chartConCategory = echarts.init(document.getElementById('chartConCategory'));
-
-        var optionChartConCategory = {
-            title: {text: '消费分类计数'},
-            tooltip: {
-                trigger: 'item',
-                formatter: "{a} <br/>{b} : {c} ({d}%)"
-            },
-            toolbox: {
-                show: true,
-                feature: {
-                    mark: {show: true},
-                    dataView: {show: true, readOnly: false},
-                    restore: {show: true},
-                    saveAsImage: {show: true}
-                }
-            },
-            legend: {
-                show: true,
-                orient: 'horizontal',
-                left: 'center',
-                data: []
-            },
-            series: [{
-                name: '消费分布',
-                type: 'pie',
-                radious: '50%',
-                center: ['50%','50%'],
-                data: []
-            }]
-        };
-
-        chartConCategory.setOption(optionChartConCategory);
-
-
-        refresh_chart_ConCategory = function () {
-
-            chartConCategory.showLoading();
-
-            $.get('/summary/GetJson_concategory?' + chartInput, function (json_response) {
-
-                chartConCategory.hideLoading();
-
-                chartConCategory.setOption(optionChartConCategory);
-
-                var titles;
-                var seriesData;
-
-                if (!json_response.errMsg) {
-
-                    titles = json_response.titles;
-                    seriesData = json_response.seriesData;
-
-                    alert(titles);
-                    alert(seriesData);
-
-                    chartConCategory.setOption({
-                        legend: {data: titles },
-                        series: [{data: seriesData}]
-                    });
-                } else {
-                    for (err in json_response.errMsg) {
-                        alert(json_response.errMsg[err]);
-                    }
-                }
-            }, 'json')
-        };
-
-    // chart_penalty
-
-    var chartPenalty = echarts.init(document.getElementById('chartPenalty'));
-
-        var opt_chartPenalty = {
-            title: {text: '滞纳金缴纳'},
-            color: ['#E3ECFF', '#D7E2FA', '#C8D8FA', '#B9CEFA', '#A2BEFA'],
-            tooltip: {
-                trigger: 'axis',
-                formatter: function (params) {
-                    var str_return = '总 ' + params[0].name + ' 元<br/>';
-                    str_return += params[0].seriesName + ' : ' + params[0].value + ' 人<br/>';
-                    return str_return;
-                }
-            },
-            toolbox: {
-                show: true,
-                feature: {
-                    mark: {show: true},
-                    dataView: {show: true, readOnly: false},
-                    magicType: {show: true, type: ['line', 'bar']},
-                    restore: {show: true},
-                    saveAsImage: {show: true}
-                }
-            },
-            xAxis: {
-                type: 'category',
-                name: '滞纳金总额',
-                boundaryGap: false,
-                data: []
-            },
-            yAxis: {
-                type: 'value',
-                name: '人数',
-                axisLabel: {
-                    formatter: '{value} 人'
-                }
-            },
-            series: [{
-                name: '人数',
-                type: 'line',
-                smooth: true,
-                stack: 'a',
-                areaStyle: {
-                    normal: {}
-                },
-                data: [],
-                markPoint: {
-                    data : []
-                }
-            }],
-            dataZoom: []
-        };
-
-        chartPenalty.setOption(opt_chartPenalty);
-
-        refresh_chart_Penalty = function () {
-
-            chartPenalty.showLoading();
-
-            $.get('/summary/GetJson_penalty?' + chartInput, function (json_response) {
-                // json_response = {'userAmount': userAmount, 'amount': amount, 'num': num}
-
-                var userAmount = json_response.userAmount;
-                var amount = json_response.amount;
-                var num = json_response.num;
-                var index_userAmount = 0;
-
-                for (var i = 0; i < amount.length; i++) {
-                    if (amount[i].toString() == parseInt(userAmount).toString()) {
-                        index_userAmount = i;
-                        break;
-                    }
-                }
-
-                chartPenalty.hideLoading();
-
-                if (!json_response.errMsg) {
-
-                    var startPoint = (parseInt(userAmount) - 33 > 0) ? (parseInt(userAmount) - 33): 0;
-                    var endPoint = (parseInt(userAmount) + 33 > amount[amount.length - 1]) ? amount[amount.length - 1] : (parseInt(userAmount) + 33);
-
-                    chartPenalty.setOption({
-                        xAxis: [{
-                            data: amount
-                        }],
-                        series: [{
-                                data: num,
-                                markPoint: {
-                                    label: {
-                                        normal: {
-                                            formatter: function () {return userAmount.toString();},
-                                            textStyle: {fontSize: 10}
-                                        }
-                                    },
-                                    data: [
-                                    {
-                                        name: '此人',
-                                        coord: [index_userAmount, num[index_userAmount]]
-                                    }]
-                                }
-                        }],
-                        dataZoom: [
-                            {
-                                type: 'inside',
-                                xAxisIndex: 0,
-                                startValue: startPoint,
-                                endValue: endPoint
-                            },
-                            {
-                                type: 'slider',
-                                startValue: startPoint,
-                                endValue: endPoint
-                            }
-                        ]
-                    });
-                } else {
-                    for (err in json_response.errMsg) {
-                        alert(json_response.errMsg[err]);
-                    }
-                }
-            }, 'json')
-        };
-
-	$(document).ready(function() {
-	    $('#fullpage').fullpage({
-	        // Navigation
-	        menu: false,
-	        lockAnchors: false,
-	        anchors: [],
-	        navigation: true,
-	        navigationPosition: 'right',
-	        navigationTooltips: [],
-	        showActiveTooltip: false,
-	        slidesNavigation: true,
-	        slidesNavPosition: 'bottom',
-	
-	        // Scrolling
-	        css3: true,
-	        scrollingSpeed: 700,
-	        autoScrolling: true,
-	        fitToSection: true,
-	        fitToSectionDelay: 1000,
-	        scrollBar: false,
-	        easing: 'easeInOutCubic',
-	        easingcss3: 'ease',
-	        loopBottom: false,
-	        loopTop: false,
-	        loopHorizontal: true,
-	        continuousVertical: false,
-	        normalScrollElements: null,
-	        scrollOverflow: false,
-	        touchSensitivity: 5,
-	        normalScrollElementTouchThreshold: 5,
-	
-	        // Accessibility
-	        keyboardScrolling: true,
-	        animateAnchor: true,
-	        recordHistory: false,
-	
-	        // Design
-	        controlArrows: true,
-	        verticalCentered: true,
-	        resize : true,
-	        // sectionsColor : ['#C0392B', '#D35400', '#F39C12', '#27AE60', '#16A085', '#2980B9', '#8E44AD'],
-	        sectionsColor : ['#E74C3C', '#E67E22', '#F1C40F', '#2ECC71', '#1ABC9C', '#3498DB', '#9B59B6'],
-	        paddingTop: 0,
-	        paddingBottom: 0,
-	        fixedElements: '#header, .footer',
-	        responsiveWidth: 0,
-	        responsiveHeight: 0,
-	
-	        // Custom selectors
-	        sectionSelector: '.section',
-	        slideSelector: '.slide',
-	
-	        // events
-	        // onLeave: function(index, nextIndex, direction){},
-	        // afterLoad: function(anchorLink, index){},
-	        // afterRender: function(){},
-	        // afterResize: function(){},
-	        // afterSlideLoad: function(anchorLink, index, slideAnchor, slideIndex){},
-			onSlideLeave: function(anchorLink, index, slideIndex, direction, nextSlideIndex) {
-				
-				// var leavingSlide = $(this);
-	
-	            // callback ACCategory
-	            if(index == 2 && slideIndex == 0 && direction == 'right') {
-	                refresh_chart_ACCategory();
-	            }
-	            
-                // callback ACPeriodCate
-	            if(index == 3 && slideIndex == 0 && direction == 'right') {
-	                refresh_chart_ACPeriodCate();
-	            }
-
-	            // callback ConCategory
-	            if(index == 6 && slideIndex == 0 && direction == 'right') {
-	                alert();
-	                refresh_chart_ConCategory();
-	            }
-
-	            // callback Penalty
-	            if(index == 7 && slideIndex == 0 && direction == 'right') {
-	                refresh_chart_Penalty();
-                }
-
+	refresh_chart_ACCategory = function() {
+		chartACCategory.showLoading();
+		$.get('/summary/GetJson_accategory?' + chartInput, function(json_response) {
+			chartACCategory.hideLoading();
+			if (!json_response.errMsg) {
+				var titles;
+				var seriesData;
+				titles = json_response.titles;
+				seriesData = json_response.seriesData;
+				chartACCategory.setOption({
+					legend: {
+						data: titles
+					},
+					series: [{
+						data: seriesData
+					}]
+				});
+			} else {
+				for (err in json_response.errMsg) {
+					alert(json_response.errMsg[err]);
+				}
 			}
-	    });
-	
+		}, 'json')
+	};
+	// ACPeriodCate
+	var chartACPeriodCateTime = echarts.init(document.getElementById('chartACPeriodCateTime'));
+	window.onresize = chartACPeriodCateTime.resize;
+	var opt_chartACPeriodCateTime = {
+		title: {
+			text: '门禁类型时间分布',
+			textStyle: {
+				color: '#34495E',
+				fontSize: 30
+			},
+			x: 'right'
+		},
+		color: ['#BED0F7', '#29A9FF', '#0066FF', '#27446E'],
+		grid: {
+			width: '80%',
+			right: 1
+		},
+		textStyle: {
+			color: '#34495E',
+			fontSize: 14
+		},
+		tooltip: {
+			trigger: 'axis'
+		},
+		toolbox: {
+			show: true,
+			feature: {
+				mark: {
+					show: true
+				},
+				dataView: {
+					show: true,
+					readOnly: false
+				},
+				magicType: {
+					show: true,
+					type: ['line', 'bar']
+				},
+				restore: {
+					show: true
+				},
+				saveAsImage: {
+					show: true
+				}
+			},
+			iconStyle: {
+				normal: {
+					borderColor: '#34495E'
+				}
+			},
+			top: '10%',
+			right: 0
+		},
+		legend: {
+			data: [],
+			textStyle: {
+				color: '#34495E',
+				fontSize: 18
+			},
+			x: 'left',
+			orient: 'vertical'
+		},
+		xAxis: {
+			type: 'category',
+			boundaryGap: true,
+			data: []
+		},
+		yAxis: {
+			type: 'value',
+			name: '次数',
+			axisLabel: {
+				formatter: '{value} 次'
+			}
+		},
+		series: []
+	};
+	chartACPeriodCateTime.setOption(opt_chartACPeriodCateTime);
+	refresh_chart_ACPeriodCate = function() {
+		chartACPeriodCateTime.showLoading();
+		$.get('/summary/GetJson_acperiodcate?' + chartInput, function(json_response) {
+			chartACPeriodCateTime.hideLoading();
+			// 还原图表选项
+			chartACPeriodCateTime.setOption(opt_chartACPeriodCateTime);
+			var json_dateTrend;
+			var json_timeDistribution;
+			json_dateTrend = json_response.json_dateTrend;
+			json_timeDistribution = json_response.json_timeDistribution;
+			if (!json_response.errMsg) {
+				// 时间分布图表设定。
+				chartACPeriodCateTime.setOption({
+					legend: {
+						data: json_timeDistribution.legendLabels
+					},
+					xAxis: [{
+						data: json_timeDistribution.axisLabels
+					}]
+				});
+				for (var i = 0; i < json_timeDistribution.seriesData.length; i++) {
+					var tmp_option = chartACPeriodCateTime.getOption();
+					tmp_option.series.push({
+						name: json_timeDistribution.seriesData[i].name,
+						stack: 'ac',
+						type: 'bar',
+						data: json_timeDistribution.seriesData[i].data
+					});
+					chartACPeriodCateTime.setOption(tmp_option);
+				}
+			} else {
+				for (err in json_response.errMsg) {
+					alert(json_response.errMsg[err]);
+				}
+			}
+		}, 'json')
+	};
+	// chart_conategory
+	var chartConCategory = echarts.init(document.getElementById('chartConCategory'));
+	window.onresize = chartConCategory.resize;
+	var optionChartConCategory = {
+		title: {
+			text: '消费分类计数',
+			textStyle: {
+				color: '#ECF0F1',
+				fontSize: 30
+			},
+			x: 'right'
+		},
+		textStyle: {
+			color: '#ECF0F1',
+			fontSize: 14
+		},
+		tooltip: {
+			trigger: 'item',
+			formatter: "{a} <br/>{b} : {c} ({d}%)"
+		},
+		toolbox: {
+			show: true,
+			feature: {
+				mark: {
+					show: true
+				},
+				dataView: {
+					show: true,
+					readOnly: false
+				},
+				restore: {
+					show: true
+				},
+				saveAsImage: {
+					show: true
+				}
+			},
+			iconStyle: {
+				normal: {
+					borderColor: '#ECF0F1'
+				}
+			},
+			top: '10%',
+			right: 0,
+		},
+		legend: {
+			show: true,
+			data: [],
+			textStyle: {
+				color: '#ECF0F1',
+				fontSize: 18
+			},
+			x: 'left',
+			orient: 'vertical'
+		},
+		series: [{
+			name: '消费分布',
+			type: 'pie',
+			radius: [0, '60%'],
+			data: []
+		}]
+	};
+	chartConCategory.setOption(optionChartConCategory);
+	refresh_chart_ConCategory = function() {
+		chartConCategory.showLoading();
+		$.get('/summary/GetJson_concategory?' + chartInput, function(json_response) {
+			chartConCategory.hideLoading();
+			chartConCategory.setOption(optionChartConCategory);
+			var titles;
+			var seriesData;
+			if (!json_response.errMsg) {
+				titles = json_response.titles;
+				seriesData = json_response.seriesData;
+				chartConCategory.setOption({
+					legend: {
+						data: titles
+					},
+					series: [{
+						data: seriesData
+					}]
+				});
+			} else {
+				for (err in json_response.errMsg) {
+					alert(json_response.errMsg[err]);
+				}
+			}
+		}, 'json')
+	};
+	// chart_penalty
+	var chartPenalty = echarts.init(document.getElementById('chartPenalty'));
+	window.onresize = chartPenalty.resize;
+	var opt_chartPenalty = {
+		title: {
+			text: '滞纳金缴纳',
+			textStyle: {
+				color: '#ECF0F1',
+				fontSize: 30
+			},
+			x: 'right'
+		},
+		textStyle: {
+			color: '#ECF0F1',
+			fontSize: 14
+		},
+		tooltip: {
+			trigger: 'axis',
+			formatter: function(params) {
+				var str_return = '总 ' + params[0].name + ' 元<br/>';
+				str_return += params[0].seriesName + ' : ' + params[0].value + ' 人<br/>';
+				return str_return;
+			}
+		},
+		toolbox: {
+			show: true,
+			feature: {
+				mark: {
+					show: true
+				},
+				dataView: {
+					show: true,
+					readOnly: false
+				},
+				magicType: {
+					show: true,
+					type: ['line', 'bar']
+				},
+				restore: {
+					show: true
+				},
+				saveAsImage: {
+					show: true
+				}
+			},
+			iconStyle: {
+				normal: {
+					borderColor: '#ECF0F1'
+				}
+			},
+			top: '10%',
+			right: 0,
+		},
+		xAxis: {
+			type: 'category',
+			name: '滞纳金总额',
+			boundaryGap: false,
+			data: []
+		},
+		yAxis: {
+			type: 'value',
+			name: '人数',
+			axisLabel: {
+				formatter: '{value} 人'
+			}
+		},
+		series: [{
+			name: '人数',
+			type: 'line',
+			smooth: true,
+			stack: 'a',
+			areaStyle: {
+				normal: {}
+			},
+			data: [],
+			markPoint: {
+				data: []
+			}
+		}],
+		dataZoom: []
+	};
+	chartPenalty.setOption(opt_chartPenalty);
+	refresh_chart_Penalty = function() {
+		chartPenalty.showLoading();
+		$.get('/summary/GetJson_penalty?' + chartInput, function(json_response) {
+			// json_response = {'userAmount': userAmount, 'amount': amount, 'num': num}
+			var userAmount = json_response.userAmount;
+			var amount = json_response.amount;
+			var num = json_response.num;
+			var index_userAmount = 0;
+			for (var i = 0; i < amount.length; i++) {
+				if (amount[i].toString() == parseInt(userAmount).toString()) {
+					index_userAmount = i;
+					break;
+				}
+			}
+			chartPenalty.hideLoading();
+			if (!json_response.errMsg) {
+				var startPoint = (parseInt(userAmount) - 33 > 0) ? (parseInt(userAmount) - 33) : 0;
+				var endPoint = (parseInt(userAmount) + 33 > amount[amount.length - 1]) ? amount[amount.length - 1] : (parseInt(userAmount) + 33);
+				chartPenalty.setOption({
+					xAxis: [{
+						data: amount
+					}],
+					series: [{
+						data: num,
+						markPoint: {
+							label: {
+								normal: {
+									formatter: function() {
+										return userAmount.toString();
+									},
+									textStyle: {
+										fontSize: 10
+									}
+								}
+							},
+							data: [{
+								name: '此人',
+								coord: [index_userAmount, num[index_userAmount]]
+							}]
+						}
+					}],
+					dataZoom: [{
+						type: 'inside',
+						xAxisIndex: 0,
+						startValue: startPoint,
+						endValue: endPoint
+					}, {
+						type: 'slider',
+						startValue: startPoint,
+						endValue: endPoint
+					}]
+				});
+			} else {
+				for (err in json_response.errMsg) {
+					alert(json_response.errMsg[err]);
+				}
+			}
+		}, 'json')
+	};
+	// Radar
+	var chartRadar = echarts.init(document.getElementById('chartRadar'));
+	window.onresize = chartRadar.resize;
+	var values = [];
+	var value_ACCategory = {{ vals_summary['ret_access']['count_nodes'] }} / (430.298 / 0.7) * 10;
+		value_ACCategory = value_ACCategory < 1 ? 1 : value_ACCategory;
+		value_ACCategory = value_ACCategory > 10 ? 10 : value_ACCategory;
+		value_ACCategory = value_ACCategory.toFixed(1);
+	var value_ACPeriodCate = {{ vals_summary['ret_habit']['count_early'] }} * 7 - {{ vals_summary['ret_habit']['count_night'] }} / 25.273 * 10;
+		value_ACPeriodCate = value_ACPeriodCate < 1 ? 1 : value_ACPeriodCate;
+		value_ACPeriodCate = value_ACPeriodCate > 10 ? 10 : value_ACPeriodCate;
+		value_ACPeriodCate = value_ACPeriodCate.toFixed(1);
+	var value_Study = {{ vals_summary['ret_study']['percent_asc'] }} * 10;
+		value_Study = value_Study < 1 ? 1 : value_Study;
+		value_Study = value_Study.toFixed(1);
+	var value_Relation = 1;
+	var value_ConCategory = {{ vals_summary['ret_bill']['con_per_month'] }};
+		if (value_ConCategory < 202.167 * 1.3)
+		{
+			value_ConCategory = 10;
+		}
+		else
+		{
+			value_ConCategory = 10 - (value_ConCategory - 202.167 * 1.3) / 202.167;
+		}
+		value_ConCategory = value_ConCategory < 1 ? 1 : value_ConCategory;
+		value_ConCategory = value_ConCategory.toFixed(1);
+	var value_penalty = {{ (1 - vals_summary['ret_penalty']['percent_asc']) * 10 }};
+		value_penalty = value_penalty < 1 ? 1 : value_penalty;
+		value_penalty = value_penalty.toFixed(1);
+	values.push(value_ACCategory);
+	values.push(value_ACPeriodCate);
+	values.push(value_Study);
+	values.push(value_Relation);
+	values.push(value_ConCategory);
+	values.push(value_penalty);
+	var opt_chartRadar = {
+		title: {
+			text: '截至2015年我在校园的成就',
+			textStyle: {
+				color: '#ECF0F1',
+				fontSize: 30
+			}
+		},
+		color: ['#ECF0F1'],
+		textStyle: {
+			color: '#ECF0F1',
+			fontSize: 14
+		},
+		tooltip: {
+			trigger: 'axis'
+		},
+		toolbox: {
+			show: true,
+			feature: {
+				mark: {
+					show: true
+				},
+				dataView: {
+					show: true,
+					readOnly: false
+				},
+				restore: {
+					show: true
+				},
+				saveAsImage: {
+					show: true
+				}
+			},
+			iconStyle: {
+				normal: {
+					borderColor: '#ECF0F1'
+				}
+			},
+			top: '10%',
+			right: 0
+		},
+		calculable: true,
+		polar: [{
+			indicator: [{
+				text: '足迹',
+				max: 10
+			}, {
+				text: '作息',
+				max: 10
+			}, {
+				text: '学习',
+				max: 10
+			}, {
+				text: '人脉',
+				max: 10
+			}, {
+				text: '理财',
+				max: 10
+			}, {
+				text: '信用',
+				max: 10
+			}],
+			radius: '60%'
+		}],
+		series: [{
+			type: 'radar',
+			itemStyle: {
+				normal: {
+					areaStyle: {
+						type: 'default'
+					}
+				}
+			},
+			data: [{
+				value: values,
+				name: userID
+			}]
+		}]
+	};
+	chartRadar.setOption(opt_chartRadar);
+	$(document).ready(function() {
+		$('#fullpage').fullpage({
+			// Navigation
+			menu: false,
+			lockAnchors: false,
+			anchors: [],
+			navigation: true,
+			navigationPosition: 'right',
+			navigationTooltips: [],
+			showActiveTooltip: false,
+			slidesNavigation: true,
+			slidesNavPosition: 'bottom',
+			// Scrolling
+			css3: true,
+			scrollingSpeed: 700,
+			autoScrolling: true,
+			fitToSection: true,
+			fitToSectionDelay: 1000,
+			scrollBar: false,
+			easing: 'easeInOutCubic',
+			easingcss3: 'ease',
+			loopBottom: false,
+			loopTop: false,
+			loopHorizontal: true,
+			continuousVertical: false,
+			normalScrollElements: null,
+			scrollOverflow: false,
+			touchSensitivity: 5,
+			normalScrollElementTouchThreshold: 5,
+			// Accessibility
+			keyboardScrolling: true,
+			animateAnchor: true,
+			recordHistory: false,
+			// Design
+			controlArrows: true,
+			verticalCentered: true,
+			resize: true,
+			sectionsColor: ['#E74C3C', '#E67E22', '#F1C40F', '#2ECC71', '#1ABC9C', '#3498DB', '#9B59B6', '#34495E'],
+			paddingTop: 0,
+			paddingBottom: 0,
+			fixedElements: '#header, .footer',
+			responsiveWidth: 0,
+			responsiveHeight: 0,
+			// Custom selectors
+			sectionSelector: '.section',
+			slideSelector: '.slide',
+			// events
+			// onLeave: function(index, nextIndex, direction){},
+			// afterLoad: function(anchorLink, index){},
+			// afterRender: function(){},
+			// afterResize: function(){},
+			// afterSlideLoad: function(anchorLink, index, slideAnchor, slideIndex){},
+			onSlideLeave: function(anchorLink, index, slideIndex, direction, nextSlideIndex) {
+				// var leavingSlide = $(this);
+				// callback ACCategory
+				if (index == 2 && slideIndex == 0 && direction == 'right') {
+					refresh_chart_ACCategory();
+				}
+				// callback ACPeriodCate
+				if (index == 3 && slideIndex == 0 && direction == 'right') {
+					refresh_chart_ACPeriodCate();
+				}
+				// callback ConCategory
+				if (index == 6 && slideIndex == 0 && direction == 'right') {
+					refresh_chart_ConCategory();
+				}
+				// callback Penalty
+				if (index == 7 && slideIndex == 0 && direction == 'right') {
+					refresh_chart_Penalty();
+				}
+			}
+		});
 	});
-
 </script>
 
 {% endblock %}
