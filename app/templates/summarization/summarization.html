@@ -708,6 +708,7 @@
 			},
 			x: 'right'
 		},
+		color: ['#E67E22'],
 		textStyle: {
 			color: '#ECF0F1',
 			fontSize: 14
@@ -753,13 +754,23 @@
 			type: 'category',
 			name: '滞纳金总额',
 			boundaryGap: false,
-			data: []
+			data: [],
+			axisLabel: {
+				textStyle: {
+					color: '#ECF0F1',
+					fontSize: 14
+				}
+			}
 		},
 		yAxis: {
 			type: 'value',
 			name: '人数',
 			axisLabel: {
-				formatter: '{value} 人'
+				formatter: '{value} 人',
+				textStyle: {
+					color: '#ECF0F1',
+					fontSize: 14
+				}
 			}
 		},
 		series: [{
@@ -876,7 +887,8 @@
 			fontSize: 14
 		},
 		tooltip: {
-			trigger: 'axis'
+			trigger: 'axis',
+			formatter: '{b}：{c}分'
 		},
 		calculable: true,
 		polar: [{
@@ -899,6 +911,12 @@
 				text: '信用',
 				max: 10
 			}],
+			axisLabel: {
+				textStyle: {
+					color: '#ECF0F1',
+					fontSize: 14
+				}
+			}
 		}],
 		series: [{
 			type: 'radar',
