@@ -23,25 +23,55 @@
 	</head>
 	<body>
 
+        <!-- Main Navbar -->
         <div id="header">{% block header %}
             <nav class="navbar navbar-inverse navbar-fixed-top">
-            <div class="container"></div>
-                <div class="navbar-header">
-                    <a class="navbar-brand" href="#home">智慧校园 WitCampus</a>
-                </div>
-                <div>
-                    <ul class="nav navbar-nav">
-
-                        <!-- 导航按钮 -->
-                        <li><a href="{{ url_for('show_summary') }}">Summary</a></li>
-                        <li><a href="{{ url_for('show_charts') }}">Charts</a></li>
-                    </ul>
+                <div style="padding-left: 55px">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="{{ url_for('show_index') }}">智慧校园 WitCampus</a>
+                    </div>
+                    <div id="navbar" class="navbar-collapse collapse">
+                        <ul class="nav navbar-nav">
+                            <!-- 导航按钮 -->
+                            <li class="dropdown">
+                                <a href="{{ url_for('show_charts') }}" class="dropdown-toggle" data-toggle="dropdown" role="button">
+                                    所有图表
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    {% macro charts_navbtn(url_fun, value) -%}
+                                        <li><a href="{{ url_for(url_fun) }}">{{ value }}</a></li>
+                                    {%- endmacro %}
+                                    {{ charts_navbtn('show_chart_expenditure','个体支出趋势与分布') }}
+                                    {{ charts_navbtn('show_chart_acperiodcate','个体门禁类型时间分布') }}
+                                    {{ charts_navbtn('show_chart_income','刷卡机收入趋势与分布') }}
+                                    {{ charts_navbtn('show_chart_foodIncome','餐饮收入趋势与分布') }}
+                                    {{ charts_navbtn('show_chart_acvalid','个体合法门禁比例') }}
+                                    {{ charts_navbtn('show_chart_accategory','个体门禁分类分布') }}
+                                    {{ charts_navbtn('show_chart_concategory','个体消费分类分布') }}
+                                    {{ charts_navbtn('show_chart_number','人数统计') }}
+                                    {{ charts_navbtn('show_chart_conWaterTime','水消费规律') }}
+                                    {{ charts_navbtn('show_chart_conability','个体消费能力认定') }}
+                                    {{ charts_navbtn('show_chart_conwater','男女生用水情况') }}
+                                    {{ charts_navbtn('show_chart_penalty','个体滞纳金缴费情况') }}
+                                    {{ charts_navbtn('show_chart_relation','人际关系') }}
+                                </ul>
+                            </li>
+                            <li><a href="/summary">个人成就报告</a></li>
+                        </ul>
+                    </div>
                 </div>
             </nav>
         {% endblock %}</div>
 
         <div style="">{% block content %}{% endblock %}</div>
 
+        <!-- Main Footer -->
 {#        <div id="footer" style="clear:left">{% block footer %}#}
 {#            <div class="container">#}
 {#                <p>#}

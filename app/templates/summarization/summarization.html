@@ -10,7 +10,26 @@
 				</div>
 				<div class="col-md-5 col-sm-5">
 					<h1>
-		                您好，工号：{{ userID }}，您的2015年总结：
+{#                        <div id="alert-userID" class="alert alert-error hide">#}
+{#                            <a href="#" class="close" data-dismiss="alert">&times;</a>#}
+{#                            <strong>错误！</strong>找不到这个工号。#}
+{#                        </div>#}
+
+		                您好，工号：
+                        <div id="show_userID" style="display: inline;">
+                            <span id="label_userID" onclick="switch_userID_iptshow(false)"></span>
+                            <i class="fa fa-pencil-square-o" onclick="switch_userID_iptshow(false)"></i>
+                        </div>
+                        <form id="edit_userID" class="form-inline has-error" style="display: none;" action="#">
+                            <input id="ipt_userID" class="form-control" type="text" size="15"
+                                   value="{{ userID }}" onblur=set_userID($('#ipt_userID').val()); />
+                            <input class="btn btn-info"
+                                    type="button" value="确定" onclick=set_userID($('#ipt_userID').val()); />
+                            <input class="btn btn-default"
+                                    type="reset" value="重置">
+                        </form>
+                        </br>
+                        您的2015年总结：
 		            </h1>
     					<div id="chartRadar" class="center-block" style="height: 300px;"></div>
 					<p>
@@ -363,10 +382,73 @@
 	var userID = '{{ userID }}';
 	var startDate = '{{ startDate }}';
 	var endDate = '{{ endDate }}';
+{#    var chartInput;#}
 	var chartInput = 'userID=' + userID + '&startDate=' + startDate + '&endDate=' + endDate;
+    $('#label_userID').html(userID);
+
+
+    set_userID = function (new_userID) {
+{#        alert("set_userID");#}
+        if( has_userID(new_userID) ){         // Verify.
+            userID = new_userID;              // Set.
+            $('#label_userID').html(userID);
+            switch_userID_iptshow(true);
+            window.location.href='/summary/'+ userID;
+            chartInput = 'userID=' + userID + '&startDate=' + startDate + '&endDate=' + endDate;
+        }else{
+            // 若目标用户工号无效则保持原工号
+            // 弹出提示
+            alert('找不到这个工号。');
+        }
+    };
+
+    has_userID = function(tar_userID){
+        var ret_val;
+{#        alert("has_userID");#}
+        $.ajax('/check_user_id?userID='+tar_userID, {
+            async: false,
+            type: 'GET',
+            success: function (json_response) {
+                ret_val = json_response['has_user'] == true;
+            },
+            error: function () {
+                alert("与服务器断开连接！");
+                ret_val = false;
+            },
+            datatype: 'json'
+        });
+        return ret_val;
+    };
+
+    switch_userID_iptshow = function (isShow) {
+{#        alert("switch_userID_iptshow");#}
+        if(isShow){
+            $('#show_userID').css('display','inline');
+            $('#edit_userID').css('display', 'none');
+        }else{
+            $('#show_userID').css('display', 'none');
+            $('#edit_userID').css('display', 'inline');
+            $('#ipt_userID').focus();
+        }
+    };
+
+{#    set_userID(userID);#}
+
+
+    // =======================
+    // Charts
+    // =======================
+    // Bind resize event of all charts.
+    $(window).resize(function () {
+        chartACCategory.resize();
+        chartACPeriodCateTime.resize();
+        chartRelation.resize();
+        chartConCategory.resize();
+        chartPenalty.resize();
+        chartRadar.resize();
+    });
 	// ACCategory
 	var chartACCategory = echarts.init(document.getElementById('chartACCategory'));
-	window.onresize = chartACCategory.resize;
 	var opt_chartACCategory = {
 		title: {
 			text: '门禁分类计数',
@@ -452,7 +534,6 @@
 	};
 	// ACPeriodCate
 	var chartACPeriodCateTime = echarts.init(document.getElementById('chartACPeriodCateTime'));
-	window.onresize = chartACPeriodCateTime.resize;
 	var opt_chartACPeriodCateTime = {
 		title: {
 			text: '门禁类型时间分布',
@@ -566,7 +647,6 @@
 	};
 	// chart_relation
 	var chartRelation = echarts.init(document.getElementById('chartRelation'));
-	window.onresize = chartRelation.resize;
     var optionChartRelation = {
     		color: ['#ECF0F1'],
         legend: {
@@ -615,7 +695,6 @@
     };
 	// chart_conategory
 	var chartConCategory = echarts.init(document.getElementById('chartConCategory'));
-	window.onresize = chartConCategory.resize;
 	var optionChartConCategory = {
 		title: {
 			text: '消费分类计数',
@@ -704,7 +783,6 @@
 	};
 	// chart_penalty
 	var chartPenalty = echarts.init(document.getElementById('chartPenalty'));
-	window.onresize = chartPenalty.resize;
 	var opt_chartPenalty = {
 		title: {
 			text: '滞纳金缴纳',
@@ -856,7 +934,6 @@
 	};
 	// Radar
 	var chartRadar = echarts.init(document.getElementById('chartRadar'));
-	window.onresize = chartRadar.resize;
 	var values = [];
 	var value_ACCategory = {{ vals_summary['ret_access']['count_nodes'] }} / (430.298 / 0.7) * 10;
 		value_ACCategory = value_ACCategory < 1 ? 1 : value_ACCategory;
