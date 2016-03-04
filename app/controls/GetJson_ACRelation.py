@@ -24,7 +24,7 @@ def GetJson_ACRelation(userID):
     value_source = int(max_val * 1.2)
     symbolSize_source = (min_size * max_val - max_size + (max_size - min_size) * (max_val + 10)) / (max_val - 1)
     # 初始化节点和边队列
-    nodes = [{'name': source, 'value': value_source, 'symbolSize':symbolSize_source/2 }]
+    nodes = [{'name': source, 'value': value_source, 'symbolSize':symbolSize_source/2.0 }]
     links = []
 
     # 在nodes 中返回key:name 为name 的元素序号，若无则返回-1
@@ -47,6 +47,7 @@ def GetJson_ACRelation(userID):
             item = list_relation[i]
             k = item[0]; v = item[1]
             symbolSize_source = (min_size * max_val - max_size + (max_size - min_size) * v) / (max_val - 1)
+
             # Deprecated
             # # 对关系值大的一定数量个node 加默认显示的标签
             # if i < int(max_concern*0.5) and v > min_val:    # 默认显示标签的前 x% 个node并且关系值筛选。
@@ -58,7 +59,7 @@ def GetJson_ACRelation(userID):
             #     node = {'name': k, 'value': v,
             #             'symbolSize': (min_size * max_val - max_size + (max_size - min_size) * v) / (max_val - 1)}
 
-            node = {'name': k, 'value': v, 'symbolSize': symbolSize_source/2}
+            node = {'name': k, 'value': v, 'symbolSize': symbolSize_source/2.0}
             nodes.append(node)
 
             link = {'source': index_of_name(source), 'target': index_of_name(k), 'weight': v}
