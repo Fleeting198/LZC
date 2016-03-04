@@ -648,52 +648,6 @@
 		}, 'json')
 	};
 	// chart_relation
-<<<<<<< HEAD
-	var chartRelation = echarts.init(document.getElementById('chartRelation'));
-    var optionChartRelation = {
-    		color: ['#ECF0F1'],
-        legend: {
-            data: []
-        },
-        series: []
-    };
-    chartRelation.setOption(optionChartRelation);
-    refresh_chart_Relation = function () {
-        chartRelation.showLoading();
-        $.get('/summary/GetJson_relation?' + chartInput, function (json_response) {
-            chartRelation.setOption(optionChartRelation);
-            chartRelation.hideLoading();
-            if (!json_response.errMsg) {
-                chartRelation.setOption({
-                    series: [{
-                        type: 'graph',
-                        layout: 'force',
-                        animation: false,
-                        lineStyle: {
-				    			normal: {
-				    				color: '#ECF0F1',
-				    				curveness: 0.1
-				    			}
-				    		},
-				    		draggable: true,
-                        data: json_response.nodes.map(function (node, idx) {
-                            node.id = idx;
-                            return node;
-                        }),
-                        force: {
-                            initLayout: 'circular',
-                            // gravity: 0,
-                            edgeLength: 200,
-                            repulsion: 200
-                        },
-                        edges: json_response.links
-                    }]
-                });
-            } else {
-                for (err in json_response.errMsg) {
-                    alert(json_response.errMsg[err]);
-                }
-=======
 	var chartRelation;
         require.config({
             paths: {
@@ -709,7 +663,6 @@
             function (ec) {
                 chartRelation = ec.init(document.getElementById('chartRelation'));
                 chartRelation.setOption(option);
->>>>>>> L
             }
         );
         $(window).resize(function () {
