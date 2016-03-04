@@ -11,6 +11,9 @@
     <script>
 
         var chartPenalty = echarts.init(document.getElementById('chartPenalty'));
+        $(window).resize(function () {
+            chartPenalty.resize()
+        });
 
         var optionChartPenalty = {
             title: {text: '滞纳金缴纳'},

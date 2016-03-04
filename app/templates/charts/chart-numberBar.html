@@ -2,38 +2,26 @@
 {% block chartField %}
 
     <!--place divs for charts-->
-    <div id="chartNumberTotal" style="width: inherit; height: 350px;"></div>
+    <div id="chartNumberTotal" style="width: inherit; height: 50%;"></div>
 
-    <div class="row" style="height: 400px;">
-    <div id="chartNumberGradeB" class="col-xs-3" style="height: inherit;"></div>
-    <div id="chartNumberGradePg" class="col-xs-3" style="height: inherit;"></div>
-    <div id="chartNumberGradeDr" class="col-xs-3"style="height: inherit;"></div>
+    <div class="row" style="height: 50%;">
+    <div id="chartNumberGradeB" class="col-xs-3" style="height: 100%;"></div>
+    <div id="chartNumberGradePg" class="col-xs-3" style="height: 100%;"></div>
+    <div id="chartNumberGradeDr" class="col-xs-3" style="height: 100%;"></div>
     </div>
 
-{#    <div id="chartNumberGradeB" style="width: inherit; height: 350px;"></div>#}
-{#    <div id="chartNumberGradePg" style="width: inherit; height: 350px;"></div>#}
-{#    <div id="chartNumberGradeDr" style="width: inherit; height: 350px;"></div>#}
-
     <script>
-        <!--init charts-->
         var chartNumberTotal = echarts.init(document.getElementById('chartNumberTotal'));
         var chartNumberGradeB = echarts.init(document.getElementById('chartNumberGradeB'));
         var chartNumberGradePg = echarts.init(document.getElementById('chartNumberGradePg'));
         var chartNumberGradeDr = echarts.init(document.getElementById('chartNumberGradeDr'));
 
-        // 不知道怎么把事件放在一起。
-        window.onresize = chartNumberTotal.resize;
-        window.onresize = function(){
-            chartNumberTotal.resize;
-            chartNumberGradeB.resize;
-            chartNumberGradePg.resize;
-            chartNumberGradeDr.resize;
-        }
-
-{#        window.onresize = chartNumberTotal.resize;#}
-{#        window.onresize = chartNumberGradeB.resize;#}
-{#        window.onresize = chartNumberGradePg.resize;#}
-{#        window.onresize = chartNumberGradeDr.resize;#}
+        $(window).resize(function(){
+            chartNumberTotal.resize();
+            chartNumberGradeB.resize();
+            chartNumberGradePg.resize();
+            chartNumberGradeDr.resize();
+        });
 
 
         <!--start options for charts-->
@@ -97,12 +85,12 @@
                 name: '年级比例',
                 type: 'pie',
                 radius: '70%',
-                center: ['50%', '50%'],
+                center: ['50%', '60%'],
                 data: []
             }]
         };
 
-        <!--set options for charts-->
+        // set options for charts
         chartNumberTotal.setOption(optionChartNumberTotal);
         chartNumberGradeB.setOption(optionChartNumberGrade);
         chartNumberGradePg.setOption(optionChartNumberGrade);
@@ -115,25 +103,23 @@
 
             $.get('/charts/number/getData?', function (json_response) {
 
-                json_numberTotal = json_response.json_numberTotal;
-                json_numberGradeB = json_response.json_numberGradeB;
-                json_numberGradePg = json_response.json_numberGradePg;
-                json_numberGradeDr = json_response.json_numberGradeDr;
+                var json_numberTotal = json_response.json_numberTotal;
+                var json_numberGradeB = json_response.json_numberGradeB;
+                var json_numberGradePg = json_response.json_numberGradePg;
+                var json_numberGradeDr = json_response.json_numberGradeDr;
 
                 chartNumberTotal.hideLoading();
                 chartNumberGradeB.hideLoading();
 
-                    chartNumberTotal.setOption({
-                        series: [
-                            {
-                                data: [json_numberTotal.teacher, json_numberTotal.stuB, json_numberTotal.stuPg, json_numberTotal.stuDr, json_numberTotal.other]
-                            }
-                        ]
-                    });
+                chartNumberTotal.setOption({
+                    series: [{
+                            data: [json_numberTotal.teacher, json_numberTotal.stuB, json_numberTotal.stuPg, json_numberTotal.stuDr, json_numberTotal.other]
+                    }]
+                });
 
                 <!--fetch data dynamically-->
-                names = new Array('10', '11', '12', '13', '14', '15', '其他');
-                datas = new Array('g10', 'g11', 'g12', 'g13', 'g14', 'g15', 'unknown')
+                var names = new Array('10', '11', '12', '13', '14', '15', '其他');
+                var datas = new Array('g10', 'g11', 'g12', 'g13', 'g14', 'g15', 'unknown')
 
                 function json2data (json_numberGrade) {
                     var dataOfSeries = [];
@@ -148,40 +134,24 @@
                 }
 
                 chartNumberGradeB.setOption({
-                    title: {
-                        text: '各年级本科生比例'
-                    },
-                    series: [
-                        {
-                            data: json2data(json_numberGradeB)
-                        }
-                    ]
+                    title: { text: '本科生各年级比例' },
+                    series: [{ data: json2data(json_numberGradeB) }]
                 });
 
                 chartNumberGradePg.setOption({
-                    title: {
-                        text: '各年级研究生比例'
-                    },
-                    series: [
-                        {
-                            data: json2data(json_numberGradePg)
-                        }
-                    ]
+                    title: { text: '研究生各年级比例' },
+                    series: [{ data: json2data(json_numberGradePg )}]
                 });
 
                 chartNumberGradeDr.setOption({
-                    title: {
-                        text: '各年级博士生比例'
-                    },
-                    series: [
-                        {
-                            data: json2data(json_numberGradeDr)
-                        }
-                    ]
+                    title: { text: '博士生各年级比例' },
+                    series: [{ data: json2data(json_numberGradeDr )}]
                 });
-
             }, 'json')
         };
+
+        load_number();
+
     </script>
 
 {% endblock %}

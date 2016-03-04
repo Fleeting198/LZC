@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/html">
 	<head>
-        <meta charset="UTF-8">
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
         <title>智慧校园 Witcampus</title>
         
 		<link href="{{ url_for('static',filename='css/font-awesome.min.css') }}" rel="stylesheet"/>
@@ -17,23 +17,30 @@
         <script src="{{ url_for('static',filename='js/moment.min.js') }}"></script>
         <script src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
         <script src="{{ url_for('static',filename='js/daterangepicker.js') }}"></script>
-        <script src="{{ url_for('static',filename='js/echarts.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/echarts.min.js') }}" charset="UTF-8"></script>
         <script src="{{ url_for('static',filename='js/jquery.fullpage.min.js') }}"></script>
 
 	</head>
-	<body onload="load_number()">
+	<body>
 
         <div id="header">{% block header %}
-            <nav class="navbar navbar-default">
-                <div class="container">
-                    <div class="navbar-header">
-                        <a class="navbar-brand">This is a header</a>
-                    </div>
+            <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container"></div>
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#home">智慧校园 WitCampus</a>
+                </div>
+                <div>
+                    <ul class="nav navbar-nav">
+
+                        <!-- 导航按钮 -->
+                        <li><a href="{{ url_for('show_summary') }}">Summary</a></li>
+                        <li><a href="{{ url_for('show_charts') }}">Charts</a></li>
+                    </ul>
                 </div>
             </nav>
         {% endblock %}</div>
 
-        <div style="overflow: hidden;">{% block content %}{% endblock %}</div>
+        <div style="">{% block content %}{% endblock %}</div>
 
 {#        <div id="footer" style="clear:left">{% block footer %}#}
 {#            <div class="container">#}

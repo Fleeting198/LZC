@@ -2,17 +2,19 @@
 {% block chartField %}
 
     <!--place divs for charts-->
-    <div id="chartNumberTotal" style="width: inherit; height: 350px;"></div>
-    <div id="chartNumberGrade" style="width: inherit; height: 350px;"></div>
-
+    <div id="chartNumberTotal" style="width: inherit; height: 50%;"></div>
+    <div id="chartNumberGrade" style="width: inherit; height: 50%;"></div>
 
     <script>
-
-        <!--init charts-->
         var chartNumberTotal = echarts.init(document.getElementById('chartNumberTotal'));
         var chartNumberGrade = echarts.init(document.getElementById('chartNumberGrade'));
+        $(window).resize(function () {
+            chartNumberTotal.resize();
+            chartNumberGrade.resize();
+        });
 
-        <!--start options for charts-->
+
+        // start options for charts
         var optionChartNumberTotal = {
             title: {text: '人数统计'},
             tooltip: {trigger: 'axis'},
@@ -77,11 +79,10 @@
                     type : 'value',
                 }
             ],
-            series: [
-            ]
+            series: []
         };
 
-        <!--set options for charts-->
+        // set options for charts
         chartNumberTotal.setOption(optionChartNumberTotal);
         chartNumberGrade.setOption(optionChartNumberGrade);
 
@@ -101,11 +102,9 @@
                 chartNumberGrade.hideLoading();
 
                     chartNumberTotal.setOption({
-                        series: [
-                            {
+                        series: [{
                                 data: [json_numberTotal.teacher, json_numberTotal.stuB, json_numberTotal.stuPg, json_numberTotal.stuDr, json_numberTotal.other]
-                            }
-                        ]
+                        }]
                     });
 
                 <!--try generate series dynamically-->
@@ -129,12 +128,13 @@
                     return serie;
                 }
 
-                chartNumberGrade.setOption({
-                    series: json2serie()
-                });
+                chartNumberGrade.setOption({ series: json2serie() });
 
             }, 'json')
         };
+
+        load_number();
+
     </script>
 
 {% endblock %}

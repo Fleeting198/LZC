@@ -28,7 +28,9 @@
 
         // Init charts.
         var chartConCategory = echarts.init(document.getElementById('chartConCategory'));
-        window.onresize = chartConCategory.resize;
+        $(window).resize(function () {
+            chartConCategory.resize();
+        });
 
         var optionChartConCategory = {
             title: {text: '消费分类计数'},

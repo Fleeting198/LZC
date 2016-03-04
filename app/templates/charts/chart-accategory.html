@@ -27,7 +27,9 @@
 
         // 图表初始化。
         var chartACCategory = echarts.init(document.getElementById('chartACCategory'));
-        window.onresize = chartACCategory.resize;
+        $(window).resize(function () {
+            chartACCategory.resize();
+        });
 
         var optionChartACCategory = {
             title: {text: '时间段内门禁分类计数'},
