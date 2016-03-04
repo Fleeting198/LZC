@@ -7,6 +7,8 @@ def GetJson_ACRelation(userID):
 
     list_relation = query_list_relation(userID)
     num_total = len(list_relation)
+    if num_total == 0:
+        return {'num_total': 0, 'nodes': [], 'links': []}
 
     # 获得最大关系值
     max_val = list_relation[0][1]
@@ -14,11 +16,8 @@ def GetJson_ACRelation(userID):
     source = str(userID)
 
     # symbolSize max and min
-    max_size = 30       # For echarts 2.2.7
+    max_size = 30
     min_size = 10
-
-    # max_size = 30     # For echarts 3.1
-    # min_size = 10
 
     # node 属性计算
     value_source = int(max_val * 1.2)
@@ -76,6 +75,7 @@ def GetJson_ACRelation(userID):
     for j in range(1, len(nodes)):  # 遍历源目标外的点
         source = nodes[j]['name']   # 取名字
         list_relation = query_list_relation(source) # 查询
+        if len(list_relation) == 0: continue
         max_concern = 7  # 最大进行处理的二级点数量
 
         for i in range(len(list_relation)):     # 遍历查询结果
@@ -92,7 +92,7 @@ def GetJson_ACRelation(userID):
                         # link = {'source': i, 'target': idx_k}
                         links.append(link)
 
-    print 'Round1: count_nodes=%d, count_links=%d' % (len(nodes), len(links))
+    print 'Round2: count_nodes=%d, count_links=%d' % (len(nodes), len(links))
     # print nodes
     # print links
 
@@ -113,7 +113,11 @@ def cmp_list_item(item1,item2):
 def query_list_relation(userID):
     # Query
     strQuery = acr_friendlist.query.filter(acr_friendlist.user_id == userID)
-    dict_relation = strQuery.first().str_relation_to_dict()
+    results = strQuery.first()
+
+    if results is None:
+        return []
+    dict_relation = results.str_relation_to_dict()
 
     # Stage 0 completed: dict_relation queried.
     # =======================

@@ -8,10 +8,9 @@
 # 02-20 acvalid, accategory
 
 from app import app
-from flask import render_template, request, jsonify
+from flask import render_template, request, jsonify, redirect
 from app.models import *
 from app.forms import *
-from datetime import datetime
 from sqlalchemy import and_, func, distinct
 import types
 from pandas import Series, DataFrame
@@ -23,14 +22,29 @@ def show_index():
     return render_template('index.html')
 
 
+@app.route('/check_user_id')
+def show_check_user_id():
+    userID = request.args.get('userID')
+    strQuery = db.session.query(individual.user_id,individual.role,individual.grade).filter(individual.user_id==userID)
+    results = strQuery.all()
+
+    return jsonify(has_user=True if len(results)==1 else False)
+
+
 @app.route('/summary')
-def show_summary():
+def show_summary_default():
+    return redirect('/summary/PPPWQHXW')
+
+
+@app.route('/summary/<user_id>')
+def show_summary(user_id):
 
     # =================================
     # 工号，日期设定
     # =================================
-
-    userID = 'PPPWQHXW'
+    print "show_summary"
+    print user_id
+    userID = str(user_id)
     startDate = ''
     endDate = ''
 
@@ -146,9 +160,12 @@ def show_summary():
     json_ACRelation = GetJson_ACRelation(userID)
 
     num_relations = json_ACRelation['num_total']
-    top_name = json_ACRelation['nodes'][0]['name']
-    top_value = int(json_ACRelation['nodes'][0]['value'])
-
+    if num_relations != 0:
+        top_name = json_ACRelation['nodes'][0]['name']
+        top_value = int(json_ACRelation['nodes'][0]['value'])
+    else:
+        top_name = 'None'
+        top_value = 0
     ret_social = {'num_relations': num_relations, 'top_name':top_name, 'top_value':top_value }
 
 
@@ -162,6 +179,7 @@ def show_summary():
 
     from controls.GetJson_expenditure import GetJson_expenditure
     json_Expenditure = GetJson_expenditure(userID, 0, 2, startDate, endDate)
+
     dateTrend = json_Expenditure['json_dateTrend']
     total_expend = dateTrend['accumulatedVals'][-1]
 
@@ -223,8 +241,8 @@ def show_summary():
     vals_summary = {'ret_access': ret_access, 'ret_habit': ret_habit, 'ret_study': ret_study,
                     'ret_social': ret_social, 'ret_bill': ret_bill, 'ret_penalty': ret_penalty }
 
+    print "return render_template summary"
     return render_template('summarization/summarization.html', userID=userID, startDate=startDate, endDate=endDate, vals_summary=vals_summary)
-    # return render_template('summarization/summarization.html')
 
 
 @app.route('/charts')
@@ -815,3 +833,10 @@ def refresh_summary_relation():
 
     json_response = jsonify(json_response)
     return json_response
+
+# =====================================
+# Summary End
+# =====================================
+
+
+

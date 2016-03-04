@@ -34,18 +34,12 @@
             chartRelation.resize()
         });
 
-
+        // 初始化标题设置无效？
         option = {
-            title: {
-                text: '人脉关系图'
-            },
-            tooltip: {
-                trigger: 'item'
-            },
+            title: { text: '人脉关系图' }
         };
 
-
-        {#        var optionChartRelation = {#}
+{#        var optionChartRelation = {#}
 {#            title: { text: '人脉关系' },#}
 {#            legend: { data: [] },#}
 {#            tooltip: {#}
@@ -97,6 +91,9 @@
                     });
 
                     chartRelation.setOption({
+                        title: {
+                            text: '人脉关系图'
+                        },
                         tooltip: {
                             trigger: 'item',
                             formatter: function (params) {

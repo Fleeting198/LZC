@@ -13,6 +13,8 @@ def GetJson_expenditure(userID, modeDate, modeTime, startDate, endDate):
         strQuery = strQuery.filter(
             and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
     results = strQuery.all()
+    if len(results) == 0:
+        return {'errMsg': u'无记录'}
 
     # Get columns.
     res_datetimes = [result.con_datetime for result in results]
