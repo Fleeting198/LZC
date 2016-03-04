@@ -180,33 +180,36 @@ def show_summary(user_id):
     from controls.GetJson_expenditure import GetJson_expenditure
     json_Expenditure = GetJson_expenditure(userID, 0, 2, startDate, endDate)
 
-    dateTrend = json_Expenditure['json_dateTrend']
-    total_expend = dateTrend['accumulatedVals'][-1]
-
-    # print total_expend
-
+    # Get total_expend 总支出
+    if 'errMsg' not in json_Expenditure:
+        dateTrend = json_Expenditure['json_dateTrend']
+        total_expend = dateTrend['accumulatedVals'][-1]
+    else:
+        total_expend = 0
 
     # 消费分类排名
     from controls.GetJson_ConCategory import GetJson_ConCategory
     json_ConCategory = GetJson_ConCategory(userID,startDate,endDate)
 
-    con_items = json_ConCategory['seriesData']
-    for datum in con_items:
-        datum['name'] = helpers.translate(datum['name'])
-    json_ConCategory['seriesData'] = con_items
+    if 'errMsg' not in json_ConCategory:
+        con_items = json_ConCategory['seriesData']
+        top_cate = helpers.translate(con_items[0]['name'])
+    else:
+        top_cate = ''
 
     # [{'name': 'food', 'value': 2653.9}, {'name': 'shop', 'value': 177.5}, {'name': 'None', 'value': 56.5}, ...]
-
 
     # 消费能力
     from controls.GetJson_ConAbility import GetJson_ConAbility
     json_ConAbility = GetJson_ConAbility(userID)
 
-    # print json_ConAbility['userAmount']    # 月均消费
-    con_per_month = json_ConAbility['userAmount']
+    # 月均消费
+    if 'errMsg' not in json_ConAbility:
+        con_per_month = json_ConAbility['userAmount']
+    else:
+        con_per_month = -1
 
-
-    ret_bill = {'total_expend':total_expend, 'con_items': con_items, 'con_per_month': con_per_month}
+    ret_bill = {'total_expend':total_expend, 'top_cate': top_cate, 'con_per_month': con_per_month}
 
 
     # =================================
@@ -219,21 +222,22 @@ def show_summary(user_id):
     # json_userAmount = json_Penalty['json_userAmount']
     # json_penalty = json_Penalty['json_penalty']
 
-    user_penalty = json_Penalty['userAmount']  # 总滞纳金
-    amount = json_Penalty['amount']
-    num = json_Penalty['num']
+    if 'errMsg' not in json_Penalty:
+        user_penalty = json_Penalty['userAmount']  # 总滞纳金
+        amount = json_Penalty['amount']
+        num = json_Penalty['num']
+        # 获取个体在全体数据中排名
+        idx_user = len(amount)
+        for i in range(len(amount)):
+            if int(amount[i]) > user_penalty:
+                idx_user = i
+                break
+        # idx_user = amount.index(int(user_penalty))
+        percent_asc = float(sum(num[: idx_user])) / sum(num)
 
-    # 获取个体在全体数据中排名
-    idx_user = len(amount)
-    for i in range(len(amount)):
-        if int(amount[i]) > user_penalty:
-            idx_user = i
-            break
-    # idx_user = amount.index(int(user_penalty))
-    percent_asc = float(sum(num[: idx_user]))/ sum(num)
-
-    ret_penalty = {'user_penalty': user_penalty, 'percent_asc': percent_asc}
-
+        ret_penalty = {'user_penalty': user_penalty, 'percent_asc': percent_asc}
+    else:
+        ret_penalty = {'user_penalty': -1, 'percent_asc': -1}
 
     # =================================
     # 打包
@@ -277,52 +281,6 @@ def refresh_chart_expenditure():
     else:
         json_response = jsonify(errMsg=form.errors)
     return json_response
-
-
-# @app.route('/charts/acperiod')
-# def show_chart_acperiod():
-#     form = Form_User_DR_MD()
-#     return render_template('chart-acperiod.html', form=form)
-
-
-# @app.route('/charts/acperiod/getData', methods=['GET'])
-# def refresh_chart_acperiod():
-#     form = Form_User_DR_MD()
-#     form.userID.data = request.args.get('userID')
-#     form.dateRange.data = request.args.get('dateRange')
-#     form.modeDate.data = request.args.get('modeDate')
-#
-#     if form.validate():
-#         userID = form.userID.data
-#         startDate = form.dateRange.data[:10]
-#         endDate = form.dateRange.data[-10:]
-#         modeDate = int(form.modeDate.data)
-#
-#         # Query.
-#         strQuery = db.session.query(acrec.ac_datetime).filter(acrec.user_id == userID).order_by(acrec.ac_datetime)
-#         if len(startDate) != 0:
-#             strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
-#         results = strQuery.all()
-#         res_datetimes = [result.ac_datetime for result in results]
-#
-#         # Process data.
-#         from app.controls.DateTimeValueProcess import DateTimeValueProcess
-#         process = DateTimeValueProcess(res_datetimes)
-#
-#         # 包装dateTrend 返回值。
-#         # 这个功能暂时不需要连续值，但还是必须获取，逻辑模块写一起了。
-#         axisLabels, accumulatedVals, pointVals = process.get_date_trend(modeDate)
-#
-#         json_dateTrend = {'axisLabels': axisLabels, 'pointVals': pointVals}
-#
-#         # timeDistribution 返回值
-#         axisLabels, vals = process.get_time_distribution()
-#         json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
-#
-#         json_response = jsonify(json_dateTrend=json_dateTrend, json_timeDistribution=json_timeDistribution)
-#     else:
-#         json_response = jsonify(errMsg=form.errors)
-#     return json_response
 
 
 @app.route('/charts/acperiodcate')
