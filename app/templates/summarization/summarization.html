@@ -5,19 +5,16 @@
 		<div class="container-fluid">
 			<div class="row">
 				<div class="col-md-1 col-sm-1"></div>
-				<div class="col-md-6 col-sm-6">
+				<div class="col-md-5 col-sm-5">
 					<img data-src="../static/pic/summary/header_boy.png">
 				</div>
-				<div class="col-md-4 col-sm-4">
+				<div class="col-md-5 col-sm-5">
 					<h1>
-                    工号：{{ userID }}，</br>
-                    您好！
-                </h1>
+		                您好，工号：{{ userID }}，您的2015年总结：
+		            </h1>
+    					<div id="chartRadar" class="center-block" style="height: 300px;"></div>
 					<p>
-						</br>
-					</p>
-					<p>
-						下滑开启成长日记：
+						下滑翻看详情：
 					</p>
 				</div>
 				<div class="col-md-1 col-sm-1"></div>
@@ -75,6 +72,16 @@
 						</div>
 						<div class="col-md-1 col-sm-1"></div>
 					</div>
+					<div class="row">
+						<div class="col-md-7 col-sm-7"></div>
+						<div class="col-md-1 col-sm-1">
+							<a href='{{ url_for('show_chart_acperiodcate') }}' target="_blank">
+								<button class="button button-highlight button-box button-large button-longshadow-right" style="width: 300px;">
+							    		<i class="fa fa-pie-chart"> 查看门禁类型日期趋势</i>
+							    </button>
+						    </a>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -120,6 +127,16 @@
 							<div id="chartACPeriodCateTime" class="center-block" style="width: inherit; height: 474.65px;"></div>
 						</div>
 						<div class="col-md-1 col-sm-2"></div>
+					</div>
+					<div class="row">
+						<div class="col-md-7 col-sm-7"></div>
+						<div class="col-md-1 col-sm-1">
+							<a href='{{ url_for('show_chart_acperiodcate') }}' target="_blank">
+								<button class="button button-primary button-box button-large button-longshadow-right" style="width: 300px;">
+							    		<i class="fa fa-bar-chart"> 查看门禁类型时间分布</i>
+							    </button>
+						    </a>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -192,9 +209,19 @@
 						<div class="col-md-1 col-sm-1"></div>
 						<div class="col-md-10 col-sm-10">
 							<!-- chart_relation -->
-							人际关系
+							<div id="chartRelation" class="center-block" style="width: inherit; height: 474.65px;"></div>
 						</div>
 						<div class="col-md-1 col-sm-1">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-7 col-sm-7"></div>
+						<div class="col-md-1 col-sm-1">
+							<a href='{{ url_for('show_chart_relation') }}' target="_blank">
+								<button class="button button-action button-box button-large button-longshadow-right" style="width: 300px;">
+							    		<i class="fa fa-pie-chart"> 查看人际关系</i>
+							    </button>
+						    </a>
 						</div>
 					</div>
 				</div>
@@ -244,6 +271,16 @@
 						</div>
 						<div class="col-md-1 col-sm-1"></div>
 					</div>
+					<div class="row">
+						<div class="col-md-7 col-sm-7"></div>
+						<div class="col-md-1 col-sm-1">
+							<a href='{{ url_for('show_chart_accategory') }}' target="_blank">
+								<button class="button button-primary button-box button-large button-longshadow-right" style="width: 300px;">
+							    		<i class="fa fa-pie-chart"> 查看消费分类计数</i>
+							    </button>
+						    </a>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -292,24 +329,34 @@
 						</div>
 						<div class="col-md-1 col-sm-1"></div>
 					</div>
+					<div class="row">
+						<div class="col-md-7 col-sm-7"></div>
+						<div class="col-md-1 col-sm-1">
+							<a href='{{ url_for('show_chart_penalty') }}' target="_blank">
+								<button class="button button-royal button-box button-large button-longshadow-right" style="width: 300px;">
+							    		<i class="fa fa-area-chart"> 查看滞纳金缴纳情况</i>
+							    </button>
+						    </a>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="section" id="section7">
+	<!--<div class="section" id="section7">
 		<div class="content">
 			<div class="container-fluid">
 				<div class="row">
 					<div class="col-md-1 col-sm-1"></div>
-					<div class="col-md-10 col-sm-10">
+					<div class="col-md-10 col-sm-10">-->
 						<!-- chart_radar -->
-						<div id="chartRadar" class="center-block" style="width: inherit; height: 474.65px;"></div>
+						<!--<div id="chartRadar" class="center-block" style="width: inherit; height: 474.65px;"></div>
 					</div>
 					<div class="col-md-1 col-sm-1"></div>
 				</div>
 			</div>
 		</div>
-	</div>
+	</div>-->
 </div>
 
 <script type="text/javascript">
@@ -517,6 +564,55 @@
 			}
 		}, 'json')
 	};
+	// chart_relation
+	var chartRelation = echarts.init(document.getElementById('chartRelation'));
+	window.onresize = chartRelation.resize;
+    var optionChartRelation = {
+    		color: ['#ECF0F1'],
+        legend: {
+            data: []
+        },
+        series: []
+    };
+    chartRelation.setOption(optionChartRelation);
+    refresh_chart_Relation = function () {
+        chartRelation.showLoading();
+        $.get('/summary/GetJson_relation?' + chartInput, function (json_response) {
+            chartRelation.setOption(optionChartRelation);
+            chartRelation.hideLoading();
+            if (!json_response.errMsg) {
+                chartRelation.setOption({
+                    series: [{
+                        type: 'graph',
+                        layout: 'force',
+                        animation: false,
+                        lineStyle: {
+				    			normal: {
+				    				color: '#ECF0F1',
+				    				curveness: 0.1
+				    			}
+				    		},
+				    		draggable: true,
+                        data: json_response.nodes.map(function (node, idx) {
+                            node.id = idx;
+                            return node;
+                        }),
+                        force: {
+                            initLayout: 'circular',
+                            // gravity: 0,
+                            edgeLength: 200,
+                            repulsion: 200
+                        },
+                        edges: json_response.links
+                    }]
+                });
+            } else {
+                for (err in json_response.errMsg) {
+                    alert(json_response.errMsg[err]);
+                }
+            }
+        }, 'json')
+    };
 	// chart_conategory
 	var chartConCategory = echarts.init(document.getElementById('chartConCategory'));
 	window.onresize = chartConCategory.resize;
@@ -529,6 +625,7 @@
 			},
 			x: 'right'
 		},
+		color: ['#0039B3', '#4F7FE8', '#6892ED', '#97B7FC', '#BED0F7'],
 		textStyle: {
 			color: '#ECF0F1',
 			fontSize: 14
@@ -617,6 +714,7 @@
 			},
 			x: 'right'
 		},
+		color: ['#E67E22'],
 		textStyle: {
 			color: '#ECF0F1',
 			fontSize: 14
@@ -662,13 +760,23 @@
 			type: 'category',
 			name: '滞纳金总额',
 			boundaryGap: false,
-			data: []
+			data: [],
+			axisLabel: {
+				textStyle: {
+					color: '#ECF0F1',
+					fontSize: 14
+				}
+			}
 		},
 		yAxis: {
 			type: 'value',
 			name: '人数',
 			axisLabel: {
-				formatter: '{value} 人'
+				formatter: '{value} 人',
+				textStyle: {
+					color: '#ECF0F1',
+					fontSize: 14
+				}
 			}
 		},
 		series: [{
@@ -761,16 +869,12 @@
 	var value_Study = {{ vals_summary['ret_study']['percent_asc'] }} * 10;
 		value_Study = value_Study < 1 ? 1 : value_Study;
 		value_Study = value_Study.toFixed(1);
-	var value_Relation = 1;
+	var value_Relation = {{ vals_summary['ret_social']['num_relations'] }} / 44 * 10;
+		value_Relation = value_Relation < 1 ? 1 : value_Relation;
+		value_Relation = value_Relation > 10 ? 10 : value_Relation;
+		value_Relation.toFixed(1);
 	var value_ConCategory = {{ vals_summary['ret_bill']['con_per_month'] }};
-		if (value_ConCategory < 202.167 * 1.3)
-		{
-			value_ConCategory = 10;
-		}
-		else
-		{
-			value_ConCategory = 10 - (value_ConCategory - 202.167 * 1.3) / 202.167;
-		}
+		value_ConCategory = value_ConCategory < 202.167 * 1.3 ? 10 : (10 - (value_ConCategory - 202.167 * 1.3) / 202.167);
 		value_ConCategory = value_ConCategory < 1 ? 1 : value_ConCategory;
 		value_ConCategory = value_ConCategory.toFixed(1);
 	var value_penalty = {{ (1 - vals_summary['ret_penalty']['percent_asc']) * 10 }};
@@ -783,45 +887,14 @@
 	values.push(value_ConCategory);
 	values.push(value_penalty);
 	var opt_chartRadar = {
-		title: {
-			text: '截至2015年我在校园的成就',
-			textStyle: {
-				color: '#ECF0F1',
-				fontSize: 30
-			}
-		},
 		color: ['#ECF0F1'],
 		textStyle: {
 			color: '#ECF0F1',
 			fontSize: 14
 		},
 		tooltip: {
-			trigger: 'axis'
-		},
-		toolbox: {
-			show: true,
-			feature: {
-				mark: {
-					show: true
-				},
-				dataView: {
-					show: true,
-					readOnly: false
-				},
-				restore: {
-					show: true
-				},
-				saveAsImage: {
-					show: true
-				}
-			},
-			iconStyle: {
-				normal: {
-					borderColor: '#ECF0F1'
-				}
-			},
-			top: '10%',
-			right: 0
+			trigger: 'axis',
+			formatter: '{b}：{c}分'
 		},
 		calculable: true,
 		polar: [{
@@ -844,7 +917,12 @@
 				text: '信用',
 				max: 10
 			}],
-			radius: '60%'
+			axisLabel: {
+				textStyle: {
+					color: '#ECF0F1',
+					fontSize: 14
+				}
+			}
 		}],
 		series: [{
 			type: 'radar',
@@ -923,6 +1001,10 @@
 				// callback ACPeriodCate
 				if (index == 3 && slideIndex == 0 && direction == 'right') {
 					refresh_chart_ACPeriodCate();
+				}
+				// callback Relation
+				if (index == 5 && slideIndex == 0 && direction == 'right') {
+					refresh_chart_Relation();
 				}
 				// callback ConCategory
 				if (index == 6 && slideIndex == 0 && direction == 'right') {
