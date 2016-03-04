@@ -1,13 +1,101 @@
 {% extends 'base.html' %}
 {% block content %}
+<<<<<<< HEAD
 
 
 
     <div style="text-align: center; font-size: 24px; margin-left: auto; margin-right: auto; width: 600px">
         <p>主页</p>
+=======
+>>>>>>> L
 
-        <a href="{{ url_for('show_charts') }}">图表页</a>
-        <p>虽然不知道主页有什么用，可能以后区分用户页面和管理员页面，再加上登陆功能吧。</p>
-    </div>
+<div class="jumbotron" style="padding-top: 92px;">
+	<div class="container">
+		<div class="row">
+			<div class="col-md=8 col-sm-8 text-center">
+				<h1>
+					智慧校园 WitCampus
+				</h1>
+				<p>
+				</br>
+					基于智慧校园学生大数据分析与挖掘
+				</p>
+			</div>
+			<div class="col-md-4 col-sm-4">
+				<div class="carousel slide" data-ride="carousel">
+					<div class="carousel-inner">
+						<div class="item active">
+							<i class="fa fa-university"></i>
+						</div>
+						<div class="item">
+							<i class="fa fa-graduation-cap"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div id="feature" class="row">
+		<div class="col-md-4 col-sm-6">
+			<h4>
+				<i class="fa fa-database"></i> 1个数据库，多种展示方式
+			</h4>
+			</br>
+			我们绘制了折线图、柱状图、饼图、雷达图和力导向布局图，力求选择适合数据的图表。
+			</br></br></br>
+		</div>
+		<div class="col-md-4 col-sm-6">
+			<h4>
+				<i class="fa fa-line-chart"></i> 13种分类，19张图表
+			</h4>
+			</br>
+			我们通过统计、比例、规律、趋势与分布，助力“数据表达”。
+			</br></br></br>
+		</div>
+		<div class="col-md-4 col-sm-6">
+			<h4>
+				<i class="fa fa-users"></i> 不同主体，多种视角
+			</h4>
+			</br>
+			我们分析了不同身份的刷卡人、类目的刷卡机的不同日期、时间模式，提供数据的单独查询和同类对比的功能。
+			</br></br></br>
+		</div>
+		<div class="col-md-4 col-sm-6">
+			<h4>
+				<i class="fa fa-tags"></i> 各种方面，丰富的内容
+			</h4>
+			</br>
+			我们发现了门禁、收支、人际关系、消费能力、水消耗、滞纳金等的规律。
+			</br></br></br>
+		</div>
+		<div class="col-md-4 col-sm-6">
+			<h4>
+				<i class="fa fa-info-circle"></i> 科学与个性化的成就报告
+			</h4>
+			</br>
+			我们选取足迹、作息、学习、人脉、理财和信用，生成用户的类Holland六边形模型。
+			</br></br></br>
+		</div>
+		<div class="col-md-4 col-sm-6">
+			<h4>
+				<i class="fa fa-child"></i> 多维度档案导向多元评价
+			</h4>
+			</br>
+			我们辅助认定学生消费能力、人际关系、学习努力程度与作息规律，转向多元评价。
+		</br></br></br>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12 text-center">
+			<a href='{{ url_for('show_charts') }}'>
+				<button class="button button-large button-plain button-border button-box" style="color: #1ABC9C; width: 270px;">
+			    		<i class="fa fa-fort-awesome"> 让我们开始吧！</i>
+			    </button>
+		    </a>
+		</div>
+	</div>
+</div>
 
 {% endblock %}

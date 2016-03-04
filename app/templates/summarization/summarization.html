@@ -1,5 +1,7 @@
 {% extends 'base.html' %} {% block content %}
 
+<script src="{{ url_for('static',filename='echarts2/echarts.js') }}"></script>
+
 <div id="fullpage">
 	<div class="section" id="section0">
 		<div class="container-fluid">
@@ -646,6 +648,7 @@
 		}, 'json')
 	};
 	// chart_relation
+<<<<<<< HEAD
 	var chartRelation = echarts.init(document.getElementById('chartRelation'));
     var optionChartRelation = {
     		color: ['#ECF0F1'],
@@ -690,9 +693,95 @@
                 for (err in json_response.errMsg) {
                     alert(json_response.errMsg[err]);
                 }
+=======
+	var chartRelation;
+        require.config({
+            paths: {
+                echarts: '{{ url_for('static',filename='echarts2') }}'
             }
-        }, 'json')
-    };
+        });
+        require(
+            [
+                'echarts',
+                'echarts/chart/force',
+                'echarts/chart/chord'
+            ],
+            function (ec) {
+                chartRelation = ec.init(document.getElementById('chartRelation'));
+                chartRelation.setOption(option);
+>>>>>>> L
+            }
+        );
+        $(window).resize(function () {
+            chartRelation.resize()
+        });
+        option = {
+            title: {
+                text: '人脉关系图'
+            },
+            tooltip: {
+                trigger: 'item'
+            }
+        };
+	    refresh_chart_Relation = function () {
+	        chartRelation.showLoading();
+	        $.get('/summary/GetJson_relation?' + chartInput, function (json_response) {
+			chartRelation.hideLoading();
+	        if (!json_response.errMsg) {
+	            // 直接默认显示的 node label 限制
+	            var min_show_symSize = 1;   // 样式大小
+	            var max_show_idx = 10;      // 数量
+	            // 处理点
+	            json_response.nodes.map(function (node, idx) {
+	                node.id = idx;
+	                    node.itemStyle = {normal:{label:{
+	                            show: node.symbolSize > min_show_symSize && idx < max_show_idx,
+	                            textStyle:{
+	                                color: '#000'
+	                            }
+	                        }
+	                    }
+	                };
+	                return node;
+	            });
+	            chartRelation.setOption({
+		            	title: {
+	                		text: '人脉关系图'
+	            		},
+	                tooltip: {
+	                    trigger: 'item',
+	                    formatter: function (params) {
+	                        console.log(params);
+	                        if (typeof(params[3]) === 'undefined') {    // nodes
+	                            return params[1] + ' : ' + params[2];
+	                        } else {                                    // links
+	                            return params[1];
+	                        }
+	                    }
+	                },
+	                series: [{
+	                    type: 'force',
+	                    roam: true,
+	                    draggable: true,
+	                    itemStyle: {
+	                        normal: {
+	                            nodeStyle: {
+	                                color: ['#ECF0F1'],
+	                                borderWidth: 0
+	                            }
+	                        }
+	                    },
+	                    nodes: json_response.nodes,
+	                    links: json_response.links
+	                }]
+	            });
+	        } else {
+	            for (err in json_response.errMsg) {
+	                alert(json_response.errMsg[err]);
+	            }
+	        }
+	    }, 'json')
+	};
 	// chart_conategory
 	var chartConCategory = echarts.init(document.getElementById('chartConCategory'));
 	var optionChartConCategory = {
