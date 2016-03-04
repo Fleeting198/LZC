@@ -145,11 +145,12 @@ def show_summary():
     from controls.GetJson_ACRelation import GetJson_ACRelation
     json_ACRelation = GetJson_ACRelation(userID)
 
-    num_relations = len(json_ACRelation['nodes'])
+    num_relations = json_ACRelation['num_total']
     top_name = json_ACRelation['nodes'][0]['name']
     top_value = int(json_ACRelation['nodes'][0]['value'])
 
     ret_social = {'num_relations': num_relations, 'top_name':top_name, 'top_value':top_value }
+
 
     # =================================
     # 消费 bill
@@ -188,7 +189,6 @@ def show_summary():
 
 
     ret_bill = {'total_expend':total_expend, 'con_items': con_items, 'con_per_month': con_per_month}
-
 
 
     # =================================
