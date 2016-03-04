@@ -14,8 +14,8 @@ def GetJson_ACRelation(userID):
     source = str(userID)
 
     # symbolSize max and min
-    max_size = 20       # For echarts 2.2.7
-    min_size = 1
+    max_size = 30       # For echarts 2.2.7
+    min_size = 10
 
     # max_size = 30     # For echarts 3.1
     # min_size = 10
