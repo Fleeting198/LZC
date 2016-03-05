@@ -18,6 +18,10 @@
                 {% macro nav_side(url_fun, value) -%}
                     {% if request.path == url_for(url_fun) %}
                         <li class="active"><a href="{{ url_for(url_fun) }}">{{ value }}</a></li>
+                        <script>
+                            $("li.active").parent("ul").addClass("in");
+                        </script>
+
                     {% else %}
                         <li><a href="{{ url_for(url_fun) }}">{{ value }}</a></li>
                     {% endif %}
