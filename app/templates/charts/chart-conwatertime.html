@@ -102,9 +102,7 @@
                     });
 
                 } else {
-                    for (err in json_response.errMsg) {
-                        alert(json_response.errMsg[err]);
-                    }
+                    alert(json_response.errMsg);
                 }
             }, 'json')
         };

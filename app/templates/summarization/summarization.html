@@ -24,9 +24,9 @@
                         </div>
                         <form id="edit_userID" class="form-inline has-error" style="display: none;" action="#">
                             <input id="ipt_userID" class="form-control" type="text" size="15"
-                                   value="{{ userID }}" onblur=set_userID($('#ipt_userID').val()); />
+                                   value="{{ userID }}" />
                             <input class="btn btn-info"
-                                    type="button" value="确定" onclick=set_userID($('#ipt_userID').val()); />
+                                    type="button" value="确定" onclick="set_userID($('#ipt_userID').val())" />
                             <input class="btn btn-default"
                                     type="reset" value="重置">
                         </form>
@@ -56,9 +56,7 @@
                                 <h1>
                                 我的足迹
                             </h1>
-                                <p>
-                                    </br>
-                                </p>
+                                <p></br></p>
                                 <p id="p1-1">
                                     在过去的一个月中，我曾在 <span>{{ vals_summary['ret_access']['count_nodes'] }}</span> 个地方留下过足迹， 拿下 <span>{{ vals_summary['ret_access']['total_count'] }}</span> 次门禁记录。</br>
 
@@ -203,7 +201,7 @@
                                 {% if vals_summary['ret_study']['percent_asc'] > 0.9 %}
                                     比全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(3)*100 }}</span> ％的人都更加努力，可以被称为五星级准学霸！
                                 {% elif vals_summary['ret_study']['percent_asc'] > 0.5 %}
-                                    比全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(3)*100 }}</span> ％的人更加努力，好学近乎知。
+                                    学习热情超过了全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(3)*100 }}</span> ％的人，好学近乎知。
                                 {% elif vals_summary['ret_study']['percent_asc'] > 0.3 %}
                                     比全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(3)*100 }}</span> ％的人更热爱学习。
                                 {% else %}
@@ -411,29 +409,33 @@
     var userID = '{{ userID }}';
     var startDate = '{{ startDate }}';
     var endDate = '{{ endDate }}';
-{#    var chartInput;#}
     var chartInput = 'userID=' + userID + '&startDate=' + startDate + '&endDate=' + endDate;
     $('#label_userID').html(userID);
 
 
     set_userID = function (new_userID) {
-{#        alert("set_userID");#}
-        if( has_userID(new_userID) ){         // Verify.
-            userID = new_userID;              // Set.
-            $('#label_userID').html(userID);
-            switch_userID_iptshow(true);
-            window.location.href='/summary/'+ userID;
-            chartInput = 'userID=' + userID + '&startDate=' + startDate + '&endDate=' + endDate;
+        console.log("set_userID");
+
+        if (new_userID != userID) {             // If not current ID.
+            if (has_userID(new_userID)) {              // Verify.
+                userID = new_userID;              // Set.
+                $('#label_userID').html(userID);
+                switch_userID_iptshow(true);
+                window.location.href = '/summary/' + userID;
+                chartInput = 'userID=' + userID + '&startDate=' + startDate + '&endDate=' + endDate;
+
+            } else {
+                // 若目标用户工号无效则保持原工号
+                // 弹出提示
+                alert('找不到这个工号。');
+            }
         }else{
-            // 若目标用户工号无效则保持原工号
-            // 弹出提示
-            alert('找不到这个工号。');
+            switch_userID_iptshow(true);
         }
     };
 
     has_userID = function(tar_userID){
         var ret_val;
-{#        alert("has_userID");#}
         $.ajax('/check_user_id?userID='+tar_userID, {
             async: false,
             type: 'GET',
@@ -450,7 +452,6 @@
     };
 
     switch_userID_iptshow = function (isShow) {
-{#        alert("switch_userID_iptshow");#}
         if(isShow){
             $('#show_userID').css('display','inline');
             $('#edit_userID').css('display', 'none');
@@ -460,8 +461,6 @@
             $('#ipt_userID').focus();
         }
     };
-
-{#    set_userID(userID);#}
 
 
     // =======================
