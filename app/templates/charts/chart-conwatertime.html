@@ -81,30 +81,35 @@
         refresh_chart = function () {
             chartTimeDistribution.showLoading();
 
-            $.get('/charts/foodIncome/getData?' + $("#form-ipt").serialize(), function (json_response) {
-                chartTimeDistribution.hideLoading();
-                chartTimeDistribution.setOption(optionChartTime);
+            $.ajax('/charts/conwatertime/getData?' + $("#form-ipt").serialize(), {
+                type: 'GET',
+                success: function (json_response) {
+                    chartTimeDistribution.hideLoading();
+                    chartTimeDistribution.setOption(optionChartTime);
 
-                if (!json_response.errMsg) {
-                    var json_timeDistribution;
-                    json_timeDistribution = json_response.json_timeDistribution;
+                    if (!json_response.errMsg) {
+                        var json_timeDistribution;
+                        json_timeDistribution = json_response.json_timeDistribution;
 
-                    chartTimeDistribution.setOption({
-                        xAxis: [{
-                            data: json_timeDistribution.axisLabels
-                        }],
-                        series: [{
-                            data: json_timeDistribution.vals
-                        }]
-                    });
+                        chartTimeDistribution.setOption({
+                            xAxis: [{
+                                data: json_timeDistribution.axisLabels
+                            }],
+                            series: [{
+                                data: json_timeDistribution.vals
+                            }]
+                        });
 
-                } else {
-                    alert(json_response.errMsg);
-                }
-            }, 'json')
+                    } else {
+                        alert(json_response.errMsg);
+                    }
+                },
+                error: function () {
+                    alert("与服务器断开连接！");
+                },
+                dataType: 'json'
+            });
         };
-
         refresh_chart();
-
     </script>
 {% endblock %}

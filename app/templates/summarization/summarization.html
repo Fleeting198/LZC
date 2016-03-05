@@ -53,16 +53,15 @@
                         </div>
                         <div class="col-md-5 col-sm-5">
                             <div style="margin-left: 30px">
-                                <h1>
-                                我的足迹
-                            </h1>
+                                <h1>我的足迹</h1>
                                 <p></br></p>
                                 <p id="p1-1">
-                                    在过去的一个月中，我曾在 <span>{{ vals_summary['ret_access']['count_nodes'] }}</span> 个地方留下过足迹， 拿下 <span>{{ vals_summary['ret_access']['total_count'] }}</span> 次门禁记录。</br>
-
+                                    在过去的一个月中，我曾在 <span>{{ vals_summary['ret_access']['count_nodes'] }}</span> 个地方留下过足迹，
+                                    拿下 <span>{{ vals_summary['ret_access']['total_count'] }}</span> 次门禁记录。</br>
                                     <!-- 此处应有地点种类数量判断， -->
                                     {% if vals_summary['ret_access']['ac_items'][1] is defined %} 
-                                        除了访问了 <span>{{ vals_summary['ret_access']['ac_items'][0]['count'] }}</span> 次的 <span>{{ vals_summary['ret_access']['ac_items'][0]['node_des'] }}</span> 之外，
+                                        除了访问了 <span>{{ vals_summary['ret_access']['ac_items'][0]['count'] }}</span> 次的 <span>
+                                        {{ vals_summary['ret_access']['ac_items'][0]['node_des'] }}</span> 之外，
                                     </br>
                                         我最爱的是 <span>{{ vals_summary['ret_access']['ac_items'][1]['node_des'] }}</span> ，
                                         在那留下了 <span>{{ vals_summary['ret_access']['ac_items'][1]['count'] }}</span> 次记录。
@@ -116,18 +115,20 @@
                         </div>
                         <div class="col-md-5 col-sm-5">
                             <div style="margin-left: 30px">
-                                <h1 style="color: #2C3E50">
-                                我的作息
-                            </h1>
-                                <p>
-                                    </br>
-                                </p>
+                                <h1 style="color: #2C3E50">我的作息</h1>
+                                <p></br></p>
                                 <p id="p2-1" style="color: #2C3E50">
                                     又到了起床靠毅力的季节了，</br>
-
-                                    {% if vals_summary['ret_habit']['count_early'] == 0 %} 我的被子上可能存在不知名的结界，从未在早晨7点前解开。 {% else %} 我早起 <span>{{ vals_summary['ret_habit']['count_early'] }}</span> 次， {% endif %}
+                                    {% if vals_summary['ret_habit']['count_early'] == 0 %}
+                                        我的被子上可能存在不知名的结界，从未在早晨7点前解开。
+                                    {% else %}
+                                        我早起 <span>{{ vals_summary['ret_habit']['count_early'] }}</span> 次，
+                                    {% endif %}
                                     </br>
-                                    {% if vals_summary['ret_habit']['count_night'] == 0 %} 无晚归记录，习惯良好！ {% else %} 曾在晚上 11 点～早上 6 点之间访问门禁 <span>{{ vals_summary['ret_habit']['count_night'] }}</span> 次，注意早点休息哟～ {% endif %}
+                                    {% if vals_summary['ret_habit']['count_night'] == 0 %}
+                                        无晚归记录，习惯良好！ {% else %} 曾在晚上 11 点～早上 6 点之间访问门禁 <span>
+                                        {{ vals_summary['ret_habit']['count_night'] }}</span> 次，注意早点休息哟～
+                                    {% endif %}
                                 </p>
                             </div>
                         </div>
@@ -416,8 +417,8 @@
     set_userID = function (new_userID) {
         console.log("set_userID");
 
-        if (new_userID != userID) {             // If not current ID.
-            if (has_userID(new_userID)) {              // Verify.
+        if (new_userID != userID) {               // If not current ID.
+            if (has_userID(new_userID)) {         // Verify.
                 userID = new_userID;              // Set.
                 $('#label_userID').html(userID);
                 switch_userID_iptshow(true);
@@ -446,7 +447,7 @@
                 alert("与服务器断开连接！");
                 ret_val = false;
             },
-            datatype: 'json'
+            dataType: 'json'
         });
         return ret_val;
     };
@@ -461,7 +462,6 @@
             $('#ipt_userID').focus();
         }
     };
-
 
     // =======================
     // Charts
@@ -554,9 +554,7 @@
                     }]
                 });
             } else {
-                for (err in json_response.errMsg) {
-                    alert(json_response.errMsg[err]);
-                }
+                alert(json_response.errMsg);
             }
         }, 'json')
     };
@@ -667,9 +665,7 @@
                     chartACPeriodCateTime.setOption(tmp_option);
                 }
             } else {
-                for (err in json_response.errMsg) {
-                    alert(json_response.errMsg[err]);
-                }
+                alert(json_response.errMsg);
             }
         }, 'json')
     };
@@ -691,9 +687,7 @@
                 chartRelation.setOption(option);
             }
         );
-        $(window).resize(function () {
-            chartRelation.resize()
-        });
+
         option = {
             title: {
                 text: '人脉关系图',
@@ -760,9 +754,7 @@
                     }]
                 });
             } else {
-                for (err in json_response.errMsg) {
-                    alert(json_response.errMsg[err]);
-                }
+                alert(json_response.errMsg);
             }
         }, 'json')
     };
@@ -848,9 +840,7 @@
                     }]
                 });
             } else {
-                for (err in json_response.errMsg) {
-                    alert(json_response.errMsg[err]);
-                }
+                alert(json_response.errMsg);
             }
         }, 'json')
     };
@@ -999,9 +989,7 @@
                     }]
                 });
             } else {
-                for (err in json_response.errMsg) {
-                    alert(json_response.errMsg[err]);
-                }
+                alert(json_response.errMsg);
             }
         }, 'json')
     };

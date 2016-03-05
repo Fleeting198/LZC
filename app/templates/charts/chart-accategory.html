@@ -66,24 +66,31 @@
 
         refresh_chart = function () {
             chartACCategory.showLoading();
-            $.get('/charts/accategory/getData?' + $("#form-ipt").serialize(), function (json_response) {
-                chartACCategory.hideLoading();
-                chartACCategory.setOption(optionChartACCategory);
+            $.ajax('/charts/accategory/getData?' + $("#form-ipt").serialize(), {
+                type: 'GET',
+                success: function (json_response) {
+                    chartACCategory.hideLoading();
+                    chartACCategory.setOption(optionChartACCategory);
 
-                if (!json_response.errMsg) {
-                    var titles;
-                    var seriesData;
-                    titles = json_response.titles;
-                    seriesData = json_response.seriesData;
+                    if (!json_response.errMsg) {
+                        var titles;
+                        var seriesData;
+                        titles = json_response.titles;
+                        seriesData = json_response.seriesData;
 
-                    chartACCategory.setOption({
-                        legend: {data: titles},
-                        series: [{data: seriesData}]
-                    });
-                } else {
-                    alert(json_response.errMsg);
-                }
-            }, 'json')
+                        chartACCategory.setOption({
+                            legend: {data: titles},
+                            series: [{data: seriesData}]
+                        });
+                    } else {
+                        alert(json_response.errMsg);
+                    }
+                },
+                error: function () {
+                    alert("与服务器断开连接！");
+                },
+                dataType: 'json'
+            });
         };
     </script>
 

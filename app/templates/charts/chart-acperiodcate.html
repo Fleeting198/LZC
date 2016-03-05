@@ -137,77 +137,86 @@
         refresh_chart = function () {
             chartDateTrend.showLoading();
             chartTimeDistribution.showLoading();
-            $.get('/charts/acperiodcate/getData?' + $("#form-ipt").serialize(), function (json_response) {
-                chartDateTrend.hideLoading();
-                chartTimeDistribution.hideLoading();
-
-                // 还原图表选项
-                chartDateTrend.setOption(optionChartDate);
-                chartTimeDistribution.setOption(optionChartTime);
-
-                if (!json_response.errMsg) {
-                    var json_dateTrend;
-                    var json_timeDistribution;
-                    json_dateTrend = json_response.json_dateTrend;
-                    json_timeDistribution = json_response.json_timeDistribution;
 
 
-                    // 日期趋势图表设定。
-                    chartDateTrend.setOption({
-                        legend: {data: json_dateTrend.legendLabels},
-                        xAxis: [{
-                            data: json_dateTrend.axisLabels
-                        }]
-                    });
-                    for(var i=0; i< json_dateTrend.seriesData.length;i++){
-                        var tmp_option = chartDateTrend.getOption();
-                        if (json_dateTrend.seriesData[i].name == '宿舍比重'){
-                            tmp_option.series.push({
-                                        name: json_dateTrend.seriesData[i].name,
-                                        type: 'line',
-                                        data: json_dateTrend.seriesData[i].data,
-                                        yAxisIndex: 1,
-                                        smooth: true
-                            });
-                        }else if(json_dateTrend.seriesData[i].name == '总和'){
-                            tmp_option.series.push({
-                                        name: json_dateTrend.seriesData[i].name,
-                                        type: 'bar',
-                                        barWidth: 5,
-                                        data: json_dateTrend.seriesData[i].data
-                            });
-                        }else{
-                            tmp_option.series.push({
-                                        name: json_dateTrend.seriesData[i].name,
-                                        stack: 'ac',
-                                        type: 'bar',
-                                        data: json_dateTrend.seriesData[i].data
-                            });
-                        }
-                        chartDateTrend.setOption(tmp_option);
-                    }
+            $.ajax('/charts/acperiodcate/getData?' + $("#form-ipt").serialize(), {
+                type: 'GET',
+                success: function (json_response) {
+                    chartDateTrend.hideLoading();
+                    chartTimeDistribution.hideLoading();
 
-                    // 时间分布图表设定。
-                    chartTimeDistribution.setOption({
-                        legend: {data: json_timeDistribution.legendLabels },
-                        xAxis: [{data: json_timeDistribution.axisLabels }]
-                    });
+                    // 还原图表选项
+                    chartDateTrend.setOption(optionChartDate);
+                    chartTimeDistribution.setOption(optionChartTime);
 
-                    for (var i = 0; i < json_timeDistribution.seriesData.length; i++) {
-                        var tmp_option = chartTimeDistribution.getOption();
-                        tmp_option.series.push({
-                                    name: json_timeDistribution.seriesData[i].name,
+                    if (!json_response.errMsg) {
+                        var json_dateTrend;
+                        var json_timeDistribution;
+                        json_dateTrend = json_response.json_dateTrend;
+                        json_timeDistribution = json_response.json_timeDistribution;
+
+
+                        // 日期趋势图表设定。
+                        chartDateTrend.setOption({
+                            legend: {data: json_dateTrend.legendLabels},
+                            xAxis: [{
+                                data: json_dateTrend.axisLabels
+                            }]
+                        });
+                        for (var i = 0; i < json_dateTrend.seriesData.length; i++) {
+                            var tmp_option = chartDateTrend.getOption();
+                            if (json_dateTrend.seriesData[i].name == '宿舍比重') {
+                                tmp_option.series.push({
+                                    name: json_dateTrend.seriesData[i].name,
+                                    type: 'line',
+                                    data: json_dateTrend.seriesData[i].data,
+                                    yAxisIndex: 1,
+                                    smooth: true
+                                });
+                            } else if (json_dateTrend.seriesData[i].name == '总和') {
+                                tmp_option.series.push({
+                                    name: json_dateTrend.seriesData[i].name,
+                                    type: 'bar',
+                                    barWidth: 5,
+                                    data: json_dateTrend.seriesData[i].data
+                                });
+                            } else {
+                                tmp_option.series.push({
+                                    name: json_dateTrend.seriesData[i].name,
                                     stack: 'ac',
                                     type: 'bar',
-                                    data: json_timeDistribution.seriesData[i].data
-                        });
-                        chartTimeDistribution.setOption(tmp_option);
-                    }
+                                    data: json_dateTrend.seriesData[i].data
+                                });
+                            }
+                            chartDateTrend.setOption(tmp_option);
+                        }
 
-                } else {
-                    alert(json_response.errMsg);
-                }
-            }, 'json')
+                        // 时间分布图表设定。
+                        chartTimeDistribution.setOption({
+                            legend: {data: json_timeDistribution.legendLabels},
+                            xAxis: [{data: json_timeDistribution.axisLabels}]
+                        });
+
+                        for (var i = 0; i < json_timeDistribution.seriesData.length; i++) {
+                            var tmp_option = chartTimeDistribution.getOption();
+                            tmp_option.series.push({
+                                name: json_timeDistribution.seriesData[i].name,
+                                stack: 'ac',
+                                type: 'bar',
+                                data: json_timeDistribution.seriesData[i].data
+                            });
+                            chartTimeDistribution.setOption(tmp_option);
+                        }
+
+                    } else {
+                        alert(json_response.errMsg);
+                    }
+                },
+                error: function () {
+                    alert("与服务器断开连接！");
+                },
+                dataType: 'json'
+            });
         };
     </script>
 

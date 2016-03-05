@@ -78,40 +78,40 @@
 
         chartTimeDistribution.setOption(optionChartTime);
 
-
         // get向后端请求json刷新图表。
         refresh_chart = function () {
             chartTimeDistribution.showLoading();
 
-            $.get('/charts/foodIncome/getData?' + $("#form-ipt").serialize(), function (json_response) {
-                chartTimeDistribution.hideLoading();
-                chartTimeDistribution.setOption(optionChartTime);
+            $.ajax('/charts/foodIncome/getData?' + $("#form-ipt").serialize(), {
+                type: 'GET',
+                success: function (json_response) {
+                    chartTimeDistribution.hideLoading();
+                    chartTimeDistribution.setOption(optionChartTime);
 
-                if (!json_response.errMsg) {
-                    var json_timeDistribution;
-                    json_timeDistribution = json_response.json_timeDistribution;
+                    if (!json_response.errMsg) {
+                        var json_timeDistribution;
+                        json_timeDistribution = json_response.json_timeDistribution;
 
-                    chartTimeDistribution.setOption({
-                        xAxis: [{
-                            data: json_timeDistribution.axisLabels
-                        }],
-                        series: [{
-                            data: json_timeDistribution.vals
-                        }]
-                    });
+                        chartTimeDistribution.setOption({
+                            xAxis: [{
+                                data: json_timeDistribution.axisLabels
+                            }],
+                            series: [{
+                                data: json_timeDistribution.vals
+                            }]
+                        });
 
-                } else {
-                    alert(json_response.errMsg);
-                }
-            }, 'json')
+                    } else {
+                        alert(json_response.errMsg);
+                    }
+                },
+                error: function () {
+                    alert("与服务器断开连接！");
+                },
+                dataType: 'json'
+            });
         };
-
-
         // 页面载入后就刷新一次。
         refresh_chart();
-
-
     </script>
-
-
 {% endblock %}

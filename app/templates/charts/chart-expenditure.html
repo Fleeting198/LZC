@@ -168,44 +168,54 @@
         refresh_chart = function(){
             chartDateTrend.showLoading();
             chartTimeDistribution.showLoading();
-            $.get('/charts/expenditure/getData?'+$("#form-ipt").serialize(), function(json_response){
-                chartDateTrend.hideLoading();
-                chartTimeDistribution.hideLoading();
 
-                chartDateTrend.setOption(optionChartDate);
-                chartTimeDistribution.setOption(optionChartTime);
+            $.ajax('/charts/expenditure/getData?' + $("#form-ipt").serialize(), {
+                type: 'GET',
+                success: function (json_response) {
+                    chartDateTrend.hideLoading();
+                    chartTimeDistribution.hideLoading();
 
-                var json_dateTrend;
-                var json_timeDistribution;
-                json_dateTrend = json_response.json_dateTrend;
-                json_timeDistribution = json_response.json_timeDistribution;
+                    chartDateTrend.setOption(optionChartDate);
+                    chartTimeDistribution.setOption(optionChartTime);
 
-                if(!json_response.errMsg){
-                    chartDateTrend.setOption({
-                        xAxis: [{
-                            data: json_dateTrend.axisLabels
-                        }],
-                        series: [
-                            { name: '累积支出',
-                                data: json_dateTrend.accumulatedVals
-                            },
-                            {name: '节点支出',
-                                data: json_dateTrend.pointVals
-                            }
-                        ]
-                    });
-                    chartTimeDistribution.setOption({
-                        xAxis: [{
-                            data: json_timeDistribution.axisLabels
-                        }],
-                        series: [{
-                            data: json_timeDistribution.vals
-                        }]
-                    });
-                }else{
-                    alert(json_response.errMsg);
-                }
-            },'json')
+                    var json_dateTrend;
+                    var json_timeDistribution;
+                    json_dateTrend = json_response.json_dateTrend;
+                    json_timeDistribution = json_response.json_timeDistribution;
+
+                    if (!json_response.errMsg) {
+                        chartDateTrend.setOption({
+                            xAxis: [{
+                                data: json_dateTrend.axisLabels
+                            }],
+                            series: [
+                                {
+                                    name: '累积支出',
+                                    data: json_dateTrend.accumulatedVals
+                                },
+                                {
+                                    name: '节点支出',
+                                    data: json_dateTrend.pointVals
+                                }
+                            ]
+                        });
+                        chartTimeDistribution.setOption({
+                            xAxis: [{
+                                data: json_timeDistribution.axisLabels
+                            }],
+                            series: [{
+                                data: json_timeDistribution.vals
+                            }]
+                        });
+                    } else {
+                        alert(json_response.errMsg);
+                    }
+                },
+                error: function () {
+                    alert("与服务器断开连接！");
+                },
+                dataType: 'json'
+            });
         };
     </script>
 {% endblock %}

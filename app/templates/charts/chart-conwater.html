@@ -4,9 +4,7 @@
     <!--place divs for charts-->
     <div id="chartConWater" style="width: inherit; height: 90%;"></div>
 
-
     <script>
-
         var chartConWater = echarts.init(document.getElementById('chartConWater'));
         window.addEventListener('resize', function () {
             chartConWater.resize();
@@ -46,20 +44,14 @@
                 }
             ]
         };
-
-        <!--set options for charts-->
         chartConWater.setOption(optionChartConWater);
-
         load_number = function () {
-
-                chartConWater.setOption({
-                    series: {
-                        data: [1180323.72, 1180773.48]
-                    }
-                });
-
+            chartConWater.setOption({
+                series: {
+                    data: [1180323.72, 1180773.48]
+                }
+            });
         };
-
         load_number();
     </script>
 
