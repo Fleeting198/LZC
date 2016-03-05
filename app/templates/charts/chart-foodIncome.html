@@ -16,7 +16,7 @@
 
         // 图表初始化。
         var chartTimeDistribution = echarts.init(document.getElementById('chartTimeDistribution'));
-        $(window).resize(function () {
+        window.addEventListener('resize', function () {
             chartTimeDistribution.resize();
         });
 

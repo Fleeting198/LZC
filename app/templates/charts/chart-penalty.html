@@ -11,7 +11,7 @@
     <script>
 
         var chartPenalty = echarts.init(document.getElementById('chartPenalty'));
-        $(window).resize(function () {
+        window.addEventListener('resize', function () {
             chartPenalty.resize()
         });
 

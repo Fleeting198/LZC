@@ -27,13 +27,14 @@
 
         // 图表初始化。
         var chartACValid = echarts.init(document.getElementById('chartACValid'));
-        $(window).resize(function () {
+        window.addEventListener('resize', function () {
+            console.log("acvalid resize");
             chartACValid.resize();
         });
 
         var optionChartACValid = {
             title: {
-                text: '门禁合法比例',
+                text: '门禁合法比例'
             },
             tooltip: {
                 trigger: 'item',

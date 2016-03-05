@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 
-    <div style="padding-top: 72px">
-        <div class="col-xs-2">
+    <div class="container-fluid" style="padding-top: 72px">
+    <div class="row">
+        <div class="col-xs-2 " style="white-space: nowrap" >
             {% block sideList %}
 
 {#                {% macro nav_side(url_fun, value) -%}#}
@@ -92,11 +93,12 @@
                 </div>
             {% endblock %}
         </div>
-
-        <div class="col-xs-10" style="left: 16.66%; position:absolute; height: 80%;">
+        <div class="col-xs-1 col-md-1 col-lg-1 col-sm-1"></div>
+        <div class="col-xs-9 " style="left: 25% ;position: absolute; height: 90%;">
             {% block chartField %}
             {% endblock %}
         </div>
+    </div>
     </div>
 
 {% endblock %}

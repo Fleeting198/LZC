@@ -8,7 +8,7 @@
     <script>
 
         var chartConWater = echarts.init(document.getElementById('chartConWater'));
-        $(window).resize(function () {
+        window.addEventListener('resize', function () {
             chartConWater.resize();
         });
 

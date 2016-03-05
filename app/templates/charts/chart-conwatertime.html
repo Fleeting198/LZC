@@ -13,10 +13,9 @@
     <div id="chartTimeDistribution" style="width: inherit; height: 90%;"></div>
 
     <script>
-
         // 图表初始化。
         var chartTimeDistribution = echarts.init(document.getElementById('chartTimeDistribution'));
-        $(window).resize(function () {
+        window.addEventListener('resize', function () {
             chartTimeDistribution.resize();
         });
 
@@ -78,8 +77,6 @@
             }]
         };
         chartTimeDistribution.setOption(optionChartTime);
-
-
 
         refresh_chart = function () {
             chartTimeDistribution.showLoading();

@@ -39,7 +39,7 @@
         // 图表初始化。
         var chartDateTrend = echarts.init(document.getElementById('chartDateTrend'));
         var chartTimeDistribution = echarts.init(document.getElementById('chartTimeDistribution'));
-        $(window).resize(function () {
+        window.addEventListener('resize', function () {
             chartDateTrend.resize();
             chartTimeDistribution.resize();
         });

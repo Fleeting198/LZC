@@ -21,7 +21,7 @@
         <script src="{{ url_for('static',filename='js/jquery.fullpage.min.js') }}"></script>
 
 	</head>
-	<body>
+	<body style="height: 100%">
 
         <!-- Main Navbar -->
         <div id="header">{% block header %}
@@ -51,7 +51,7 @@
                                     {{ charts_navbtn('show_chart_acperiodcate','个体门禁类型时间分布') }}
                                     {{ charts_navbtn('show_chart_acvalid','个体合法门禁比例') }}
                                     {{ charts_navbtn('show_chart_accategory','个体门禁分类分布') }}
-                                    <li class="divider" style="width: 60%"></li>
+                                    <li class="divider"></li>
 
                                     {{ charts_navbtn('show_chart_relation','人际关系') }}
                                     <li class="divider"></li>
@@ -79,7 +79,7 @@
             </nav>
         {% endblock %}</div>
 
-        <div style="">{% block content %}{% endblock %}</div>
+        <div>{% block content %}{% endblock %}</div>
 
         <!-- Main Footer -->
 {#        <div id="footer" style="clear:left">{% block footer %}#}
@@ -89,5 +89,14 @@
 {#                </p>#}
 {#            </div>#}
 {#        {% endblock %}</div>#}
+
+        <script>
+            force_window_resize = function () {
+                console.log("force_window_resize");
+                $(window).trigger("resize");
+                $(window).resize();
+            };
+            force_window_resize();
+        </script>
 	</body>
 </html>

@@ -16,7 +16,7 @@
         var chartNumberGradePg = echarts.init(document.getElementById('chartNumberGradePg'));
         var chartNumberGradeDr = echarts.init(document.getElementById('chartNumberGradeDr'));
 
-        $(window).resize(function(){
+        window.addEventListener('resize', function () {
             chartNumberTotal.resize();
             chartNumberGradeB.resize();
             chartNumberGradePg.resize();

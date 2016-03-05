@@ -27,12 +27,12 @@
 
         // 图表初始化。
         var chartACCategory = echarts.init(document.getElementById('chartACCategory'));
-        $(window).resize(function () {
+        window.addEventListener('resize', function () {
             chartACCategory.resize();
         });
 
         var optionChartACCategory = {
-            title: {text: '时间段内门禁分类计数'},
+            title: {text: '门禁分类'},
             tooltip: {
                 trigger: 'item',
                 formatter: "{b} : {c} ({d}%)"

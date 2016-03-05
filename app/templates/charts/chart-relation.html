@@ -30,14 +30,12 @@
         );
 
 {#        var chartRelation = echarts.init(document.getElementById('chartRelation'));#}
-        $(window).resize(function () {
+        window.addEventListener('resize', function () {
             chartRelation.resize()
         });
 
         // 初始化标题设置无效？
-        option = {
-            title: { text: '人脉关系图' }
-        };
+        option = { title: { text: '人脉关系图' } };
 
 {#        var optionChartRelation = {#}
 {#            title: { text: '人脉关系' },#}

@@ -28,7 +28,7 @@
 
         // Init charts.
         var chartConCategory = echarts.init(document.getElementById('chartConCategory'));
-        $(window).resize(function () {
+        window.addEventListener('resize', function () {
             chartConCategory.resize();
         });
 
