@@ -42,8 +42,6 @@ def show_summary(user_id):
     # =================================
     # 工号，日期设定
     # =================================
-    print "show_summary"
-    print user_id
     userID = str(user_id)
     startDate = ''
     endDate = ''
@@ -245,7 +243,7 @@ def show_summary(user_id):
     vals_summary = {'ret_access': ret_access, 'ret_habit': ret_habit, 'ret_study': ret_study,
                     'ret_social': ret_social, 'ret_bill': ret_bill, 'ret_penalty': ret_penalty }
 
-    print "return render_template summary"
+    # print "return render_template summary"
     return render_template('summarization/summarization.html', userID=userID, startDate=startDate, endDate=endDate, vals_summary=vals_summary)
 
 

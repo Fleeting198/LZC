@@ -1113,27 +1113,27 @@
             onSlideLeave: function(anchorLink, index, slideIndex, direction, nextSlideIndex) {
                 // var leavingSlide = $(this);
                 // callback ACCategory
-                if (index == 2 && slideIndex == 0 && direction == 'right' && !isChartRefreshed[0]) {
+                if (index == 2 && slideIndex == 0  && !isChartRefreshed[0]) {
                     refresh_chart_ACCategory();
                     isChartRefreshed[0] = true;
                 }
                 // callback ACPeriodCate
-                if (index == 3 && slideIndex == 0 && direction == 'right' && !isChartRefreshed[1]) {
+                if (index == 3 && slideIndex == 0 && !isChartRefreshed[1]) {
                     refresh_chart_ACPeriodCate();
                     isChartRefreshed[1] = true;
                 }
                 // callback Relation
-                if (index == 5 && slideIndex == 0 && direction == 'right' && !isChartRefreshed[2]) {
+                if (index == 5 && slideIndex == 0 && !isChartRefreshed[2]) {
                     refresh_chart_Relation();
                     isChartRefreshed[2] = true;
                 }
                 // callback ConCategory
-                if (index == 6 && slideIndex == 0 && direction == 'right' && !isChartRefreshed[3]) {
+                if (index == 6 && slideIndex == 0 && !isChartRefreshed[3]) {
                     refresh_chart_ConCategory();
                     isChartRefreshed[3] = true;
                 }
                 // callback Penalty
-                if (index == 7 && slideIndex == 0 && direction == 'right' && !isChartRefreshed[4]) {
+                if (index == 7 && slideIndex == 0 && !isChartRefreshed[4]) {
                     refresh_chart_Penalty();
                     isChartRefreshed[4] = true;
                 }

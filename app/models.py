@@ -3,7 +3,6 @@
 
 from app import db
 
-
 class device(db.Model):
     """
     刷卡机：设备号，地点序号(外键：设备地点表 序号)
