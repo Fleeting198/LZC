@@ -140,14 +140,12 @@
                 }
             },
             dataZoom: [
-                {
-                    type: 'inside',
+                {   type: 'inside',
                     xAxisIndex: [0],
                     start: 0,
                     end: 100
                 },
-                {
-                    type: 'slider',
+                {   type: 'slider',
                     xAxisIndex: [0],
                     start: 0,
                     end: 100
@@ -162,7 +160,6 @@
 
         chartDateTrend.setOption(optionChartDate);
         chartTimeDistribution.setOption(optionChartTime);
-
 
         // get向后端请求json刷新图表。
         refresh_chart = function(){
@@ -189,12 +186,10 @@
                                 data: json_dateTrend.axisLabels
                             }],
                             series: [
-                                {
-                                    name: '累积支出',
+                                {   name: '累积支出',
                                     data: json_dateTrend.accumulatedVals
                                 },
-                                {
-                                    name: '节点支出',
+                                {   name: '节点支出',
                                     data: json_dateTrend.pointVals
                                 }
                             ]

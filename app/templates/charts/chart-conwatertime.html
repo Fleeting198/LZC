@@ -7,7 +7,7 @@
             {{ subfield(onchange='refresh_chart()') }}{{ subfield.label }}
             &nbsp;&nbsp;
         {% endfor %}
-        <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
+        <input class="btn btn-primary" type="button" value="刷新" onclick="refresh_chart()"/>
     </form>
 
     <div id="chartTimeDistribution" style="width: inherit; height: 90%;"></div>
@@ -57,14 +57,12 @@
                 }
             },
             dataZoom: [
-                {
-                    type: 'inside',
+                {   type: 'inside',
                     xAxisIndex: [0],
                     start: 0,
                     end: 100
                 },
-                {
-                    type: 'slider',
+                {   type: 'slider',
                     xAxisIndex: [0],
                     start: 0,
                     end: 100

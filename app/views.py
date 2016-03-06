@@ -543,11 +543,6 @@ def refresh_chart_number():
     # process numberGrade
     grade = {'10', '11', '12', '13', '14', '15'}
 
-    # init json
-    json_numberGradeB = {'unknown': 0}
-    json_numberGradePg = {'unknown': 0}
-    json_numberGradeDr = {'unknown': 0}
-
     # func convert result to json
     def result_to_jsonUnicode(resultGrade):
         json = {'unknown': 0}

@@ -99,11 +99,12 @@
         load_number = function () {
             chartNumberTotal.showLoading();
             chartNumberGradeB.showLoading();
+            chartNumberGradePg.showLoading();
+            chartNumberGradeDr.showLoading();
 
             $.ajax('/charts/number/getData', {
                 type: 'GET',
                 success: function (json_response) {
-
                     var json_numberTotal = json_response.json_numberTotal;
                     var json_numberGradeB = json_response.json_numberGradeB;
                     var json_numberGradePg = json_response.json_numberGradePg;
@@ -111,6 +112,8 @@
 
                     chartNumberTotal.hideLoading();
                     chartNumberGradeB.hideLoading();
+                    chartNumberGradePg.hideLoading();
+                    chartNumberGradeDr.hideLoading();
 
                     chartNumberTotal.setOption({
                         series: [{
@@ -119,8 +122,8 @@
                     });
 
                     // fetch data dynamically
-                    var names = new Array('10', '11', '12', '13', '14', '15', '其他');
-                    var datas = new Array('g10', 'g11', 'g12', 'g13', 'g14', 'g15', 'unknown')
+                    var names = ['10', '11', '12', '13', '14', '15', '其他'];
+                    var datas = ['g10', 'g11', 'g12', 'g13', 'g14', 'g15', 'unknown'];
 
                     function json2data(json_numberGrade) {
                         var dataOfSeries = [];
