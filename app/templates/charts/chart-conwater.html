@@ -19,7 +19,6 @@
                 feature: {
                     mark: {show: true},
                     dataView: {show: true, readOnly: false},
-                    magicType: {show: true, type: ['bar']},
                     restore: {show: true},
                     saveAsImage: {show: true}
                 }
@@ -33,12 +32,13 @@
                 type: 'value',
                 name: '用水量',
                 axisLabel: {
-                    formatter: '{value} 元'
+                    formatter: function (value, index) {
+                        return value/10000 + "万元";
+                    }
                 }
             },
             series: [
-                {
-                    name: '金额',
+                {   name: '金额',
                     type: 'bar',
                     data: []
                 }
@@ -48,7 +48,19 @@
         load_number = function () {
             chartConWater.setOption({
                 series: {
-                    data: [1180323.72, 1180773.48]
+                    data: [
+                        {   name: '男生',
+                            value: 1180323.72,
+                            itemStyle: {
+                                normal: {
+                                    color: '#314656'
+                                }
+                            }
+                        },
+                        {   name: '女生',
+                            value: 1180773.48,
+                        }
+                    ]
                 }
             });
         };
