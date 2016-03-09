@@ -16,17 +16,26 @@
 {#                    {% endif %}#}
 {#                {%- endmacro %}#}
 
+{#                {% macro nav_side(url_fun, value) -%}#}
+{#                    {% if request.path == url_for(url_fun) %}#}
+{#                        <li class="active"><a href="{{ url_for(url_fun) }}">{{ value }}</a></li>#}
+{#                        <script>#}
+{#                            $("li.active").parent("ul").addClass("in");#}
+{#                        </script>#}
+{#                    {% else %}#}
+{#                        <li><a href="{{ url_for(url_fun) }}">{{ value }}</a></li>#}
+{#                    {% endif %}#}
+{#                {%- endmacro %}#}
+
+
                 {% macro nav_side(url_fun, value) -%}
                     {% if request.path == url_for(url_fun) %}
                         <li class="active"><a href="{{ url_for(url_fun) }}">{{ value }}</a></li>
-                        <script>
-                            $("li.active").parent("ul").addClass("in");
-                        </script>
-
                     {% else %}
                         <li><a href="{{ url_for(url_fun) }}">{{ value }}</a></li>
                     {% endif %}
                 {%- endmacro %}
+
 
                 <div class="panel-group">
                     <div class="panel panel-default">
@@ -34,29 +43,17 @@
                             <h3 class="panel-title">同学圈</h3>
                         </div>
                         <div class="panel-body">
-                            <ul class="nav nav-pills nav-stacked">
-                                <li>
-                                    <a role="button" data-toggle="collapse" data-parent="#accordion"
-                                       href="#collapse-1-1">
-                                        <i class="fa fa-angle-right"></i>
-                                        足迹地图
-                                    </a>
-                                    <ul id="collapse-1-1" class="nav nav-pills nav-stacked panel-collapse collapse"
-                                        style="padding-left: 20px">
+                            <ul class="navgoco nav nav-pills nav-stacked">
+                                <li><a href="#">足迹地图</a>
+                                    <ul class="nav nav-pills nav-stacked" style="padding-left: 20px">
                                         {{ nav_side('show_chart_accategory','个体门禁分类分布') }}
                                         {{ nav_side('show_chart_acperiodcate','个体门禁类型时间分布') }}
                                         {{ nav_side('show_chart_acvalid','个体合法门禁比例') }}
                                     </ul>
                                 </li>
                                 {{ nav_side('show_chart_relation','人际关系') }}
-                                <li>
-                                    <a role="button" data-toggle="collapse" data-parent="#accordion"
-                                       href="#collapse-1-3">
-                                        <i class="fa fa-angle-right"></i>
-                                        支出报表
-                                    </a>
-                                    <ul id="collapse-1-3" class="nav nav-pills nav-stacked panel-collapse collapse"
-                                        style="padding-left: 20px">
+                                <li><a href="#">支出报表</a>
+                                    <ul class="nav nav-pills nav-stacked" style="padding-left: 20px">
                                         {{ nav_side('show_chart_concategory','个体消费分类分布') }}
                                         {{ nav_side('show_chart_expenditure','个体支出趋势与分布') }}
                                         {{ nav_side('show_chart_conability','个体消费能力认定') }}
@@ -71,16 +68,10 @@
                             <h3 class="panel-title">校园信息</h3>
                         </div>
                         <div class="panel-body">
-                            <ul class="nav nav-pills nav-stacked">
+                            <ul class="navgoco nav nav-pills nav-stacked">
                                 {{ nav_side('show_chart_number','人数统计') }}
-                                <li>
-                                    <a role="button" data-toggle="collapse" data-parent="#accordion"
-                                       href="#collapse-2-2">
-                                        <i class="fa fa-angle-right"></i>
-                                        收入报表
-                                    </a>
-                                    <ul id="collapse-2-2" class="nav nav-pills nav-stacked panel-collapse collapse"
-                                        style="padding-left: 20px">
+                                <li><a href="#">收入报表</a>
+                                    <ul class="nav nav-pills nav-stacked" style="padding-left: 20px">
                                         {{ nav_side('show_chart_income','刷卡机收入趋势与分布') }}
                                         {{ nav_side('show_chart_foodIncome','餐饮收入规律') }}
                                         {{ nav_side('show_chart_conWaterTime','水消费规律') }}
@@ -91,9 +82,73 @@
                         </div>
                     </div>
                 </div>
+
+{#                <div class="panel-group">#}
+{#                    <div class="panel panel-default">#}
+{#                        <div class="panel-heading">#}
+{#                            <h3 class="panel-title">同学圈</h3>#}
+{#                        </div>#}
+{#                        <div class="panel-body">#}
+{#                            <ul class="nav nav-pills nav-stacked">#}
+{#                                <li>#}
+{#                                    <a role="button" data-toggle="collapse" data-parent="#accordion"#}
+{#                                       href="#collapse-1-1">#}
+{#                                        <i class="fa fa-angle-right"></i>#}
+{#                                        足迹地图#}
+{#                                    </a>#}
+{#                                    <ul id="collapse-1-1" class="nav nav-pills nav-stacked panel-collapse collapse"#}
+{#                                        style="padding-left: 20px">#}
+{#                                        {{ nav_side('show_chart_accategory','个体门禁分类分布') }}#}
+{#                                        {{ nav_side('show_chart_acperiodcate','个体门禁类型时间分布') }}#}
+{#                                        {{ nav_side('show_chart_acvalid','个体合法门禁比例') }}#}
+{#                                    </ul>#}
+{#                                </li>#}
+{#                                {{ nav_side('show_chart_relation','人际关系') }}#}
+{#                                <li>#}
+{#                                    <a role="button" data-toggle="collapse" data-parent="#accordion"#}
+{#                                       href="#collapse-1-3">#}
+{#                                        <i class="fa fa-angle-right"></i>#}
+{#                                        支出报表#}
+{#                                    </a>#}
+{#                                    <ul id="collapse-1-3" class="nav nav-pills nav-stacked panel-collapse collapse"#}
+{#                                        style="padding-left: 20px">#}
+{#                                        {{ nav_side('show_chart_concategory','个体消费分类分布') }}#}
+{#                                        {{ nav_side('show_chart_expenditure','个体支出趋势与分布') }}#}
+{#                                        {{ nav_side('show_chart_conability','个体消费能力认定') }}#}
+{#                                        {{ nav_side('show_chart_penalty','个体滞纳金缴费情况') }}#}
+{#                                    </ul>#}
+{#                                </li>#}
+{#                            </ul>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <div class="panel panel-default">#}
+{#                        <div class="panel-heading">#}
+{#                            <h3 class="panel-title">校园信息</h3>#}
+{#                        </div>#}
+{#                        <div class="panel-body">#}
+{#                            <ul class="nav nav-pills nav-stacked">#}
+{#                                {{ nav_side('show_chart_number','人数统计') }}#}
+{#                                <li>#}
+{#                                    <a role="button" data-toggle="collapse" data-parent="#accordion"#}
+{#                                       href="#collapse-2-2">#}
+{#                                        <i class="fa fa-angle-right"></i>#}
+{#                                        收入报表#}
+{#                                    </a>#}
+{#                                    <ul id="collapse-2-2" class="nav nav-pills nav-stacked panel-collapse collapse"#}
+{#                                        style="padding-left: 20px">#}
+{#                                        {{ nav_side('show_chart_income','刷卡机收入趋势与分布') }}#}
+{#                                        {{ nav_side('show_chart_foodIncome','餐饮收入规律') }}#}
+{#                                        {{ nav_side('show_chart_conWaterTime','水消费规律') }}#}
+{#                                        {{ nav_side('show_chart_conwater','男女生用水情况') }}#}
+{#                                    </ul>#}
+{#                                </li>#}
+{#                            </ul>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
             {% endblock %}
         </div>
-        <div id="chart_container" class=" col-sm-8 col-md-8 col-lg-10 " style="position: absolute; height: 90%;">
+        <div id="chart_container" class=" col-sm-8 col-md-8 col-lg-10 " style="position: absolute; height: 85%;">
             {% block chartField %}
             {% endblock %}
         </div>
@@ -103,7 +158,22 @@
     <script>
         $(window).resize(function(){
             $('#chart_container').css('left', $('#chart_list').width()+30) ;
-        })
+        });
+        $(".navgoco").navgoco({
+            caretHtml: '<i class="fa fa-angle-right"></i>',
+            accordion: false,
+            openClass: 'open',
+            save: true,
+            cookie: {
+                name: 'navgoco',
+                expires: false,
+                path: '/'
+            },
+            slide: {
+                duration: 400,
+                easing: 'swing'
+            }
+        });
     </script>
 
 {% endblock %}

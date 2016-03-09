@@ -37,7 +37,8 @@ dictTrans = {
     'lib':u'图书馆',
     'sci':u'科研',
 
-    'none':u'未分类|其他',
+    'none':u'其他',
+    'None':u'其他',
 
     'SUM':u'总和',
     'PER_DORM':u'宿舍比重'

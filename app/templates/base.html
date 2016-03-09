@@ -1,15 +1,16 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/html">
-	<head>
-        <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <head>
+        <meta charset="UTF-8"/>
         <title>智慧校园 Witcampus</title>
         
-		<link href="{{ url_for('static',filename='css/font-awesome.min.css') }}" rel="stylesheet"/>
+        <link href="{{ url_for('static',filename='css/font-awesome.min.css') }}" rel="stylesheet"/>
         <link href="{{ url_for('static',filename='css/bootstrap-theme.min.css') }}" rel="stylesheet"/>
         <link href="{{ url_for('static',filename='css/daterangepicker.css') }}" rel="stylesheet"/>
         <link href="{{ url_for('static',filename='css/jquery.fullpage.min.css') }}" rel="stylesheet"/>
-		<link href="{{ url_for('static',filename='css/buttons.css') }}" rel="stylesheet"/>
+        <link href="{{ url_for('static',filename='css/buttons.css') }}" rel="stylesheet"/>
         <link href="{{ url_for('static',filename='css/witcampus.min.css') }}" rel="stylesheet"/>
+{#        <link href="{{ url_for('static',filename='css/jquery.navgoco.css') }}" rel="stylesheet"/>#}
 
         <script src="{{ url_for('static',filename='js/jquery-1.12.0.min.js') }}"></script>
         <script src="{{ url_for('static',filename='js/moment.min.js') }}"></script>
@@ -17,8 +18,11 @@
         <script src="{{ url_for('static',filename='js/daterangepicker.js') }}"></script>
         <script src="{{ url_for('static',filename='js/echarts.min.js') }}" charset="UTF-8"></script>
         <script src="{{ url_for('static',filename='js/jquery.fullpage.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/jquery.cookie.min.js') }}"></script>
+        <script src="{{ url_for('static',filename='js/jquery.navgoco.min.js') }}"></script>
 
-	</head>
+
+    </head>
 	<body style="height: 100%">
 
         <!-- Main Navbar -->
@@ -80,13 +84,13 @@
         <div>{% block content %}{% endblock %}</div>
 
         <!-- Main Footer -->
-{#        <div id="footer" style="clear:left">{% block footer %}#}
-{#            <div class="container">#}
-{#                <p>#}
-{#                    This is footer.#}
-{#                </p>#}
-{#            </div>#}
-{#        {% endblock %}</div>#}
+        <!--<div id="footer" style="clear:left">{% block footer %}
+            <div class="container">
+                <p>
+                    This is footer.
+                </p>
+            </div>
+        {% endblock %}</div>-->
 
         <script>
             force_window_resize = function () {

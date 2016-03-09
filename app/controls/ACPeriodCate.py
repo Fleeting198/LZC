@@ -21,8 +21,7 @@ def ACPeriodCate(res_datetimes, res_categorys, mode_date):
     axisLabels = oriDate[:]
     pointVals = [{copy.deepcopy(oriValue): 1} for oriValue in oriValues]
 
-    # TODO: 年规则不可eval
-    rule_mode = {'0': 'D', '1': 'W', '2': 'M', '3': 'Q', '4': 'Y'}
+    rule_mode = {'0': 'D', '1': 'W', '2': 'M', '3': 'Q'}
 
     df = DataFrame(pointVals, index=axisLabels)
     df = df.resample(rule_mode[str(mode_date)], how='sum')
@@ -102,8 +101,6 @@ def mergeDict(dict1, dict2):
     """
     dict1 = dict1 + dict2
     合并相同的key的值
-    :param dict2:
-    :param dict1:
     """
     for k, v in dict2.iteritems():
         dict1[k] = dict1[k] + v if k in dict1 else 1

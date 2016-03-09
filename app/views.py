@@ -570,7 +570,8 @@ def refresh_chart_number():
     json_numberGradeDr = result_to_jsonString(json_numberGradeDr)
 
     # return
-    json_response = jsonify(json_numberTotal = json_numberTotal, json_numberGradeB = json_numberGradeB, json_numberGradePg = json_numberGradePg, json_numberGradeDr = json_numberGradeDr)
+    json_response = jsonify(json_numberTotal = json_numberTotal, json_numberGradeB = json_numberGradeB,
+                            json_numberGradePg = json_numberGradePg, json_numberGradeDr = json_numberGradeDr)
     return json_response
 
 
