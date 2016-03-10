@@ -99,8 +99,8 @@ def ACPeriodCate(res_datetimes, res_categorys, mode_date):
 
 def mergeDict(dict1, dict2):
     """
-    dict1 = dict1 + dict2
-    合并相同的key的值
+    dict1 = dict1 + dict2  合并相同的key的值
+
     """
     for k, v in dict2.iteritems():
         dict1[k] = dict1[k] + v if k in dict1 else 1

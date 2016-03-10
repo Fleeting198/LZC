@@ -12,7 +12,6 @@
                 </div>
                 <div class="col-md-5 col-sm-5">
                     <h1 style="line-height: 50px;">
-
                         您好，工号：
                         <div id="show_userID" style="display: inline; background: #ECF0F1; color: #E74C3C; border-radius: 5px; white-space: nowrap">
                             &nbsp;<span id="label_userID" onclick="switch_userID_iptshow(false)"></span>
@@ -52,7 +51,7 @@
                                 <h1>我的足迹</h1>
                                 <p></br></p>
                                 <p id="p1-1">
-                                    在过去的一个月中，我曾在 <span>{{ vals_summary['ret_access']['count_nodes'] }}</span> 个地方留下过足迹，
+                                    我曾在 <span>{{ vals_summary['ret_access']['count_nodes'] }}</span> 个地方留下过足迹，
                                     拿下 <span>{{ vals_summary['ret_access']['total_count'] }}</span> 次门禁记录。</br>
                                     <!-- 此处应有地点种类数量判断， -->
                                     {% if vals_summary['ret_access']['ac_items'][1] is defined %} 
@@ -168,15 +167,10 @@
                     </div>
                     <div class="col-md-5 col-sm-5">
                         <div style="margin-left: 30px">
-                            <h1>
-                            我的学习
-                        </h1>
-                            <p>
-                                </br>
-                            </p>
+                            <h1>我的学习</h1>
+                            <p></br></p>
                             <p id="p3-1">
                                 <!-- ret_study = {'count_lib':count_lib, 'count_acad': count_acad, 'count_sci':count_sci} -->
-                                上个月中，我
                                 {% if vals_summary['ret_study']['count_acad'] != 0 %}去过教学楼 <span>
                                     {{ vals_summary['ret_study']['count_acad'] }}</span>次，
                                 {% else %}
@@ -335,12 +329,20 @@
                                 <p></br></p>
                                 <p id="p6-1">
                                     <!-- ret_penalty = {'user_penalty': user_penalty, 'percent_asc': percent_asc} -->
-
-                                    在这一年里，我 {% if vals_summary['ret_penalty']['user_penalty'] == 0 %} 从未超期还书。 {% else %} 产生了 <span>{{ vals_summary['ret_penalty']['user_penalty'] }}</span> 元滞纳金。 {% endif %}
+                                    在这一年里，我
+                                    {% if vals_summary['ret_penalty']['user_penalty'] == 0 %}
+                                        从未超期还书。
+                                    {% else %}
+                                        产生了 <span>{{ vals_summary['ret_penalty']['user_penalty'] }}</span> 元滞纳金。
+                                    {% endif %}
                                     </br>
-                                    {% if vals_summary['ret_penalty']['percent_asc']
-                                    < 0.3 %} 信用记录打败了 <span>{{ (1-vals_summary[ 'ret_penalty'][ 'percent_asc']|round(2))*100 }}</span> ％的同学，继续保持噢～ {% elif vals_summary[ 'ret_penalty'][ 'percent_asc']>= 0.6 %} 信用记录落后于 <span>{{ vals_summary['ret_penalty']['percent_asc']|round(2)*100 }}</span> ％的同学，记得及时还书哟～
-                                        {% endif %}
+                                    {% if vals_summary['ret_penalty']['percent_asc'] < 0.3 %}
+                                        信用记录打败了 <span>{{ (1-vals_summary[ 'ret_penalty'][ 'percent_asc']|round(2))*100 }}</span> ％的同学，
+                                        继续保持噢～
+                                    {% elif vals_summary[ 'ret_penalty'][ 'percent_asc']>= 0.6 %}
+                                        信用记录落后于 <span>{{ vals_summary['ret_penalty']['percent_asc']|round(2)*100 }}</span> ％的同学，
+                                        记得及时还书哟～
+                                    {% endif %}
                                 </p>
                             </div>
                         </div>
@@ -482,9 +484,7 @@
         toolbox: {
             show: true,
             feature: {
-                mark: {
-                    show: true
-                },
+                mark: { show: true },
                 dataView: {
                     show: true,
                     readOnly: false

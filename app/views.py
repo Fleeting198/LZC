@@ -46,11 +46,9 @@ def show_summary(user_id):
     startDate = ''
     endDate = ''
 
-
     # =================================
     # 门禁
     # =================================
-    #
     # 最近一月 distinct门禁地点名数
     # 门禁地点数
     # 地点类型 accategory
@@ -76,7 +74,6 @@ def show_summary(user_id):
     # =================================
     # 生活习惯
     # =================================
-    #
     # 最近一个月
     # 时间分布 6点~7点宿舍打卡
     # 23点到5点打卡  ACPeriodCate
@@ -96,13 +93,7 @@ def show_summary(user_id):
         if col == 'SUM': break
         df['SUM'] += vals
 
-    # print df
-
-    if 'dorm' in df:
-        count_early = df.loc[6]['dorm']  # 取 6 点宿舍值，总计早起次数
-    else:
-        count_early = 0
-
+    count_early = df.loc[6]['dorm'] if 'dorm' in df else 0  # 取 6 点宿舍值，总计早起次数
     count_night = sum(df.loc[0:6]['SUM'].tolist()) + df.loc[23]['SUM']  # 取23点 ~ 5点总门禁次数
 
     ret_habit = {'count_early': count_early, 'count_night': count_night }
@@ -111,28 +102,20 @@ def show_summary(user_id):
     # =================================
     # 学习
     # =================================
-    #
     # 最近一个月图书馆、教学楼次数
 
     from controls.GetJson_ACCategory import GetJson_ACCategory
     json_ACCategory = GetJson_ACCategory(userID,startDate,startDate)
 
-    # print json_ACCategory['seriesData']
-
-    count_acad = count_lib = count_sci = 0
+    # 教学、图书馆、科研门禁计数
+    count = {'acad':0,'lib':0,'sci':0}
     for item in json_ACCategory['seriesData']:
-        if item['name'] == 'acad':
-            count_acad = item['value']
-        elif item['name'] == 'lib':
-            count_lib = item['value']
-        elif item['name'] == 'sci':
-            count_sci = item['value']
-    count_total = count_sci + count_acad + count_lib
+        count[item['name']] = item['value']
+    count_total = count['acad']+count['lib']+count['sci']
 
-    sql = db.session.query(ac_count.sum_per_month).order_by(ac_count.sum_per_month)
+    sql = ac_count.query
     results = sql.all()
-
-    sum_per_month = [result.sum_per_month for result in results]
+    sum_per_month = sorted([result.get_sum_per_month() for result in results])
 
     # 获取个体在全体数据中排名
     idx_user = len(sum_per_month)
@@ -143,7 +126,7 @@ def show_summary(user_id):
 
     percent_asc = float(sum(sum_per_month[: idx_user])) / sum(sum_per_month)
 
-    ret_study = {'count_lib':count_lib, 'count_acad': count_acad, 'count_sci':count_sci, 'percent_asc': percent_asc}
+    ret_study = {'count_lib':count['lib'], 'count_acad': count['acad'], 'count_sci': count['sci'], 'percent_asc': percent_asc}
 
 
     # =================================
@@ -170,7 +153,6 @@ def show_summary(user_id):
     # =================================
     # 消费 bill
     # =================================
-    #
     # 账单： 最近一月：
     # 消费类型比例 concategory, conablilty, expenditure
     # 一月消费总额
@@ -238,12 +220,10 @@ def show_summary(user_id):
         ret_penalty = {'user_penalty': -1, 'percent_asc': -1}
 
     # =================================
-    # 打包
-
+    # 最后打包
     vals_summary = {'ret_access': ret_access, 'ret_habit': ret_habit, 'ret_study': ret_study,
                     'ret_social': ret_social, 'ret_bill': ret_bill, 'ret_penalty': ret_penalty }
 
-    # print "return render_template summary"
     return render_template('summarization/summarization.html', userID=userID, startDate=startDate, endDate=endDate, vals_summary=vals_summary)
 
 

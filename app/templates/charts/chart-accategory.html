@@ -65,6 +65,15 @@
         chartACCategory.setOption(optionChartACCategory);
 
         refresh_chart = function () {
+
+            var
+            $.ajax('/check_user_id?' + $("#form-ipt").serialize(), {
+                type:'POST',
+                success:
+                error:
+                dataType:'json'
+            });
+
             chartACCategory.showLoading();
             $.ajax('/charts/accategory/getData?' + $("#form-ipt").serialize(), {
                 type: 'GET',

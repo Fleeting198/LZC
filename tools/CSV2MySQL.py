@@ -9,8 +9,6 @@ import MySQL
 """
 依赖 兔大侠和他的朋友们 的 对MySQLdb常用函数进行封装的类 MySQL.py
 
-示例：
-
 自定义数据库配置和文件路径
 
 import CSV2MySQL
@@ -35,9 +33,6 @@ class Cvs2MySQL:
 
 
     def __init__(self):
-        """
-        初始化 MySql 连接
-        """
         self._mysql = MySQL.MySQL()
 
 
