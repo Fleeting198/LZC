@@ -68,15 +68,14 @@ class ac_loc(db.Model):
     门禁地点：地点序号(自增)，地点描述。
     分类：
     """
-    # node_id = db.Column(db.Integer, primary_key=True)
-    node_des = db.Column(db.String(40), primary_key=True)
+    node_id = db.Column(db.Integer, primary_key=True)
+    node_des = db.Column(db.String(40))
     category = db.Column(db.String(5))
 
     acrecs = db.relationship('acrec', backref=db.backref('ac_loc'))  # 属于这个地点的所有门禁记录
 
-    def __init__(self, node_id, node_des, category):
+    def __init__(self, node_id, category):
         self.node_id=node_id
-        self.node_des=node_des
         self.category=category
 
 

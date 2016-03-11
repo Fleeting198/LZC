@@ -14,6 +14,7 @@ warn_userIDFill = u'工号不可为空'
 warn_userIDLength = u'工号长度应为8'
 warn_devIDFill = u'设备号不可为空'
 warn_devIDLength = u'设备号长度最大为10'
+warn_userIDNon = u'找不到这个工号'
 
 opts_modeDate = (u'日', u'周', u'月', u'季', u'年')
 opts_modeTime = (u'24小时', u'7天', u'12月')

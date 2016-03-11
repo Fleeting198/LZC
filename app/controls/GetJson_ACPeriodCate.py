@@ -8,7 +8,7 @@ from sqlalchemy import and_
 def GetJson_ACPeriodCate(userID, modeDate, startDate, endDate):
     # Query.
     strQuery = db.session.query(acrec.ac_datetime, ac_loc.category).filter(
-        and_(acrec.user_id == userID, acrec.node_des == ac_loc.node_des)).order_by(acrec.ac_datetime)
+        and_(acrec.user_id == userID, acrec.node_id == ac_loc.node_id)).order_by(acrec.ac_datetime)
     if len(startDate) != 0:
         strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
     results = strQuery.all()
