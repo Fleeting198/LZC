@@ -21,7 +21,7 @@
         <script type="text/javascript" src="{{ url_for('static',filename='js/echarts.min.js') }}" charset="UTF-8"></script>
 {#        <script type="text/javascript" src="{{ url_for('static',filename='js/all.js') }}"></script>#}
     </head>
-	<body style="height: 100%">
+    <body>
 
         <!-- Main Navbar -->
         <div id="header">{% block header %}
@@ -97,8 +97,7 @@
                 </div>
             </div>
         </div>
-
-        <script>
+        <script type="text/javascript">
             force_window_resize = function () {
                 console.log("force_window_resize");
                 $(window).trigger("resize");
@@ -108,11 +107,10 @@
 
             // 模态提示框的显示。
             showDialog = function (title, content) {
-
-                $("#modal-err-title").text(title);
-                $("#modal-err-content").text(content);
+                document.getElementById("modal-err-title").innerText = title;
+                document.getElementById("modal-err-content").innerText = content;
                 $("#modal-err").modal('show');
             }
         </script>
-	</body>
+    </body>
 </html>
