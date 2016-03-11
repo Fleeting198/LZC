@@ -430,7 +430,7 @@
                 ret_val = json_response['has_user'] == true;
             },
             error: function () {
-                alert("与服务器断开连接！");
+                showDialog("出错了", "与服务器断开连接");
                 ret_val = false;
             },
             dataType: 'json'
@@ -538,7 +538,7 @@
                     }]
                 });
             } else {
-                alert(json_response.errMsg);
+                showDialog("出错了", json_response.errMsg);
             }
         }, 'json')
     };
@@ -649,7 +649,7 @@
                     chartACPeriodCateTime.setOption(tmp_option);
                 }
             } else {
-                alert(json_response.errMsg);
+                showDialog("出错了", json_response.errMsg);
             }
         }, 'json')
     };
@@ -732,7 +732,7 @@
                     }]
                 });
             } else {
-                alert(json_response.errMsg);
+                showDialog("出错了", json_response.errMsg);
             }
         }, 'json')
     };
@@ -818,7 +818,7 @@
                     }]
                 });
             } else {
-                alert(json_response.errMsg);
+                showDialog("出错了", json_response.errMsg);
             }
         }, 'json')
     };
@@ -967,7 +967,7 @@
                     }]
                 });
             } else {
-                alert(json_response.errMsg);
+                showDialog("出错了", json_response.errMsg);
             }
         }, 'json')
     };
