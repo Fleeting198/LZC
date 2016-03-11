@@ -1,8 +1,7 @@
 {% extends 'base.html' %} {% block content %}
+    <script src="{{ url_for('static',filename='echarts2/echarts.js') }}"></script>
 
-<script src="{{ url_for('static',filename='echarts2/echarts.js') }}"></script>
-
-<div id="fullpage">
+    <div id="fullpage">
     <div class="section" id="section0">
         <div class="container-fluid">
             <div class="row">
@@ -456,7 +455,6 @@
     $(window).resize(function () {
         chartACCategory.resize();
         chartACPeriodCateTime.resize();
-        chartRelation.resize();
         chartConCategory.resize();
         chartPenalty.resize();
         chartRadar.resize();
@@ -1008,46 +1006,26 @@
             fontSize: 14
         },
         tooltip: {
-            trigger: 'axis',
-            formatter: '{b}：{c}分'
+            trigger: 'item'
         },
-        calculable: true,
-        polar: [{
-            indicator: [{
-                text: '足迹',
-                max: 10
-            }, {
-                text: '作息',
-                max: 10
-            }, {
-                text: '学习',
-                max: 10
-            }, {
-                text: '人脉',
-                max: 10
-            }, {
-                text: '理财',
-                max: 10
-            }, {
-                text: '信用',
-                max: 10
-            }],
-            axisLabel: {
-                textStyle: {
-                    color: '#ECF0F1',
-                    fontSize: 14
-                }
-            }
-        }],
+        radar:{
+            indicator: [
+                {text: '足迹', max: 10},
+                {text: '作息', max: 10},
+                {text: '学习', max: 10},
+                {text: '人脉', max: 10},
+                {text: '理财', max: 10},
+                {text: '信用', max: 10}
+            ],
+            center: ['50%', '50%'],
+            radius: 120
+        },
         series: [{
             type: 'radar',
-            itemStyle: {
-                normal: {
-                    areaStyle: {
-                        type: 'default'
-                    }
-                }
+            tooltip: {
+                trigger:'item'
             },
+            itemStyle: { normal: { areaStyle: { type: 'default' }}},
             data: [{
                 value: values,
                 name: userID
