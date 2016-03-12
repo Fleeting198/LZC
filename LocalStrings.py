@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-
 userID = u'工号'
 devID = u'设备号'
 startDate = u'开始日期'
@@ -38,6 +37,7 @@ dictTrans = {
     'lib':u'图书馆',
     'sci':u'科研',
 
+    'other': u'其他',
     'none':u'其他',
     'None':u'其他',
 
