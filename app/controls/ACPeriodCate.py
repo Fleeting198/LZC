@@ -84,8 +84,7 @@ def ACPeriodCate(res_datetimes, res_categorys, mode_date):
                 vals[j + 1] = mergeDict(vals[j + 1], values[i])
 
     df = DataFrame(vals)
-
-    print df
+    # print df
 
     seriesData = []
     legendLabels = []

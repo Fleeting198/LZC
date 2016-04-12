@@ -26,7 +26,7 @@
                         </br>
                         您的2015年总结：
                     </h1>
-                        <div id="chartRadar" class="center-block" style="height: 300px;"></div>
+                    <div id="chartRadar" class="center-block" style="height: 300px;"></div>
                     <p>
                         下滑翻看详情：
                     </p>
@@ -49,21 +49,30 @@
                                 <h1>我的足迹</h1>
                                 <p></br></p>
                                 <p id="p1-1">
-                                    我曾在 <span>{{ vals_summary['ret_access']['count_nodes'] }}</span> 个地方留下过足迹，
-                                    拿下 <span>{{ vals_summary['ret_access']['total_count'] }}</span> 次门禁记录。</br>
-                                    <!-- 此处应有地点种类数量判断， -->
-                                    {% if vals_summary['ret_access']['ac_items'][1] is defined %} 
-                                        除了访问了 <span>{{ vals_summary['ret_access']['ac_items'][0]['count'] }}</span> 次的 <span>
+                                    {% if vals_summary['ret_access']['count_nodes'] == -1 %}
+                                        没有找到相关记录。
+                                    {% else %}
+                                        我曾在 <span>{{ vals_summary['ret_access']['count_nodes'] }}</span> 个地方留下过足迹，
+                                        拿下 <span>{{ vals_summary['ret_access']['total_count'] }}</span> 次门禁记录。</br>
+                                        <!-- 此处应有地点种类数量判断， -->
+                                        {% if vals_summary['ret_access']['ac_items'][1] is defined %}
+                                            除了访问了 <span>{{ vals_summary['ret_access']['ac_items'][0]['count'] }}</span>
+                                            次的 <span>
                                         {{ vals_summary['ret_access']['ac_items'][0]['node_des'] }}</span> 之外，
-                                    </br>
-                                        我最爱的是 <span>{{ vals_summary['ret_access']['ac_items'][1]['node_des'] }}</span> ，
-                                        在那留下了 <span>{{ vals_summary['ret_access']['ac_items'][1]['count'] }}</span> 次记录。
-                                    {% else %} 
-                                        我最爱的是 <span>{{ vals_summary['ret_access']['ac_items'][0]['node_des'] }}</span>，
-                                        在那留下了 <span>{{ vals_summary['ret_access']['ac_items'][0]['count'] }}</span> 次记录。 
+                                            </br>
+                                            我最爱的是
+                                            <span>{{ vals_summary['ret_access']['ac_items'][1]['node_des'] }}</span> ，
+                                            在那留下了 <span>{{ vals_summary['ret_access']['ac_items'][1]['count'] }}</span>
+                                            次记录。
+                                        {% else %}
+                                            我最爱的是
+                                            <span>{{ vals_summary['ret_access']['ac_items'][0]['node_des'] }}</span>，
+                                            在那留下了 <span>{{ vals_summary['ret_access']['ac_items'][0]['count'] }}</span>
+                                            次记录。
+                                        {% endif %}
+                                        </br>
+                                        我的一小步，人类一大步。
                                     {% endif %}
-                                    </br>
-                                    我的一小步，人类一大步。
                                 </p>
                             </div>
                         </div>
@@ -111,6 +120,9 @@
                                 <h1 style="color: #2C3E50">我的作息</h1>
                                 <p></br></p>
                                 <p id="p2-1" style="color: #2C3E50">
+                                {% if vals_summary['ret_habit']['count_early'] == -1 %}
+                                    没有找到相关记录。
+                                {% else %}
                                     又到了起床靠毅力的季节了，</br>
                                     {% if vals_summary['ret_habit']['count_early'] == 0 %}
                                         我的被子上可能存在不知名的结界，从未在早晨7点前解开。
@@ -122,6 +134,7 @@
                                         无晚归记录，习惯良好！ {% else %} 曾在晚上 11 点～早上 6 点之间访问门禁 <span>
                                         {{ vals_summary['ret_habit']['count_night'] }}</span> 次，注意早点休息哟～
                                     {% endif %}
+                                {% endif %}
                                 </p>
                             </div>
                         </div>
@@ -169,32 +182,36 @@
                             <p></br></p>
                             <p id="p3-1">
                                 <!-- ret_study = {'count_lib':count_lib, 'count_acad': count_acad, 'count_sci':count_sci} -->
-                                {% if vals_summary['ret_study']['count_acad'] != 0 %}去过教学楼 <span>
-                                    {{ vals_summary['ret_study']['count_acad'] }}</span>次，
+                                {% if vals_summary['ret_study']['count_acad'] == -1 %}
+                                    没有找到相关记录。
                                 {% else %}
-                                    没有去过教学楼，
-                                {% endif %}
+                                    {% if vals_summary['ret_study']['count_acad'] != 0 %}去过教学楼 <span>
+                                        {{ vals_summary['ret_study']['count_acad'] }}</span>次，
+                                    {% else %}
+                                        没有去过教学楼，
+                                    {% endif %}
 
-                                {% if vals_summary['ret_study']['count_lib'] != 0 %}
-                                    成功泡图书馆 <span>{{ vals_summary['ret_study']['count_lib'] }}</span>次，
-                                {% else %}
-                                    没有进入图书馆，
-                                {% endif %}
+                                    {% if vals_summary['ret_study']['count_lib'] != 0 %}
+                                        成功泡图书馆 <span>{{ vals_summary['ret_study']['count_lib'] }}</span>次，
+                                    {% else %}
+                                        没有进入图书馆，
+                                    {% endif %}
 
-                                {% if vals_summary['ret_study']['count_sci'] != 0 %} 宅实验室<span>
-                                    {{ vals_summary['ret_study']['count_sci'] }}</span> 次。
-                                {% else %}
-                                    远离实验室。
-                                {% endif %}
-                                </br>
-                                {% if vals_summary['ret_study']['percent_asc'] > 0.9 %}
-                                    比全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(3)*100 }}</span> ％的人都更加努力，可以被称为五星级准学霸！
-                                {% elif vals_summary['ret_study']['percent_asc'] > 0.5 %}
-                                    学习热情超过了全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(3)*100 }}</span> ％的人，好学近乎知。
-                                {% elif vals_summary['ret_study']['percent_asc'] > 0.3 %}
-                                    比全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(3)*100 }}</span> ％的人更热爱学习。
-                                {% else %}
-                                    比全校 <span>{{ (1-vals_summary['ret_study']['percent_asc']|round(3))*100 }}</span> ％的人更悠闲。
+                                    {% if vals_summary['ret_study']['count_sci'] != 0 %} 宅实验室<span>
+                                        {{ vals_summary['ret_study']['count_sci'] }}</span> 次。
+                                    {% else %}
+                                        远离实验室。
+                                    {% endif %}
+                                    </br>
+                                    {% if vals_summary['ret_study']['percent_asc'] > 0.9 %}
+                                        比全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(3)*100 }}</span> ％的人都更加努力，可以被称为五星级准学霸！
+                                    {% elif vals_summary['ret_study']['percent_asc'] > 0.5 %}
+                                        学习热情超过了全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(3)*100 }}</span> ％的人，好学近乎知。
+                                    {% elif vals_summary['ret_study']['percent_asc'] > 0.3 %}
+                                        比全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(3)*100 }}</span> ％的人更热爱学习。
+                                    {% else %}
+                                        比全校 <span>{{ (1-vals_summary['ret_study']['percent_asc']|round(3))*100 }}</span> ％的人更悠闲。
+                                    {% endif %}
                                 {% endif %}
                             </p>
                         </div>
@@ -219,8 +236,16 @@
                                 <p></br></p>
                                 <p id="p4-1">
                                     <!-- ret_social = {'num_relations': num_relations, 'top_name':top_name, 'top_value':top_value } -->
-                                    奋斗的路上有更多同伴才更有动力，有 <span>{{ vals_summary['ret_social']['num_relations'] }}</span> 位同学曾与我擦肩而过。</br>
-                                    <span>{{ vals_summary['ret_social']['top_name'] }}</span> 童鞋，我们 <span>{{ vals_summary['ret_social']['top_value'] }}</span> 次不断相遇，难道是缘分，难道是天意。
+                                    {% if vals_summary['ret_social']['top_value'] == -1 %}
+                                        没有找到相关记录。
+                                    {% elif vals_summary['ret_social']['top_value'] == 0 %}
+                                        同学，最近你在玩失踪么……
+                                    {% else %}
+                                        奋斗的路上有更多同伴才更有动力，有 <span>{{ vals_summary['ret_social']['num_relations'] }}</span>
+                                        位同学曾与我擦肩而过。</br>
+                                        <span>{{ vals_summary['ret_social']['top_name'] }}</span> 童鞋，
+                                        我们 <span>{{ vals_summary['ret_social']['top_value'] }}</span> 次不断相遇，难道是缘分，难道是天意。
+                                    {% endif %}
                                 </p>
                             </div>
                         </div>
@@ -271,13 +296,16 @@
                                 <p id="p5-1">
                                     <!-- ret_bill = {'total_expend':total_expend, 'con_items': json_ConCategory['seriesData'],
                                 'con_per_month': con_per_month} -->
-                                    {% if vals_summary['ret_bill']['total_expend'] >= 0 %}
-                                        最近一年来，我总共花了 <span>{{ vals_summary['ret_bill']['total_expend'] }}</span> 元，</br>
-                                        <span>{{ vals_summary['ret_bill']['top_cate']}}</span>
-                                        打榜成功，成为我的消费分类TOP 1。</br>
-                                        根据长期统计，我的月均支出是 <span>{{ vals_summary['ret_bill']['con_per_month'] }}</span> 元。
+                                    {% if vals_summary['ret_bill']['total_expend'] == -1 or vals_summary['ret_bill']['con_per_month'] == -1%}
+                                        没有找到相关记录。
                                     {% else %}
-                                        无消费记录。
+                                        最近一年来，我总共花了 <span>{{ vals_summary['ret_bill']['total_expend'] }}</span> 元，
+                                        </br>
+                                        <span>{{ vals_summary['ret_bill']['top_cate'] }}</span>
+                                        打榜成功，成为我的消费分类TOP 1。</br>
+
+                                        根据长期统计，我的月均支出是 <span>{{ vals_summary['ret_bill']['con_per_month'] }}</span>
+                                        元。
                                     {% endif %}
                                 </p>
                             </div>
@@ -327,19 +355,27 @@
                                 <p></br></p>
                                 <p id="p6-1">
                                     <!-- ret_penalty = {'user_penalty': user_penalty, 'percent_asc': percent_asc} -->
-                                    在这一年里，我
-                                    {% if vals_summary['ret_penalty']['user_penalty'] == 0 %}
-                                        从未超期还书。
+                                    {% if vals_summary['ret_penalty']['user_penalty'] == -1 %}
+                                        没有找到相关记录。
                                     {% else %}
-                                        产生了 <span>{{ vals_summary['ret_penalty']['user_penalty'] }}</span> 元滞纳金。
-                                    {% endif %}
-                                    </br>
-                                    {% if vals_summary['ret_penalty']['percent_asc'] < 0.3 %}
-                                        信用记录打败了 <span>{{ (1-vals_summary[ 'ret_penalty'][ 'percent_asc']|round(2))*100 }}</span> ％的同学，
-                                        继续保持噢～
-                                    {% elif vals_summary[ 'ret_penalty'][ 'percent_asc']>= 0.6 %}
-                                        信用记录落后于 <span>{{ vals_summary['ret_penalty']['percent_asc']|round(2)*100 }}</span> ％的同学，
-                                        记得及时还书哟～
+                                        在这一年里，我
+                                        {% if vals_summary['ret_penalty']['user_penalty'] == 0 %}
+                                            从未超期还书。
+                                        {% else %}
+                                            产生了 <span>{{ vals_summary['ret_penalty']['user_penalty'] }}</span> 元滞纳金。
+                                        {% endif %}
+                                        </br>
+                                        {% if vals_summary['ret_penalty']['percent_asc'] < 0.3 %}
+                                            信用记录打败了
+                                            <span>{{ (1-vals_summary[ 'ret_penalty'][ 'percent_asc']|round(2))*100 }}</span>
+                                            ％的同学，
+                                            继续保持噢～
+                                        {% elif vals_summary[ 'ret_penalty'][ 'percent_asc']>= 0.6 %}
+                                            信用记录落后于
+                                            <span>{{ vals_summary['ret_penalty']['percent_asc']|round(2)*100 }}</span>
+                                            ％的同学，
+                                            记得及时还书哟～
+                                        {% endif %}
                                     {% endif %}
                                 </p>
                             </div>
@@ -374,20 +410,6 @@
             </div>
         </div>
     </div>
-    <!--<div class="section" id="section7">
-        <div class="content">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-1 col-sm-1"></div>
-                    <div class="col-md-10 col-sm-10">-->
-                        <!-- chart_radar -->
-                        <!--<div id="chartRadar" class="center-block" style="width: inherit; height: 474.65px;"></div>
-                    </div>
-                    <div class="col-md-1 col-sm-1"></div>
-                </div>
-            </div>
-        </div>
-    </div>-->
 </div>
 
     <script src="{{ url_for('static',filename='echarts2/echarts.js') }}"></script>
@@ -916,18 +938,19 @@
         chartPenalty.showLoading();
         $.get('/summary/GetJson_penalty?' + chartInput, function(json_response) {
             // json_response = {'userAmount': userAmount, 'amount': amount, 'num': num}
-            var userAmount = json_response.userAmount;
-            var amount = json_response.amount;
-            var num = json_response.num;
-            var index_userAmount = 0;
-            for (var i = 0; i < amount.length; i++) {
-                if (amount[i].toString() == parseInt(userAmount).toString()) {
-                    index_userAmount = i;
-                    break;
-                }
-            }
             chartPenalty.hideLoading();
             if (!json_response.errMsg) {
+                var userAmount = json_response.userAmount;
+                var amount = json_response.amount;
+                var num = json_response.num;
+                // 设定查询工号标志坐标
+                var index_userAmount = 0;
+                for (var i = 0; i < amount.length; i++) {
+                    if (amount[i].toString() == parseInt(userAmount).toString()) {
+                        index_userAmount = i;
+                        break;
+                    }
+                }
                 var startPoint = (parseInt(userAmount) - 33 > 0) ? (parseInt(userAmount) - 33) : 0;
                 var endPoint = (parseInt(userAmount) + 33 > amount[amount.length - 1]) ? amount[amount.length - 1] : (parseInt(userAmount) + 33);
                 chartPenalty.setOption({
@@ -969,7 +992,8 @@
             }
         }, 'json')
     };
-    // Radar
+
+    // Chart radar
     var chartRadar = echarts.init(document.getElementById('chartRadar'));
 
     clamp_val = function (val, min, max, decimal) {
@@ -1006,7 +1030,7 @@
             fontSize: 14
         },
         tooltip: {
-            trigger: 'item'
+            trigger: 'axis'
         },
         radar:{
             indicator: [
@@ -1034,6 +1058,7 @@
     };
     chartRadar.setOption(opt_chartRadar);
 
+    // fullpage设定
     var isChartRefreshed = [false,false,false,false,false]; // 防止一次个人成就报告页面访问内重复刷新图表
     $(document).ready(function() {
         $('#fullpage').fullpage({

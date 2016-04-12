@@ -72,19 +72,19 @@
             $.ajax('/charts/conability/getData?' + $("#form-ipt").serialize(), {
                 type: 'GET',
                 success: function (json_response) {
-                    var userAmount = json_response.userAmount;
-                    var amount = json_response.amount;
-                    var num = json_response.num;
-                    var index_userAmount = 0;
-
-                    for (var i = 0; i < amount.length; i++) {
-                        if (amount[i].toString() == parseInt(userAmount).toString()) {
-                            index_userAmount = i;
-                            break;
-                        }
-                    }
                     chartConAbility.hideLoading();
                     if (!json_response.errMsg) {
+                        var userAmount = json_response.userAmount;
+                        var amount = json_response.amount;
+                        var num = json_response.num;
+                        var index_userAmount = 0;
+
+                        for (var i = 0; i < amount.length; i++) {
+                            if (amount[i].toString() == parseInt(userAmount).toString()) {
+                                index_userAmount = i;
+                                break;
+                            }
+                        }
 
                         var startPoint = (parseInt(userAmount) - 77 > 0) ? (parseInt(userAmount) - 77) : 0;
                         var endPoint = (parseInt(userAmount) + 77 > amount[amount.length - 1]) ? amount[amount.length - 1] : (parseInt(userAmount) + 77);
