@@ -39,6 +39,6 @@ def CategoryProcess(results):
 
     vals = {}
     for i in range(len(final_vals)):
-        vals[final_vals[i][0]] = final_vals[i][1]
+        vals[final_vals[i][0]] = round(final_vals[i][1],2)
 
     return titles, vals

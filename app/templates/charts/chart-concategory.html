@@ -74,10 +74,8 @@
                     chartConCategory.setOption(optionChartConCategory);
 
                     if (!json_response.errMsg) {
-                        var titles;
-                        var seriesData;
-                        titles = json_response.titles;
-                        seriesData = json_response.seriesData;
+                        var titles = json_response.titles;
+                        var seriesData = json_response.seriesData;
 
                         chartConCategory.setOption({
                             legend: {data: titles},
