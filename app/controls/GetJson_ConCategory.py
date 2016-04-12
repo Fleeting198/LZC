@@ -13,7 +13,6 @@ def GetJson_ConCategory(userID, startDate, endDate):
     if len(startDate) != 0:
         strQuery = strQuery.filter(and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
     results = strQuery.all()
-
     if len(results) == 0:
         return {'errMsg': u'无记录。'}
 

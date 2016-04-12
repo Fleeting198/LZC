@@ -9,7 +9,6 @@
     <div id="chartPenalty" style="width: inherit; height: 90%;"></div>
 
     <script>
-
         var chartPenalty = echarts.init(document.getElementById('chartPenalty'));
         window.addEventListener('resize', function () {
             chartPenalty.resize()
@@ -73,21 +72,19 @@
                 type: 'GET',
                 success: function (json_response) {
                     // json_response = {'userAmount': userAmount, 'amount': amount, 'num': num}
-                    var userAmount = json_response.userAmount;
-                    var amount = json_response.amount;
-                    var num = json_response.num;
-                    var index_userAmount = 0;
-
-                    for (var i = 0; i < amount.length; i++) {
-                        if (amount[i].toString() == parseInt(userAmount).toString()) {
-                            index_userAmount = i;
-                            break;
-                        }
-                    }
-
                     chartPenalty.hideLoading();
-
                     if (!json_response.errMsg) {
+                        var userAmount = json_response.userAmount;
+                        var amount = json_response.amount;
+                        var num = json_response.num;
+                        var index_userAmount = 0;
+
+                        for (var i = 0; i < amount.length; i++) {
+                            if (amount[i].toString() == parseInt(userAmount).toString()) {
+                                index_userAmount = i;
+                                break;
+                            }
+                        }
                         var startPoint = (parseInt(userAmount) - 33 > 0) ? (parseInt(userAmount) - 33) : 0;
                         var endPoint = (parseInt(userAmount) + 33 > amount[amount.length - 1]) ? amount[amount.length - 1] : (parseInt(userAmount) + 33);
 

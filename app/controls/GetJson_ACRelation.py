@@ -22,8 +22,10 @@ def GetJson_ACRelation(userID):
     # node 属性计算
     value_source = int(max_val * 1.2)
     symbolSize_source = (min_size * max_val - max_size + (max_size - min_size) * (max_val + 10)) / (max_val - 1)
+
     # 初始化节点和边队列
     nodes = [{'name': source, 'value': value_source, 'symbolSize':symbolSize_source/2.0 }]
+    nodes[0]['symbolSize'] = min(max_size, nodes[0]['symbolSize'])
     links = []
 
     # 在nodes 中返回key:name 为name 的元素序号，若无则返回-1
@@ -72,23 +74,21 @@ def GetJson_ACRelation(userID):
     # print "======================="
 
     # 第二轮加边
-    for j in range(1, len(nodes)):  # 遍历源目标外的点
+    max_concern = 7  # 最大进行处理的二级点数量
+    for j in range(1, len(nodes)):  # 遍历关系中心外的点
         source = nodes[j]['name']   # 取名字
         list_relation = query_list_relation(source) # 查询
         if len(list_relation) == 0: continue
-        max_concern = 7  # 最大进行处理的二级点数量
 
+        max_concern = min(max_concern, len(nodes))
         for i in range(len(list_relation)):     # 遍历查询结果
             if i < max_concern:     # 处理数量限制
-                # 取项的属性
-                item = list_relation[i]
-                k = item[0];  v = item[1]
+                k = list_relation[i][0];  v = list_relation[i][1]  # 取项的属性
 
                 if v > min_val:     # 关系值筛选
                     idx_k = index_of_name(k)    # 取name 在nodes 中序号
                     if idx_k != -1:
                         link = {'source': i, 'target': idx_k, 'weight': (nodes[i]['value']+nodes[idx_k]['value'])/2.0 }
-
                         # link = {'source': i, 'target': idx_k}
                         links.append(link)
 
@@ -114,22 +114,13 @@ def query_list_relation(userID):
     # Query
     strQuery = acr_friendlist.query.filter(acr_friendlist.user_id == userID)
     results = strQuery.first()
-
-    if results is None:
+    if results is None:  # 若查不到直接返回空队列
         return []
     dict_relation = results.str_relation_to_dict()
 
-    # Stage 0 completed: dict_relation queried.
-    # =======================
-
-
-    # 删掉关系所有者在关系中的记录
+    # 删掉关系中心在关系中的记录
     if userID in dict_relation:
         del dict_relation[userID]
-
-    # Stage 1 completed: dict_relation without self inside.
-    # =======================
-
 
     # 排序
     list_relation = []
@@ -137,10 +128,6 @@ def query_list_relation(userID):
         list_relation.append([k, int(v)])
 
     del dict_relation
-
     list_relation = sorted(list_relation, cmp_list_item)[::-1]
-
-    # Stage 2 completed: sorted list_relation.
-    # =======================
 
     return list_relation

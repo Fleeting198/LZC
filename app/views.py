@@ -11,10 +11,9 @@ from app import app
 from flask import render_template, request, jsonify, redirect
 from app.models import *
 from app.forms import *
-from sqlalchemy import and_, func, distinct
-import types
-from pandas import Series, DataFrame
+from sqlalchemy import func
 from app import helpers
+import types
 
 
 @app.route('/')
@@ -36,199 +35,21 @@ def check_dev_id(devID):
     strQuery = device.query.filter(devID = devID)
     return True if len(strQuery.all()) == 1 else False
 
-
+# 访问 Summary 页面的默认工号
 @app.route('/summary')
 def show_summary_default():
     return redirect('/summary/PPPWQHXW')
 
-
+# 按工号 user_id 获取信息，刷新页面
 @app.route('/summary/<user_id>')
 def show_summary(user_id):
-
-    # =================================
-    # 工号，日期设定
-    # =================================
+    # Summary 页面用的默认工号及日期设定
     userID = str(user_id)
     startDate = ''
     endDate = ''
 
-    # =================================
-    # 门禁
-    # =================================
-    # 最近一月 distinct门禁地点名数
-    # 门禁地点数
-    # 地点类型 accategory
-
-    sql = "SELECT node_des,COUNT(acrec.node_des)as con from acrec where user_id='%s' GROUP BY node_des ORDER BY con DESC"%(userID)
-    # sql = db.session.query(acrec.node_des, func.count(acrec.node_des)).filter(acrec.user_id==userID)
-    results = db.session.execute(sql).fetchall()
-
-    node_des = [result.node_des for result in results] # 地点名
-    count = [result.con for result in results]         # 地点门禁次数
-    node_cate = []                                     # 地点分类
-    total_count = sum(count)                           # 总门禁次数
-
-    ac_items = []
-    for i in range(len(node_des)):
-        sql = db.session.query(ac_loc.category).filter(ac_loc.node_des==node_des[i])
-        node_cate.append(helpers.translate(sql.first()))
-        ac_items.append({'node_des': node_des[i], 'count': count[i], 'node_cate': node_cate[i]})
-
-    ret_access = {'count_nodes': len(node_des), 'total_count':total_count, 'ac_items': ac_items }
-
-
-    # =================================
-    # 生活习惯
-    # =================================
-    # 最近一个月
-    # 时间分布 6点~7点宿舍打卡
-    # 23点到5点打卡  ACPeriodCate
-
-    from controls.GetJson_ACPeriodCate import GetJson_ACPeriodCate
-    json_ACPeriodCate = GetJson_ACPeriodCate(userID, 2, startDate, endDate)
-    timeDistri = json_ACPeriodCate["json_timeDistribution"]
-
-    dict_vals = {}
-    for item in timeDistri["seriesData"]:
-        dict_vals[item['name']] = item['data']
-
-    df = DataFrame(dict_vals, index=range(24))
-
-    df['SUM'] = 0
-    for col, vals in df.iteritems():
-        if col == 'SUM': break
-        df['SUM'] += vals
-
-    count_early = df.loc[6]['dorm'] if 'dorm' in df else 0  # 取 6 点宿舍值，总计早起次数
-    count_night = sum(df.loc[0:6]['SUM'].tolist()) + df.loc[23]['SUM']  # 取23点 ~ 5点总门禁次数
-
-    ret_habit = {'count_early': count_early, 'count_night': count_night }
-
-
-    # =================================
-    # 学习
-    # =================================
-    # 最近一个月图书馆、教学楼次数
-
-    from controls.GetJson_ACCategory import GetJson_ACCategory
-    json_ACCategory = GetJson_ACCategory(userID,startDate,startDate)
-
-    # 教学、图书馆、科研门禁计数
-    count = {'acad':0,'lib':0,'sci':0}
-    for item in json_ACCategory['seriesData']:
-        count[item['name']] = item['value']
-    count_total = count['acad']+count['lib']+count['sci']
-
-    sql = ac_count.query
-    results = sql.all()
-    sum_per_month = sorted([result.get_sum_per_month() for result in results])
-
-    # 获取个体在全体数据中排名
-    idx_user = len(sum_per_month)
-    for i in range(len(sum_per_month)):
-        if int(sum_per_month[i]) > count_total:
-            idx_user = i
-            break
-
-    percent_asc = float(sum(sum_per_month[: idx_user])) / sum(sum_per_month)
-
-    ret_study = {'count_lib':count['lib'], 'count_acad': count['acad'], 'count_sci': count['sci'], 'percent_asc': percent_asc}
-
-
-    # =================================
-    # 人际关系
-    # =================================
-    # 好友 —— 等待好友结果
-
-    # 奋斗的路上有更多同伴才更有动力，有｛｝位同学曾与我擦肩而过。</br>
-    #｛｝童鞋，我们｛｝次不断相遇，难道是缘分，难道是天意。
-
-    from controls.GetJson_ACRelation import GetJson_ACRelation
-    json_ACRelation = GetJson_ACRelation(userID)
-
-    num_relations = json_ACRelation['num_total']
-    if num_relations != 0:
-        top_name = json_ACRelation['nodes'][0]['name']
-        top_value = int(json_ACRelation['nodes'][0]['value'])
-    else:
-        top_name = 'None'
-        top_value = 0
-    ret_social = {'num_relations': num_relations, 'top_name':top_name, 'top_value':top_value }
-
-
-    # =================================
-    # 消费 bill
-    # =================================
-    # 账单： 最近一月：
-    # 消费类型比例 concategory, conablilty, expenditure
-    # 一月消费总额
-
-    from controls.GetJson_expenditure import GetJson_expenditure
-    json_Expenditure = GetJson_expenditure(userID, 0, 2, startDate, endDate)
-
-    # Get total_expend 总支出
-    if 'errMsg' not in json_Expenditure:
-        dateTrend = json_Expenditure['json_dateTrend']
-        total_expend = dateTrend['accumulatedVals'][-1]
-    else:
-        total_expend = 0
-
-    # 消费分类排名
-    from controls.GetJson_ConCategory import GetJson_ConCategory
-    json_ConCategory = GetJson_ConCategory(userID,startDate,endDate)
-
-    if 'errMsg' not in json_ConCategory:
-        con_items = json_ConCategory['seriesData']
-        top_cate = helpers.translate(con_items[0]['name'])
-    else:
-        top_cate = ''
-
-    # [{'name': 'food', 'value': 2653.9}, {'name': 'shop', 'value': 177.5}, {'name': 'None', 'value': 56.5}, ...]
-
-    # 消费能力
-    from controls.GetJson_ConAbility import GetJson_ConAbility
-    json_ConAbility = GetJson_ConAbility(userID)
-
-    # 月均消费
-    if 'errMsg' not in json_ConAbility:
-        con_per_month = json_ConAbility['userAmount']
-    else:
-        con_per_month = -1
-
-    ret_bill = {'total_expend':total_expend, 'top_cate': top_cate, 'con_per_month': con_per_month}
-
-
-    # =================================
-    # 滞纳金
-    # =================================
-
-    from controls.GetJson_Penalty import GetJson_Penalty
-    json_Penalty = GetJson_Penalty(userID)
-
-    # json_userAmount = json_Penalty['json_userAmount']
-    # json_penalty = json_Penalty['json_penalty']
-
-    if 'errMsg' not in json_Penalty:
-        user_penalty = json_Penalty['userAmount']  # 总滞纳金
-        amount = json_Penalty['amount']
-        num = json_Penalty['num']
-        # 获取个体在全体数据中排名
-        idx_user = len(amount)
-        for i in range(len(amount)):
-            if int(amount[i]) > user_penalty:
-                idx_user = i
-                break
-        # idx_user = amount.index(int(user_penalty))
-        percent_asc = float(sum(num[: idx_user])) / sum(num)
-
-        ret_penalty = {'user_penalty': user_penalty, 'percent_asc': percent_asc}
-    else:
-        ret_penalty = {'user_penalty': -1, 'percent_asc': -1}
-
-    # =================================
-    # 最后打包
-    vals_summary = {'ret_access': ret_access, 'ret_habit': ret_habit, 'ret_study': ret_study,
-                    'ret_social': ret_social, 'ret_bill': ret_bill, 'ret_penalty': ret_penalty }
+    from controls.GetJson_Summary import GetJson_Summary
+    vals_summary = GetJson_Summary(user_id,startDate,endDate)
 
     return render_template('summarization/summarization.html', userID=userID, startDate=startDate, endDate=endDate, vals_summary=vals_summary)
 
@@ -253,7 +74,7 @@ def refresh_chart_expenditure():
     form.dateRange.data = request.args.get('dateRange')
 
     if not form.validate():
-        return jsonify(errMsg=form.errors)
+        return jsonify(errMsg=form.errors['userID'])
     if not check_user_id(form.userID.data):
         return jsonify(errMsg=lstr.warn_userIDNon)
 
@@ -286,7 +107,7 @@ def refresh_chart_acperiodcate():
     form.modeDate.data = request.args.get('modeDate')
 
     if not form.validate():
-        return jsonify(errMsg=form.errors)
+        return jsonify(errMsg=form.errors['userID'])
     if not check_user_id(form.userID.data):
         return jsonify(errMsg=lstr.warn_userIDNon)
 
@@ -339,7 +160,7 @@ def refresh_chart_income():
     form.dateRange.data = request.args.get('dateRange')
 
     if not form.validate():
-        return jsonify(errMsg=form.errors)
+        return jsonify(errMsg=form.errors['devID'])
     # TODO: 设备号是否存在
 
 
@@ -391,7 +212,7 @@ def refresh_chart_acvalid():
     form.dateRange.data = request.args.get('dateRange')
 
     if not form.validate():
-        return jsonify(errMsg=form.errors)
+        return jsonify(errMsg=form.errors['userID'])
     if not check_user_id(form.userID.data):
         return jsonify(errMsg=lstr.warn_userIDNon)
 
@@ -599,7 +420,7 @@ def refresh_chart_conability():
     form.userID.data = request.args.get('userID')
 
     if not form.validate():
-        return jsonify(errMsg=form.errors)
+        return jsonify(errMsg=form.errors['userID'])
 
     userID = form.userID.data
 
@@ -625,7 +446,7 @@ def refresh_chart_penalty():
     form.userID.data = request.args.get('userID')
 
     if not form.validate():
-        return jsonify(errMsg=form.errors)
+        return jsonify(errMsg=form.errors['userID'])
 
     userID = form.userID.data
 
@@ -646,7 +467,7 @@ def refresh_chart_relation():
     form.userID.data = request.args.get('userID')
 
     if not form.validate():
-        return jsonify(errMsg=form.errors)
+        return jsonify(errMsg=form.errors['userID'])
 
     userID = form.userID.data
     from controls.GetJson_ACRelation import GetJson_ACRelation
@@ -664,8 +485,7 @@ def refresh_summary_penalty():
 
     from controls.GetJson_Penalty import GetJson_Penalty
     json_response = GetJson_Penalty(userID)
-    json_response = jsonify(json_response)
-    return json_response
+    return jsonify(json_response)
 
 
 @app.route('/summary/GetJson_accategory', methods=['GET'])
@@ -678,20 +498,18 @@ def refresh_summary_accategory():
     from controls.GetJson_ACCategory import GetJson_ACCategory
     json_response = GetJson_ACCategory(userID, startDate, endDate)
 
-    # ==================
-    titles = json_response['titles']
-    seriesData = json_response['seriesData']
+    if 'errMsg' not in json_response:
+        titles = json_response['titles']
+        seriesData = json_response['seriesData']
 
-    for datum in seriesData:
-        datum['name'] = helpers.translate(datum['name'])
-    titles = [helpers.translate(title) for title in titles]
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
+        titles = [helpers.translate(title) for title in titles]
 
-    json_response['titles'] = titles
-    json_response['seriesData'] = seriesData
-    # ==================
+        json_response['titles'] = titles
+        json_response['seriesData'] = seriesData
 
-    json_response = jsonify(json_response)
-    return json_response
+    return jsonify(json_response)
 
 
 @app.route('/summary/GetJson_concategory', methods=['GET'])
@@ -702,23 +520,20 @@ def refresh_summary_concategory():
     endDate = request.args.get('startDate')
 
     from controls.GetJson_ConCategory import GetJson_ConCategory
-
     json_response = GetJson_ConCategory(userID, startDate, endDate)
 
-    # ==================
-    titles = json_response['titles']
-    seriesData = json_response['seriesData']
+    if 'errMsg' not in json_response:
+        titles = json_response['titles']
+        seriesData = json_response['seriesData']
 
-    for datum in seriesData:
-        datum['name'] = helpers.translate(datum['name'])
-    titles = [helpers.translate(title) for title in titles]
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
+        titles = [helpers.translate(title) for title in titles]
 
-    json_response['titles'] = titles
-    json_response['seriesData'] = seriesData
-    # ==================
+        json_response['titles'] = titles
+        json_response['seriesData'] = seriesData
 
-    json_response = jsonify(json_response)
-    return json_response
+    return jsonify(json_response)
 
 
 @app.route('/summary/GetJson_acperiodcate', methods=['GET'])
@@ -731,35 +546,31 @@ def refresh_summary_acperiodcate():
     modeDate = 2
 
     from controls.GetJson_ACPeriodCate import GetJson_ACPeriodCate
-
     json_response = GetJson_ACPeriodCate(userID, modeDate, startDate, endDate)
 
-    # ===========================
-    # 解包，翻译，打包
-    legendLabels = json_response['json_dateTrend']['legendLabels']
-    seriesData = json_response['json_dateTrend']['seriesData']
+    if 'errMsg' not in json_response:
+        # 解包，翻译，打包
+        legendLabels = json_response['json_dateTrend']['legendLabels']
+        seriesData = json_response['json_dateTrend']['seriesData']
 
-    legendLabels = map(lambda x: helpers.translate(x), legendLabels)
-    for datum in seriesData:
-        datum['name'] = helpers.translate(datum['name'])
+        legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
 
-    json_response['json_dateTrend']['legendLabels'] = legendLabels
-    json_response['json_dateTrend']['seriesData'] = seriesData
+        json_response['json_dateTrend']['legendLabels'] = legendLabels
+        json_response['json_dateTrend']['seriesData'] = seriesData
 
-    legendLabels = json_response['json_timeDistribution']['legendLabels']
-    seriesData = json_response['json_timeDistribution']['seriesData']
+        legendLabels = json_response['json_timeDistribution']['legendLabels']
+        seriesData = json_response['json_timeDistribution']['seriesData']
 
-    legendLabels = map(lambda x: helpers.translate(x), legendLabels)
-    for datum in seriesData:
-        datum['name'] = helpers.translate(datum['name'])
+        legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
 
-    json_response['json_timeDistribution']['legendLabels'] = legendLabels
-    json_response['json_timeDistribution']['seriesData'] = seriesData
-    # ===========================
+        json_response['json_timeDistribution']['legendLabels'] = legendLabels
+        json_response['json_timeDistribution']['seriesData'] = seriesData
 
-    json_response = jsonify(json_response)
-
-    return json_response
+    return jsonify(json_response)
 
 
 @app.route('/summary/GetJson_relation', methods=['GET'])
@@ -768,9 +579,7 @@ def refresh_summary_relation():
 
     from controls.GetJson_ACRelation import GetJson_ACRelation
     json_response = GetJson_ACRelation(userID)
-
-    json_response = jsonify(json_response)
-    return json_response
+    return jsonify(json_response)
 
 # =====================================
 # Summary End
