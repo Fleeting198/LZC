@@ -85,6 +85,8 @@ def ACPeriodCate(res_datetimes, res_categorys, mode_date):
 
     df = DataFrame(vals)
 
+    print df
+
     seriesData = []
     legendLabels = []
     for colName, col in df.iteritems():
