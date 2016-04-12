@@ -501,29 +501,6 @@
             trigger: 'item',
             formatter: "{b} : {c} ({d}%)"
         },
-        toolbox: {
-            show: true,
-            feature: {
-                mark: { show: true },
-                dataView: {
-                    show: true,
-                    readOnly: false
-                },
-                restore: {
-                    show: true
-                },
-                saveAsImage: {
-                    show: true
-                }
-            },
-            iconStyle: {
-                normal: {
-                    borderColor: '#ECF0F1'
-                }
-            },
-            top: '10%',
-            right: 0
-        },
         legend: {
             data: [],
             textStyle: {
@@ -584,35 +561,6 @@
         },
         tooltip: {
             trigger: 'axis'
-        },
-        toolbox: {
-            show: true,
-            feature: {
-                mark: {
-                    show: true
-                },
-                dataView: {
-                    show: true,
-                    readOnly: false
-                },
-                magicType: {
-                    show: true,
-                    type: ['line', 'bar']
-                },
-                restore: {
-                    show: true
-                },
-                saveAsImage: {
-                    show: true
-                }
-            },
-            iconStyle: {
-                normal: {
-                    borderColor: '#34495E'
-                }
-            },
-            top: '10%',
-            right: 0
         },
         legend: {
             data: [],
@@ -767,7 +715,7 @@
             },
             x: 'right'
         },
-        color: ['#0039B3', '#4F7FE8', '#6892ED', '#97B7FC', '#BED0F7'],
+        color: ['#F2F5A6', '#FCD781', '#FFB35C', '#FF9447'],
         textStyle: {
             color: '#ECF0F1',
             fontSize: 14
@@ -775,31 +723,6 @@
         tooltip: {
             trigger: 'item',
             formatter: "{a} <br/>{b} : {c} 元 ({d}%)"
-        },
-        toolbox: {
-            show: true,
-            feature: {
-                mark: {
-                    show: true
-                },
-                dataView: {
-                    show: true,
-                    readOnly: false
-                },
-                restore: {
-                    show: true
-                },
-                saveAsImage: {
-                    show: true
-                }
-            },
-            iconStyle: {
-                normal: {
-                    borderColor: '#ECF0F1'
-                }
-            },
-            top: '10%',
-            right: 0
         },
         legend: {
             show: true,
@@ -865,35 +788,6 @@
                 str_return += params[0].seriesName + ' : ' + params[0].value + ' 人<br/>';
                 return str_return;
             }
-        },
-        toolbox: {
-            show: true,
-            feature: {
-                mark: {
-                    show: true
-                },
-                dataView: {
-                    show: true,
-                    readOnly: false
-                },
-                magicType: {
-                    show: true,
-                    type: ['line', 'bar']
-                },
-                restore: {
-                    show: true
-                },
-                saveAsImage: {
-                    show: true
-                }
-            },
-            iconStyle: {
-                normal: {
-                    borderColor: '#ECF0F1'
-                }
-            },
-            top: '10%',
-            right: 0,
         },
         xAxis: {
             type: 'category',
