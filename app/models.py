@@ -3,7 +3,6 @@
 
 from app import db
 
-
 class device(db.Model):
     """
     刷卡机：设备号，地点序号(外键：设备地点表 序号)
@@ -30,9 +29,21 @@ class individual(db.Model):
     consumptions = db.relationship('consumption', backref=db.backref('individual'))  # 此工号所有消费记录
 
     def __init__(self, user_id, role, grade):
+        self.set_user_id(user_id)
+        self.set_role(role)
+        self.set_grade(grade)
+
+    def set_user_id(self, user_id):
         self.user_id = user_id
+
+    def set_role(self, role):
         self.role = role
-        self.grade = grade
+
+    def set_grade(self, grade):
+        if self.role == '老师' or '其他':
+            self.grade = self.role
+        else:
+            self.grade = grade
 
 
 class dev_loc(db.Model):
@@ -57,15 +68,14 @@ class ac_loc(db.Model):
     门禁地点：地点序号(自增)，地点描述。
     分类：
     """
-    # node_id = db.Column(db.Integer, primary_key=True)
-    node_des = db.Column(db.String(40), primary_key=True)
+    node_id = db.Column(db.Integer, primary_key=True)
+    node_des = db.Column(db.String(40))
     category = db.Column(db.String(5))
 
     acrecs = db.relationship('acrec', backref=db.backref('ac_loc'))  # 属于这个地点的所有门禁记录
 
-    def __init__(self, node_id, node_des, category):
+    def __init__(self, node_id, category):
         self.node_id=node_id
-        self.node_des=node_des
         self.category=category
 
 
@@ -76,15 +86,13 @@ class acrec(db.Model):
     user_id = db.Column(db.String(8), db.ForeignKey('individual.user_id'), primary_key=True)
     ac_datetime = db.Column(db.DateTime, primary_key=True)
     legal = db.Column(db.Integer)
+    node_id = db.Column(db.Integer, db.ForeignKey('ac_loc.node_id'))
 
-    node_des = db.Column(db.String(40), db.ForeignKey('ac_loc.node_des'))
-    # node_id = db.Column(db.Integer, db.ForeignKey('ac_loc.node_id'))
-
-    def __init__(self, user_id, node_des, ac_datetime, legal):
+    def __init__(self, user_id, node_id, ac_datetime, legal):
         self.user_id = user_id
-        self.node_des = node_des
         self.ac_datetime = ac_datetime
         self.legal = legal
+        self.node_id = node_id
 
     # legal 为1 合法，否则非法。
     def is_legal(self):
@@ -131,12 +139,6 @@ class conability(db.Model):
     amount_avg = db.Column(db.DECIMAL())
     role = db.Column(db.String(3))
 
-    def __init__(self, user_id, amount_avg, role):
-        self.user_id = user_id
-        self.amount_avg = amount_avg
-        self.role = role
-
-
 class conability_line(db.Model):
     """
     月消费能力统计：月平均消费金额(取整),人数,角色[老师，学生]
@@ -145,21 +147,12 @@ class conability_line(db.Model):
     num = db.Column(db.Integer())
     role = db.Column(db.String(3))
 
-    def __init__(self, amount, num, role):
-        self.amount = amount
-        self.num = num
-        self.role = role
-
 class penalty(db.Model):
     """
     个体滞纳金缴纳情况：工号,缴纳总额
     """
     user_id = db.Column(db.String(8), primary_key=True)
     amount = db.Column(db.DECIMAL())
-
-    def __init__(self, user_id, amount):
-        self.user_id = user_id
-        self.amount = amount
 
 class penalty_line(db.Model):
     """
@@ -168,11 +161,7 @@ class penalty_line(db.Model):
     amount = db.Column(db.Integer(), primary_key=True)
     num = db.Column(db.Integer())
 
-    def __init__(self, amount_avg, num):
-        self.amount_avg = amount_avg
-        self.num = num
-
-# -C   用于查询食物和用水消费时间分布的现成表
+#  用于查询食物和用水消费时间分布的现成表
 class con_food_12m(db.Model):
     con_axis = db.Column(db.Integer(), primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
@@ -197,11 +186,22 @@ class con_water_24h(db.Model):
     con_axis = db.Column(db.Integer(), primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
 
+
 # 用以查询图书馆、科研、教学楼访问次数的现成表
 class ac_count(db.Model):
     user_id = db.Column(db.Integer(), primary_key=True)
     count_acad = db.Column(db.Integer())
     count_lib = db.Column(db.Integer())
     count_sci = db.Column(db.Integer())
-    sum = db.Column(db.Integer())
-    sum_per_month = db.Column(db.Integer())
+
+    def __init__(self, user_id, count_acad, count_lib, count_sci):
+        self.user_id = user_id
+        self.count_acad = count_acad
+        self.count_lib = count_lib
+        self.count_sci = count_sci
+
+    def get_sum(self):
+        return self.count_acad + self.count_sci + self.count_lib
+
+    def get_sum_per_month(self):
+        return self.get_sum() / 12.0

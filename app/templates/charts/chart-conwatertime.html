@@ -7,16 +7,15 @@
             {{ subfield(onchange='refresh_chart()') }}{{ subfield.label }}
             &nbsp;&nbsp;
         {% endfor %}
-        <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
+        <input class="btn btn-primary" type="button" value="刷新" onclick="refresh_chart()"/>
     </form>
 
     <div id="chartTimeDistribution" style="width: inherit; height: 90%;"></div>
 
     <script>
-
         // 图表初始化。
         var chartTimeDistribution = echarts.init(document.getElementById('chartTimeDistribution'));
-        $(window).resize(function () {
+        window.addEventListener('resize', function () {
             chartTimeDistribution.resize();
         });
 
@@ -58,14 +57,12 @@
                 }
             },
             dataZoom: [
-                {
-                    type: 'inside',
+                {   type: 'inside',
                     xAxisIndex: [0],
                     start: 0,
                     end: 100
                 },
-                {
-                    type: 'slider',
+                {   type: 'slider',
                     xAxisIndex: [0],
                     start: 0,
                     end: 100
@@ -79,37 +76,38 @@
         };
         chartTimeDistribution.setOption(optionChartTime);
 
-
-
         refresh_chart = function () {
             chartTimeDistribution.showLoading();
 
-            $.get('/charts/foodIncome/getData?' + $("#form-ipt").serialize(), function (json_response) {
-                chartTimeDistribution.hideLoading();
-                chartTimeDistribution.setOption(optionChartTime);
+            $.ajax('/charts/conwatertime/getData?' + $("#form-ipt").serialize(), {
+                type: 'GET',
+                success: function (json_response) {
+                    chartTimeDistribution.hideLoading();
+                    chartTimeDistribution.setOption(optionChartTime);
 
-                if (!json_response.errMsg) {
-                    var json_timeDistribution;
-                    json_timeDistribution = json_response.json_timeDistribution;
+                    if (!json_response.errMsg) {
+                        var json_timeDistribution;
+                        json_timeDistribution = json_response.json_timeDistribution;
 
-                    chartTimeDistribution.setOption({
-                        xAxis: [{
-                            data: json_timeDistribution.axisLabels
-                        }],
-                        series: [{
-                            data: json_timeDistribution.vals
-                        }]
-                    });
+                        chartTimeDistribution.setOption({
+                            xAxis: [{
+                                data: json_timeDistribution.axisLabels
+                            }],
+                            series: [{
+                                data: json_timeDistribution.vals
+                            }]
+                        });
 
-                } else {
-                    for (err in json_response.errMsg) {
-                        alert(json_response.errMsg[err]);
+                    } else {
+                        showDialog("出错了", json_response.errMsg);
                     }
-                }
-            }, 'json')
+                },
+                error: function () {
+                    showDialog("出错了", "与服务器断开连接");
+                },
+                dataType: 'json'
+            });
         };
-
         refresh_chart();
-
     </script>
 {% endblock %}

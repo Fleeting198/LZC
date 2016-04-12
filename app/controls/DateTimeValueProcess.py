@@ -27,8 +27,7 @@ class DateTimeValueProcess:
         # TODO: 日期坐标字符串调整
         ts = Series(self.oriValues, index=self.oriDate)
 
-        # TODO: 年规则不可eval
-        rule_mode = {'0': 'D', '1': 'W', '2': 'M', '3': 'Q', '4': 'Y'}
+        rule_mode = {'0': 'D', '1': 'W', '2': 'M', '3': 'Q'}
         # 按照modeDate 合并数据
         ts = ts.resample(rule_mode[str(mode_date)], how='sum')
 

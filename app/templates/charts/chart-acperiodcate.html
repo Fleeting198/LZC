@@ -2,7 +2,7 @@
 {% block chartField %}
 
     <form id="form-ipt" class="form-inline" >
-        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='AQPTHHPQ')}}
+        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='PPPWQHXW')}}
         {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
         {{ form.modeDate.label }}
         {% for subfield in form.modeDate %}
@@ -35,7 +35,7 @@
         var chartDateTrend = echarts.init(document.getElementById('chartDateTrend'));
         var chartTimeDistribution = echarts.init(document.getElementById('chartTimeDistribution'));
 
-        $(window).resize(function () {
+        window.addEventListener('resize', function () {
             chartDateTrend.resize();
             chartTimeDistribution.resize();
         });
@@ -80,6 +80,10 @@
                 },
                 {   type: 'value',
                     name: '比例',
+                    axisLine: {
+                        show: false,
+                        lineStyle: {width:10}
+                    },
                     axisLabel: {
                         formatter: function(value){
                             value *= 100;
@@ -134,84 +138,99 @@
         chartDateTrend.setOption(optionChartDate);
         chartTimeDistribution.setOption(optionChartTime);
 
-
-
         refresh_chart = function () {
             chartDateTrend.showLoading();
             chartTimeDistribution.showLoading();
-            $.get('/charts/acperiodcate/getData?' + $("#form-ipt").serialize(), function (json_response) {
-                chartDateTrend.hideLoading();
-                chartTimeDistribution.hideLoading();
 
-                // 还原图表选项
-                chartDateTrend.setOption(optionChartDate);
-                chartTimeDistribution.setOption(optionChartTime);
+            $.ajax('/charts/acperiodcate/getData?' + $("#form-ipt").serialize(), {
+                type: 'GET',
+                success: function (json_response) {
+                    chartDateTrend.hideLoading();
+                    chartTimeDistribution.hideLoading();
 
-                if (!json_response.errMsg) {
-                    var json_dateTrend;
-                    var json_timeDistribution;
-                    json_dateTrend = json_response.json_dateTrend;
-                    json_timeDistribution = json_response.json_timeDistribution;
+                    // 还原图表选项
+                    chartDateTrend.setOption(optionChartDate);
+                    chartTimeDistribution.setOption(optionChartTime);
 
+                    if (!json_response.errMsg) {
+                        var json_dateTrend;
+                        var json_timeDistribution;
+                        json_dateTrend = json_response.json_dateTrend;
+                        json_timeDistribution = json_response.json_timeDistribution;
 
-                    // 日期趋势图表设定。
-                    chartDateTrend.setOption({
-                        legend: {data: json_dateTrend.legendLabels},
-                        xAxis: [{
-                            data: json_dateTrend.axisLabels
-                        }]
-                    });
-                    for(var i=0; i< json_dateTrend.seriesData.length;i++){
+                        // 日期趋势图表设定。
+                        chartDateTrend.setOption({
+                            legend: {data: json_dateTrend.legendLabels},
+                            xAxis: [{
+                                data: json_dateTrend.axisLabels
+                            }]
+                        });
+                        
+                        // 清空series 并以notMerge 方式更新option.
                         var tmp_option = chartDateTrend.getOption();
-                        if (json_dateTrend.seriesData[i].name == '宿舍比重'){
-                            tmp_option.series.push({
-                                        name: json_dateTrend.seriesData[i].name,
-                                        type: 'line',
-                                        data: json_dateTrend.seriesData[i].data,
-                                        yAxisIndex: 1,
-                                        smooth: true,
-                            });
-                        }else if(json_dateTrend.seriesData[i].name == '总和'){
-                            tmp_option.series.push({
-                                        name: json_dateTrend.seriesData[i].name,
-                                        type: 'bar',
-                                        barWidth: 5,
-                                        data: json_dateTrend.seriesData[i].data
-                            });
-                        }else{
-                            tmp_option.series.push({
-                                        name: json_dateTrend.seriesData[i].name,
-                                        stack: 'ac',
-                                        type: 'bar',
-                                        data: json_dateTrend.seriesData[i].data
-                            });
-                        }
-                        chartDateTrend.setOption(tmp_option);
-                    }
+                        tmp_option.series = [];
+                        chartDateTrend.setOption(tmp_option, true);
 
-                    // 时间分布图表设定。
-                    chartTimeDistribution.setOption({
-                        legend: {data: json_timeDistribution.legendLabels },
-                        xAxis: [{data: json_timeDistribution.axisLabels }]
-                    });
-
-                    for (var i = 0; i < json_timeDistribution.seriesData.length; i++) {
-                        var tmp_option = chartTimeDistribution.getOption();
-                        tmp_option.series.push({
-                                    name: json_timeDistribution.seriesData[i].name,
+                        for (var i = 0; i < json_dateTrend.seriesData.length; i++) {
+                            var tmp_option = chartDateTrend.getOption();
+                            if (json_dateTrend.seriesData[i].name == '宿舍比重') {
+                                tmp_option.series.push({
+                                    name: json_dateTrend.seriesData[i].name,
+                                    type: 'line',
+                                    data: json_dateTrend.seriesData[i].data,
+                                    yAxisIndex: 1,
+                                    smooth: true
+                                });
+                            } else if (json_dateTrend.seriesData[i].name == '总和') {
+                                tmp_option.series.push({
+                                    name: json_dateTrend.seriesData[i].name,
+                                    type: 'bar',
+                                    barWidth: 5,
+                                    data: json_dateTrend.seriesData[i].data
+                                });
+                            } else {
+                                tmp_option.series.push({
+                                    name: json_dateTrend.seriesData[i].name,
                                     stack: 'ac',
                                     type: 'bar',
-                                    data: json_timeDistribution.seriesData[i].data
-                        });
-                        chartTimeDistribution.setOption(tmp_option);
-                    }
+                                    data: json_dateTrend.seriesData[i].data
+                                });
+                            }
+                            console.log(tmp_option);
+                            chartDateTrend.setOption(tmp_option, true);
+                        }
 
-                } else {
-                    for (err in json_response.errMsg) {
-                        alert(json_response.errMsg[err]);
+                        // 时间分布图表设定。
+                        chartTimeDistribution.setOption({
+                            legend: {data: json_timeDistribution.legendLabels},
+                            xAxis: [{data: json_timeDistribution.axisLabels}]
+                        });
+
+                        // 清空series 并以notMerge 方式更新option.
+                        var tmp_option = chartTimeDistribution.getOption();
+                        tmp_option.series = [];
+                        chartTimeDistribution.setOption(tmp_option, true);
+
+                        for (var i = 0; i < json_timeDistribution.seriesData.length; i++) {
+                            var tmp_option = chartTimeDistribution.getOption();
+                            tmp_option.series.push({
+                                name: json_timeDistribution.seriesData[i].name,
+                                stack: 'ac',
+                                type: 'bar',
+                                data: json_timeDistribution.seriesData[i].data
+                            });
+                            chartTimeDistribution.setOption(tmp_option);
+                        }
+
+                    } else {
+                        showDialog("出错了", json_response.errMsg);
                     }
-                }
-            }, 'json')
+                },
+                error: function () {
+                    showDialog("出错了", "与服务器断开连接");
+                },
+                dataType: 'json'
+            });
         };
     </script>
 

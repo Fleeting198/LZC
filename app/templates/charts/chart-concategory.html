@@ -28,7 +28,7 @@
 
         // Init charts.
         var chartConCategory = echarts.init(document.getElementById('chartConCategory'));
-        $(window).resize(function () {
+        window.addEventListener('resize', function () {
             chartConCategory.resize();
         });
 
@@ -36,7 +36,7 @@
             title: {text: '消费分类计数'},
             tooltip: {
                 trigger: 'item',
-                formatter: "{a} <br/>{b} : {c} ({d}%)"
+                formatter: "{a} <br/>{b} : {c} 元 ({d}%)"
             },
             toolbox: {
                 show: true,
@@ -67,27 +67,32 @@
 
         refresh_chart = function () {
             chartConCategory.showLoading();
-            $.get('/charts/concategory/getData?' + $("#form-ipt").serialize(), function (json_response) {
-                chartConCategory.hideLoading();
-                chartConCategory.setOption(optionChartConCategory);
+            $.ajax('/charts/concategory/getData?' + $("#form-ipt").serialize(), {
+                type: 'GET',
+                success: function (json_response) {
+                    chartConCategory.hideLoading();
+                    chartConCategory.setOption(optionChartConCategory);
 
-                if (!json_response.errMsg) {
-                    var titles;
-                    var seriesData;
-                    titles = json_response.titles;
-                    seriesData = json_response.seriesData;
+                    if (!json_response.errMsg) {
+                        var titles;
+                        var seriesData;
+                        titles = json_response.titles;
+                        seriesData = json_response.seriesData;
 
-                    chartConCategory.setOption({
-                        legend: {data: titles },
-                        series: [{data: seriesData}]
-                    });
+                        chartConCategory.setOption({
+                            legend: {data: titles},
+                            series: [{data: seriesData}]
+                        });
 
-                } else {
-                    for (err in json_response.errMsg) {
-                        alert(json_response.errMsg[err]);
+                    } else {
+                        showDialog("出错了", json_response.errMsg);
                     }
-                }
-            }, 'json')
+                },
+                error: function () {
+                    showDialog("出错了", "与服务器断开连接");
+                },
+                dataType: 'json'
+            });
         };
     </script>
 

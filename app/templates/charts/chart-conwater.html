@@ -4,11 +4,9 @@
     <!--place divs for charts-->
     <div id="chartConWater" style="width: inherit; height: 90%;"></div>
 
-
     <script>
-
         var chartConWater = echarts.init(document.getElementById('chartConWater'));
-        $(window).resize(function () {
+        window.addEventListener('resize', function () {
             chartConWater.resize();
         });
 
@@ -21,7 +19,6 @@
                 feature: {
                     mark: {show: true},
                     dataView: {show: true, readOnly: false},
-                    magicType: {show: true, type: ['bar']},
                     restore: {show: true},
                     saveAsImage: {show: true}
                 }
@@ -35,31 +32,38 @@
                 type: 'value',
                 name: '用水量',
                 axisLabel: {
-                    formatter: '{value} 元'
+                    formatter: function (value, index) {
+                        return value/10000 + "万元";
+                    }
                 }
             },
             series: [
-                {
-                    name: '金额',
+                {   name: '金额',
                     type: 'bar',
                     data: []
                 }
             ]
         };
-
-        <!--set options for charts-->
         chartConWater.setOption(optionChartConWater);
-
         load_number = function () {
-
-                chartConWater.setOption({
-                    series: {
-                        data: [1180323.72, 1180773.48]
-                    }
-                });
-
+            chartConWater.setOption({
+                series: {
+                    data: [
+                        {   name: '男生',
+                            value: 1180323.72,
+                            itemStyle: {
+                                normal: {
+                                    color: '#314656'
+                                }
+                            }
+                        },
+                        {   name: '女生',
+                            value: 1180773.48,
+                        }
+                    ]
+                }
+            });
         };
-
         load_number();
     </script>
 

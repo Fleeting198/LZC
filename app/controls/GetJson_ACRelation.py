@@ -66,10 +66,10 @@ def GetJson_ACRelation(userID):
             # link = {'source': index_of_name(source), 'target': index_of_name(k)}
             links.append(link)
 
-    print 'Round1: count_nodes=%d, count_links=%d' % (len(nodes), len(links))
+    # print 'Round1: count_nodes=%d, count_links=%d' % (len(nodes), len(links))
     # print nodes
     # print links
-    print "======================="
+    # print "======================="
 
     # 第二轮加边
     for j in range(1, len(nodes)):  # 遍历源目标外的点
@@ -92,7 +92,7 @@ def GetJson_ACRelation(userID):
                         # link = {'source': i, 'target': idx_k}
                         links.append(link)
 
-    print 'Round2: count_nodes=%d, count_links=%d' % (len(nodes), len(links))
+    # print 'Round2: count_nodes=%d, count_links=%d' % (len(nodes), len(links))
     # print nodes
     # print links
 

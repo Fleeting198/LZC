@@ -14,6 +14,9 @@ def GetJson_ConCategory(userID, startDate, endDate):
         strQuery = strQuery.filter(and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
     results = strQuery.all()
 
+    if len(results) == 0:
+        return {'errMsg': u'无记录。'}
+
     # Process data.
     from CategoryProcess import CategoryProcess
     titles, vals = CategoryProcess(results)

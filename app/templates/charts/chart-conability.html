@@ -9,15 +9,14 @@
     <div id="chartConAbility" style="width: inherit; height: 90%;"></div>
 
     <script>
-
         // 图表初始化。
         var chartConAbility = echarts.init(document.getElementById('chartConAbility'));
-        $(window).resize(function () {
+        window.addEventListener('resize', function () {
             chartConAbility.resize();
         });
 
         var optionChartConAbility = {
-            title: {text: '消费能力'},
+            title: { text: '消费能力' },
             tooltip: {
                 trigger: 'axis',
                 formatter: function (params) {
@@ -70,68 +69,67 @@
 
         refresh_chart = function () {
             chartConAbility.showLoading();
+            $.ajax('/charts/conability/getData?' + $("#form-ipt").serialize(), {
+                type: 'GET',
+                success: function (json_response) {
+                    var userAmount = json_response.userAmount;
+                    var amount = json_response.amount;
+                    var num = json_response.num;
+                    var index_userAmount = 0;
 
-            $.get('/charts/conability/getData?' + $("#form-ipt").serialize(), function (json_response) {
-
-                var userAmount = json_response.userAmount;
-                var amount = json_response.amount;
-                var num = json_response.num;
-                var index_userAmount = 0;
-
-                for (var i = 0; i < amount.length; i++) {
-                    if (amount[i].toString() == parseInt(userAmount).toString()) {
-                        index_userAmount = i;
-                        break;
+                    for (var i = 0; i < amount.length; i++) {
+                        if (amount[i].toString() == parseInt(userAmount).toString()) {
+                            index_userAmount = i;
+                            break;
+                        }
                     }
-                }
+                    chartConAbility.hideLoading();
+                    if (!json_response.errMsg) {
 
-                chartConAbility.hideLoading();
+                        var startPoint = (parseInt(userAmount) - 77 > 0) ? (parseInt(userAmount) - 77) : 0;
+                        var endPoint = (parseInt(userAmount) + 77 > amount[amount.length - 1]) ? amount[amount.length - 1] : (parseInt(userAmount) + 77);
 
-                if (!json_response.errMsg) {
-
-                    var startPoint = (parseInt(userAmount) - 77 > 0) ? (parseInt(userAmount) - 77): 0;
-                    var endPoint = (parseInt(userAmount) + 77 > amount[amount.length - 1]) ? amount[amount.length - 1] : (parseInt(userAmount) + 77);
-
-                    chartConAbility.setOption({
-                        xAxis: [{
-                            data: amount
-                        }],
-                        series: [{
+                        chartConAbility.setOption({
+                            xAxis: [{ data: amount }],
+                            series: [{
                                 data: num,
                                 markPoint: {
                                     label: {
                                         normal: {
-                                            formatter: function () {return userAmount.toString();},
+                                            formatter: function () {
+                                                return userAmount.toString();
+                                            },
                                             textStyle: {fontSize: 10}
                                         }
                                     },
                                     data: [
-                                    {
-                                        name: '此人',
-                                        coord: [index_userAmount, num[index_userAmount]]
-                                    }]
+                                        {
+                                            name: '此人',
+                                            coord: [index_userAmount, num[index_userAmount]]
+                                        }]
                                 }
-                        }],
-                        dataZoom: [
-                            {
-                                type: 'inside',
-                                xAxisIndex: 0,
-                                startValue: startPoint,
-                                endValue: endPoint
-                            },
-                            {
-                                type: 'slider',
-                                startValue: startPoint,
-                                endValue: endPoint
-                            }
-                        ],
-                    });
-                } else {
-                    for (err in json_response.errMsg) {
-                        alert(json_response.errMsg[err]);
+                            }],
+                            dataZoom: [
+                                {   type: 'inside',
+                                    xAxisIndex: 0,
+                                    startValue: startPoint,
+                                    endValue: endPoint
+                                },
+                                {   type: 'slider',
+                                    startValue: startPoint,
+                                    endValue: endPoint
+                                }
+                            ]
+                        });
+                    } else {
+                        showDialog("出错了", json_response.errMsg);
                     }
-                }
-            }, 'json')
+                },
+                error: function () {
+                    showDialog("出错了", "与服务器断开连接");
+                },
+                dataType: 'json'
+            });
         };
     </script>
 

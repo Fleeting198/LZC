@@ -1,5 +1,4 @@
 *.pyc
 *.xml
 *.swp
-
-app/.project
+*.iml

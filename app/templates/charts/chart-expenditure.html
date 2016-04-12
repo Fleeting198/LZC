@@ -41,7 +41,7 @@
         var chartDateTrend = echarts.init(document.getElementById('chartDateTrend'));
         var chartTimeDistribution = echarts.init(document.getElementById('chartTimeDistribution'));
 
-        $(window).resize(function () {
+        window.addEventListener('resize', function () {
             chartDateTrend.resize();
             chartTimeDistribution.resize();
         });
@@ -140,14 +140,12 @@
                 }
             },
             dataZoom: [
-                {
-                    type: 'inside',
+                {   type: 'inside',
                     xAxisIndex: [0],
                     start: 0,
                     end: 100
                 },
-                {
-                    type: 'slider',
+                {   type: 'slider',
                     xAxisIndex: [0],
                     start: 0,
                     end: 100
@@ -163,51 +161,56 @@
         chartDateTrend.setOption(optionChartDate);
         chartTimeDistribution.setOption(optionChartTime);
 
-
         // get向后端请求json刷新图表。
         refresh_chart = function(){
             chartDateTrend.showLoading();
             chartTimeDistribution.showLoading();
-            $.get('/charts/expenditure/getData?'+$("#form-ipt").serialize(), function(json_response){
-                chartDateTrend.hideLoading();
-                chartTimeDistribution.hideLoading();
 
-                chartDateTrend.setOption(optionChartDate);
-                chartTimeDistribution.setOption(optionChartTime);
+            $.ajax('/charts/expenditure/getData?' + $("#form-ipt").serialize(), {
+                type: 'GET',
+                success: function (json_response) {
+                    chartDateTrend.hideLoading();
+                    chartTimeDistribution.hideLoading();
 
-                var json_dateTrend;
-                var json_timeDistribution;
-                json_dateTrend = json_response.json_dateTrend;
-                json_timeDistribution = json_response.json_timeDistribution;
+                    chartDateTrend.setOption(optionChartDate);
+                    chartTimeDistribution.setOption(optionChartTime);
 
-                if(!json_response.errMsg){
-                    chartDateTrend.setOption({
-                        xAxis: [{
-                            data: json_dateTrend.axisLabels
-                        }],
-                        series: [
-                            { name: '累积支出',
-                                data: json_dateTrend.accumulatedVals
-                            },
-                            {name: '节点支出',
-                                data: json_dateTrend.pointVals
-                            }
-                        ]
-                    });
-                    chartTimeDistribution.setOption({
-                        xAxis: [{
-                            data: json_timeDistribution.axisLabels
-                        }],
-                        series: [{
-                            data: json_timeDistribution.vals
-                        }]
-                    });
-                }else{
-                    for(err in json_response.errMsg){
-                        alert(json_response.errMsg[err]);
+                    var json_dateTrend;
+                    var json_timeDistribution;
+                    json_dateTrend = json_response.json_dateTrend;
+                    json_timeDistribution = json_response.json_timeDistribution;
+
+                    if (!json_response.errMsg) {
+                        chartDateTrend.setOption({
+                            xAxis: [{
+                                data: json_dateTrend.axisLabels
+                            }],
+                            series: [
+                                {   name: '累积支出',
+                                    data: json_dateTrend.accumulatedVals
+                                },
+                                {   name: '节点支出',
+                                    data: json_dateTrend.pointVals
+                                }
+                            ]
+                        });
+                        chartTimeDistribution.setOption({
+                            xAxis: [{
+                                data: json_timeDistribution.axisLabels
+                            }],
+                            series: [{
+                                data: json_timeDistribution.vals
+                            }]
+                        });
+                    } else {
+                        showDialog("出错了", json_response.errMsg);
                     }
-                }
-            },'json')
+                },
+                error: function () {
+                    showDialog("出错了", "与服务器断开连接");
+                },
+                dataType: 'json'
+            });
         };
     </script>
 {% endblock %}

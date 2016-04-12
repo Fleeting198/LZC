@@ -16,7 +16,7 @@
         var chartNumberGradePg = echarts.init(document.getElementById('chartNumberGradePg'));
         var chartNumberGradeDr = echarts.init(document.getElementById('chartNumberGradeDr'));
 
-        $(window).resize(function(){
+        window.addEventListener('resize', function () {
             chartNumberTotal.resize();
             chartNumberGradeB.resize();
             chartNumberGradePg.resize();
@@ -97,61 +97,67 @@
         chartNumberGradeDr.setOption(optionChartNumberGrade);
 
         load_number = function () {
-
             chartNumberTotal.showLoading();
             chartNumberGradeB.showLoading();
+            chartNumberGradePg.showLoading();
+            chartNumberGradeDr.showLoading();
 
-            $.get('/charts/number/getData?', function (json_response) {
+            $.ajax('/charts/number/getData', {
+                type: 'GET',
+                success: function (json_response) {
+                    var json_numberTotal = json_response.json_numberTotal;
+                    var json_numberGradeB = json_response.json_numberGradeB;
+                    var json_numberGradePg = json_response.json_numberGradePg;
+                    var json_numberGradeDr = json_response.json_numberGradeDr;
 
-                var json_numberTotal = json_response.json_numberTotal;
-                var json_numberGradeB = json_response.json_numberGradeB;
-                var json_numberGradePg = json_response.json_numberGradePg;
-                var json_numberGradeDr = json_response.json_numberGradeDr;
+                    chartNumberTotal.hideLoading();
+                    chartNumberGradeB.hideLoading();
+                    chartNumberGradePg.hideLoading();
+                    chartNumberGradeDr.hideLoading();
 
-                chartNumberTotal.hideLoading();
-                chartNumberGradeB.hideLoading();
-
-                chartNumberTotal.setOption({
-                    series: [{
+                    chartNumberTotal.setOption({
+                        series: [{
                             data: [json_numberTotal.teacher, json_numberTotal.stuB, json_numberTotal.stuPg, json_numberTotal.stuDr, json_numberTotal.other]
-                    }]
-                });
+                        }]
+                    });
 
-                <!--fetch data dynamically-->
-                var names = new Array('10', '11', '12', '13', '14', '15', '其他');
-                var datas = new Array('g10', 'g11', 'g12', 'g13', 'g14', 'g15', 'unknown')
+                    // fetch data dynamically
+                    var names = ['10', '11', '12', '13', '14', '15', '其他'];
+                    var datas = ['g10', 'g11', 'g12', 'g13', 'g14', 'g15', 'unknown'];
 
-                function json2data (json_numberGrade) {
-                    var dataOfSeries = [];
-                    for ( var i = 0; i < datas.length; i++ ) {
-                        var item = {
-                        value: eval('json_numberGrade.'+datas[i]),
-                        name: names[i]
+                    function json2data(json_numberGrade) {
+                        var dataOfSeries = [];
+                        for (var i = 0; i < datas.length; i++) {
+                            var item = {
+                                value: eval('json_numberGrade.' + datas[i]),
+                                name: names[i]
+                            };
+                            dataOfSeries.push(item);
                         }
-                        dataOfSeries.push(item);
+                        return dataOfSeries;
                     }
-                    return dataOfSeries;
-                }
 
-                chartNumberGradeB.setOption({
-                    title: { text: '本科生各年级比例' },
-                    series: [{ data: json2data(json_numberGradeB) }]
-                });
+                    chartNumberGradeB.setOption({
+                        title: {text: '本科生各年级比例'},
+                        series: [{data: json2data(json_numberGradeB)}]
+                    });
 
-                chartNumberGradePg.setOption({
-                    title: { text: '研究生各年级比例' },
-                    series: [{ data: json2data(json_numberGradePg )}]
-                });
+                    chartNumberGradePg.setOption({
+                        title: {text: '研究生各年级比例'},
+                        series: [{data: json2data(json_numberGradePg)}]
+                    });
 
-                chartNumberGradeDr.setOption({
-                    title: { text: '博士生各年级比例' },
-                    series: [{ data: json2data(json_numberGradeDr )}]
-                });
-            }, 'json')
+                    chartNumberGradeDr.setOption({
+                        title: {text: '博士生各年级比例'},
+                        series: [{data: json2data(json_numberGradeDr)}]
+                    });
+                },
+                error: function () {
+                    showDialog("出错了", "与服务器断开连接");
+                },
+                dataType: 'json'
+            });
         };
-
         load_number();
-
     </script>
-
 {% endblock %}

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-
 userID = u'工号'
 devID = u'设备号'
 startDate = u'开始日期'
@@ -14,6 +13,7 @@ warn_userIDFill = u'工号不可为空'
 warn_userIDLength = u'工号长度应为8'
 warn_devIDFill = u'设备号不可为空'
 warn_devIDLength = u'设备号长度最大为10'
+warn_userIDNon = u'找不到这个工号'
 
 opts_modeDate = (u'日', u'周', u'月', u'季', u'年')
 opts_modeTime = (u'24小时', u'7天', u'12月')
@@ -37,7 +37,9 @@ dictTrans = {
     'lib':u'图书馆',
     'sci':u'科研',
 
-    'none':u'未分类|其他',
+    'other': u'其他',
+    'none':u'其他',
+    'None':u'其他',
 
     'SUM':u'总和',
     'PER_DORM':u'宿舍比重'

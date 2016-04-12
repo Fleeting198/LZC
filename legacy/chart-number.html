@@ -1,6 +1,6 @@
 {% extends "charts/charts.html" %}
 {% block chartField %}
-
+    <!-- This file is deprecated, replaced by chart-numberBar.html -->
     <!--place divs for charts-->
     <div id="chartNumberTotal" style="width: inherit; height: 50%;"></div>
     <div id="chartNumberGrade" style="width: inherit; height: 50%;"></div>
@@ -12,7 +12,6 @@
             chartNumberTotal.resize();
             chartNumberGrade.resize();
         });
-
 
         // start options for charts
         var optionChartNumberTotal = {
@@ -41,8 +40,7 @@
                 }
             },
             series: [
-                {
-                    name: '人数',
+                {   name: '人数',
                     type: 'bar',
                     data: []
                 }
@@ -69,15 +67,12 @@
                 }
             },
             xAxis: [
-                {
-                    type: 'category',
+                {   type: 'category',
                     data: ['本科生', '研究生', '博士生']
                 }
             ],
             yAxis: [
-                {
-                    type : 'value',
-                }
+                { type : 'value' }
             ],
             series: []
         };
@@ -103,38 +98,34 @@
 
                     chartNumberTotal.setOption({
                         series: [{
-                                data: [json_numberTotal.teacher, json_numberTotal.stuB, json_numberTotal.stuPg, json_numberTotal.stuDr, json_numberTotal.other]
+                            data: [json_numberTotal.teacher, json_numberTotal.stuB, json_numberTotal.stuPg, json_numberTotal.stuDr, json_numberTotal.other]
                         }]
                     });
 
-                <!--try generate series dynamically-->
-                names = new Array('10', '11', '12', '13', '14', '15', '其他');
-                datas = new Array('g10', 'g11', 'g12', 'g13', 'g14', 'g15', 'unknown')
+                // try generate series dynamically
+                names = ['10', '11', '12', '13', '14', '15', '其他'];
+                datas = ['g10', 'g11', 'g12', 'g13', 'g14', 'g15', 'unknown'];
                 function json2serie () {
                     var serie = [];
                     for ( var i = 0; i < 7; i++ ) {
-                        d = new Array()
-                        eval('d.push(json_numberGradeB.' + datas[i] + ')')
-                        eval('d.push(json_numberGradePg.' + datas[i] + ')')
-                        eval('d.push(json_numberGradeDr.' + datas[i] + ')')
+                        d = [];
+                        eval('d.push(json_numberGradeB.' + datas[i] + ')');
+                        eval('d.push(json_numberGradePg.' + datas[i] + ')');
+                        eval('d.push(json_numberGradeDr.' + datas[i] + ')');
                         var item = {
                             name: names[i],
                             type: 'bar',
                             stack: 'grade',
                             data: d
-                        }
+                        };
                         serie.push(item);
                     }
                     return serie;
                 }
-
                 chartNumberGrade.setOption({ series: json2serie() });
-
             }, 'json')
         };
-
         load_number();
 
     </script>
-
 {% endblock %}

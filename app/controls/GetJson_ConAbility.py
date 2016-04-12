@@ -6,11 +6,15 @@ from app.models import *
 def GetJson_ConAbility(userID):
     # search for user conability & role
     strQuery = db.session.query(conability.amount_avg, conability.role).filter(conability.user_id == userID)
-    results = strQuery.first()
+    result = strQuery.first()
 
-    # unpacking results
-    userAmount, role = results
-    userAmount = float(userAmount)
+    if result is not None:
+        # unpacking results
+        userAmount, role = result
+        userAmount = float(userAmount)
+    else:
+        return {'errMsg': u'无记录。'}
+
 
     strQueryLine = db.session.query(conability_line.amount, conability_line.num).filter(
         conability_line.role == role).order_by(conability_line.amount)
