@@ -16,7 +16,7 @@
                             <i class="fa fa-pencil-square-o" onclick="switch_userID_iptshow(false)"></i>
                         </div>
                         <form id="edit_userID" class="form-inline has-error" style="display: none;" action="#">
-                            <input id="ipt_userID" class="form-control" type="text" size="15"
+                            <input id="ipt_userID" class="form-control" type="text" size="15" maxlength=8
                                    value="{{ userID }}" />
                             <input class="btn btn-info"
                                     type="button" value="确定" onclick="set_userID($('#ipt_userID').val())" />

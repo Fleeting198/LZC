@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/html">
     <head>
         <meta charset="UTF-8"/>
@@ -20,7 +20,6 @@
         <script type="text/javascript" src="{{ url_for('static',filename='js/moment.min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static',filename='js/daterangepicker.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static',filename='js/echarts.min.js') }}" charset="UTF-8"></script>
-{#        <script type="text/javascript" src="{{ url_for('static',filename='js/all.js') }}"></script>#}
     </head>
     <body>
 
@@ -89,7 +88,8 @@
                     <div class="modal-header">
                         <button class="close" data-dismiss="modal">&times;</button>
                         <h4 id="modal-err-title" class="modal-title label label-danger" style="font-size: 18px"></h4>
-                     <div class="modal-body">
+                    </div>
+                    <div class="modal-body">
                         <h3><span id="modal-err-content" style="color: #000;" ></span></h3>
                     </div>
                     <div class="modal-footer">
