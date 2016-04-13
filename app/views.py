@@ -161,8 +161,6 @@ def refresh_chart_income():
 
     if not form.validate():
         return jsonify(errMsg=form.errors['devID'])
-    # TODO: 设备号是否存在
-
 
     devID = form.devID.data
     modeDate = int(form.modeDate.data)

@@ -1,17 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-from app import helpers
-from datetime import time, datetime, timedelta, date
-from pandas import Series, DataFrame
+from datetime import time
+from pandas import DataFrame
 from numpy import isnan
 import copy
 import types
 
 
-def ACPeriodCate(res_datetimes, res_categorys, mode_date):
-    oriDate = res_datetimes
-    oriValues = res_categorys
+def ACPeriodCate(oriDate, oriValues, mode_date):
+    """
+    :param oriDate: 日期标签数组
+    :param oriValues: 与oriDate 对应的值数组
+    :param mode_date: 日期模式，合并到最短时间单位. 0-day, 1-week, 2-month, 3-Quarter. (default 2)
+    """
 
     # =====================================================
     # dateTrend
@@ -34,14 +36,8 @@ def ACPeriodCate(res_datetimes, res_categorys, mode_date):
     for i in range(len(cols_name)):
         df['SUM'] += df[cols_name[i]]
 
-    # 仅当存在宿舍值时才计算宿舍比重
-    if 'dorm' in df:
-        df['PER_DORM'] = df['dorm']/df['SUM']
-    else:
-        df['PER_DORM'] = 0
-
-    axisLabels = map(lambda x: x.strftime('%Y-%m-%d'), df.index.tolist())
-
+    df['PER_DORM'] = df['dorm']/df['SUM']  if 'dorm' in df  else df['PER_DORM'] = 0  # 仅当存在宿舍值时才计算宿舍比重
+    axisLabels = map(lambda x: x.strftime('%Y-%m-%d'), df.index.tolist())  # 从dataframe 中取出作为索引的日期标签成为队列
     seriesData = []
     legendLabels = []
     for colName, col in df.iteritems():
@@ -99,9 +95,9 @@ def ACPeriodCate(res_datetimes, res_categorys, mode_date):
 
 
 def mergeDict(dict1, dict2):
-    """
-    dict1 = dict1 + dict2  合并相同的key的值
-
+    """dict1 = dict1 + dict2  合并相同的key的值
+    :param dict1: 第一个用以合并的字典
+    :param dict2: 第二个用以合并的字典
     """
     for k, v in dict2.iteritems():
         dict1[k] = dict1[k] + v if k in dict1 else 1
