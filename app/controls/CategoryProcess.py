@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-from pandas import DataFrame
+
 import operator
 
 def CategoryProcess(results):

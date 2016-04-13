@@ -1,6 +1,28 @@
 {% extends 'base.html' %} {% block content %}
-
-    <div id="fullpage">
+    <!-- 社区分享 来自百度分享 share.baidu.com -->
+    <div class="bdsharebuttonbox"
+         style="background: #ECF0F1; border-radius: 5px; padding-left: 7px; position: fixed; z-index: 1100; right: 20px; bottom: 20px">
+        <a href="#" class="bds_more" data-cmd="more"></a>
+        <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+        <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+        <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+        <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    </div>
+    <script>
+        window._bd_share_config = {
+            "common": {
+                "bdSnsKey": {},
+                "bdText": "快来看看我的校园记录吧！",
+                "bdMini": "2",
+                "bdMiniList": ["mshare", "qzone", "tsina", "bdysc", "weixin", "renren", "tqq", "bdhome", "sqq", "fx", "qingbiji", "people", "xinhua"],
+                "bdPic": "../static/pic/summary/header_boy.png",
+                "bdStyle": "1",
+                "bdSize": "32"
+            }, "share": {}
+        };
+        with (document)0[(getElementsByTagName('head')[0] || body).appendChild(createElement('script')).src = 'http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion=' + ~(-new Date() / 36e5)];
+    </script>
+<div id="fullpage">
     <div class="section" id="section0">
         <div class="container-fluid">
             <div class="row">
@@ -27,9 +49,7 @@
                         您的2015年总结：
                     </div>
                     <div id="chartRadar" class="center-block" style="height: 300px;"></div>
-                    <p>
-                        下滑翻看详情：
-                    </p>
+                    <p>下滑翻看详情&nbsp;<i class="fa fa-arrow-circle-down"></i></p>
                 </div>
                 <div class="col-md-1 col-sm-1"></div>
             </div>
@@ -412,8 +432,8 @@
     </div>
 </div>
 
-    <script src="{{ url_for('static',filename='echarts2/echarts.js') }}"></script>
-    <script type="text/javascript">
+<script src="{{ url_for('static',filename='echarts2/echarts.js') }}"></script>
+<script type="text/javascript">
     // =======================
     // Init and userID set.
     // =======================

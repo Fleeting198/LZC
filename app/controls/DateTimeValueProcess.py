@@ -5,24 +5,21 @@
 # 02-18 Weekly done.
 # 02-24 Pandas imported.
 
-from datetime import time
 from pandas import Series
 from decimal import *
 import types
 
 
 class DateTimeValueProcess:
-    """
-    输入坐标（日期，可重复）与对应值，对其进行统计。
+    """输入坐标（日期，可重复）与对应值，对其进行统计。
     """
     def __init__(self, dates, vals=None):
         self.oriDate = dates  # 日期
         self.oriValues = [1] * len(dates) if vals is None else vals  # 与日期对应的消费额， 若不传值列表则设次数为 1
 
     def get_date_trend(self, mode_date=2):
-        """
-        日期趋势，输入日期模式，输出合并后的日期、节点值和累积值。
-        默认日期模式为月
+        """日期趋势，输入日期模式，输出合并后的日期、节点值和累积值。
+        :param mode_date: 日期模式，合并到最短时间单位. 0-day, 1-week, 2-month, 3-Quarter. (default 2)
         """
         # TODO: 日期坐标字符串调整
         ts = Series(self.oriValues, index=self.oriDate)
@@ -40,8 +37,8 @@ class DateTimeValueProcess:
         return axisLabels, accumulatedVals, pointVals
 
     def get_time_distribution(self, mode_time=1):
-        """
-        时间分布，输出各时间段总计数，目的在于对比。
+        """时间分布，输出各时间段总计数，目的在于对比。
+        :param mode_time: period for time distribution. 0-day, 1-week, 2-month. (default 1)
         """
         dates = self.oriDate[:]
         values = self.oriValues[:]
@@ -50,11 +47,11 @@ class DateTimeValueProcess:
         span_w = float((dates[-1] - dates[0]).days) / 7
         span_y = float((dates[-1] - dates[0]).days) / 365
 
+        periods = []
+        axisLabels = []
         if mode_time == 0:
             # 按天 - 24小时分割时间段
             dates = map(lambda x: x.time().hour, dates)
-            periods = []
-            axisLabels = []
             for i in range(24):
                 periods.append(i)
                 axisLabels.append(str(i) + u'点~' + str((i + 1) % 24) + u'点')
