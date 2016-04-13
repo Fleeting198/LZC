@@ -6,26 +6,26 @@
             <div class="row">
                 <div class="col-md-1 col-sm-1"></div>
                 <div class="col-md-5 col-sm-5">
-                    <img data-src="../static/pic/summary/header_boy.png">
+                    <img src='' data-src="../static/pic/summary/header_boy.png">
                 </div>
                 <div class="col-md-5 col-sm-5">
-                    <h1 style="line-height: 50px;">
+                    <div style="line-height: 50px; font-size: 36px; font-weight: 400; color: #ECF0F1; margin-top: 20px; margin-bottom: 10px;">
                         您好，工号：
                         <div id="show_userID" style="display: inline; background: #ECF0F1; color: #E74C3C; border-radius: 5px; white-space: nowrap">
                             &nbsp;<span id="label_userID" onclick="switch_userID_iptshow(false)"></span>
                             <i class="fa fa-pencil-square-o" onclick="switch_userID_iptshow(false)"></i>
                         </div>
                         <form id="edit_userID" class="form-inline has-error" style="display: none;" action="#">
-                            <input id="ipt_userID" class="form-control" type="text" size="15" maxlength=8
-                                   value="{{ userID }}" />
+                            <label>input id="ipt_userID" class="form-control" type="text" size="15" maxlength=8
+                                   value="{{ userID }}" /></label>
                             <input class="btn btn-info"
                                     type="button" value="确定" onclick="set_userID($('#ipt_userID').val())" />
                             <input class="btn btn-default"
                                     type="reset" value="重置">
                         </form>
-                        </br>
+                        <br />
                         您的2015年总结：
-                    </h1>
+                    </div>
                     <div id="chartRadar" class="center-block" style="height: 300px;"></div>
                     <p>
                         下滑翻看详情：
@@ -42,24 +42,24 @@
                     <div class="row">
                         <div class="col-md-1 col-sm-1"></div>
                         <div class="col-md-5 col-sm-5">
-                            <img data-src="../static/pic/summary/section/section1Footprint.png">
+                            <img src='' data-src="../static/pic/summary/section/section1Footprint.png">
                         </div>
                         <div class="col-md-5 col-sm-5">
                             <div style="margin-left: 30px">
                                 <h1>我的足迹</h1>
-                                <p></br></p>
+                                <p><br /></p>
                                 <p id="p1-1">
                                     {% if vals_summary['ret_access']['count_nodes'] == -1 %}
                                         没有找到相关记录。
                                     {% else %}
                                         我曾在 <span>{{ vals_summary['ret_access']['count_nodes'] }}</span> 个地方留下过足迹，
-                                        拿下 <span>{{ vals_summary['ret_access']['total_count'] }}</span> 次门禁记录。</br>
+                                        拿下 <span>{{ vals_summary['ret_access']['total_count'] }}</span> 次门禁记录。<br />
                                         <!-- 此处应有地点种类数量判断， -->
                                         {% if vals_summary['ret_access']['ac_items'][1] is defined %}
                                             除了访问了 <span>{{ vals_summary['ret_access']['ac_items'][0]['count'] }}</span>
                                             次的 <span>
                                         {{ vals_summary['ret_access']['ac_items'][0]['node_des'] }}</span> 之外，
-                                            </br>
+                                            <br />
                                             我最爱的是
                                             <span>{{ vals_summary['ret_access']['ac_items'][1]['node_des'] }}</span> ，
                                             在那留下了 <span>{{ vals_summary['ret_access']['ac_items'][1]['count'] }}</span>
@@ -70,7 +70,7 @@
                                             在那留下了 <span>{{ vals_summary['ret_access']['ac_items'][0]['count'] }}</span>
                                             次记录。
                                         {% endif %}
-                                        </br>
+                                        <br />
                                         我的一小步，人类一大步。
                                     {% endif %}
                                 </p>
@@ -88,7 +88,7 @@
                         <div class="col-md-1 col-sm-1"></div>
                         <div class="col-md-10 col-sm-10">
                             <!-- ACCategory -->
-                            <div id="chartACCategory" class="center-block" style="width: inherit; height: 474.65px;"></div>
+                            <div id="chartACCategory" class="center-block" style="width: inherit; height: 475px;"></div>
                         </div>
                         <div class="col-md-1 col-sm-1"></div>
                     </div>
@@ -113,23 +113,23 @@
                     <div class="row">
                         <div class="col-md-1 col-sm-1"></div>
                         <div class="col-md-5 col-sm-5">
-                            <img data-src="../static/pic/summary/section/section2Schedule.png">
+                            <img src='' data-src="../static/pic/summary/section/section2Schedule.png">
                         </div>
                         <div class="col-md-5 col-sm-5">
                             <div style="margin-left: 30px">
                                 <h1 style="color: #2C3E50">我的作息</h1>
-                                <p></br></p>
+                                <p><br /></p>
                                 <p id="p2-1" style="color: #2C3E50">
                                 {% if vals_summary['ret_habit']['count_early'] == -1 %}
                                     没有找到相关记录。
                                 {% else %}
-                                    又到了起床靠毅力的季节了，</br>
+                                    又到了起床靠毅力的季节了，<br />
                                     {% if vals_summary['ret_habit']['count_early'] == 0 %}
                                         我的被子上可能存在不知名的结界，从未在早晨7点前解开。
                                     {% else %}
                                         我早起 <span>{{ vals_summary['ret_habit']['count_early'] }}</span> 次，
                                     {% endif %}
-                                    </br>
+                                    <br />
                                     {% if vals_summary['ret_habit']['count_night'] == 0 %}
                                         无晚归记录，习惯良好！ {% else %} 曾在晚上 11 点～早上 6 点之间访问门禁 <span>
                                         {{ vals_summary['ret_habit']['count_night'] }}</span> 次，注意早点休息哟～
@@ -150,7 +150,7 @@
                         <div class="col-md-1 col-sm-1"></div>
                         <div class="col-md-10 col-sm-10">
                             <!-- ACPeriodCate -->
-                            <div id="chartACPeriodCateTime" class="center-block" style="width: inherit; height: 474.65px;"></div>
+                            <div id="chartACPeriodCateTime" class="center-block" style="width: inherit; height: 475px;"></div>
                         </div>
                         <div class="col-md-1 col-sm-2"></div>
                     </div>
@@ -174,12 +174,12 @@
                 <div class="row">
                     <div class="col-md-1 col-sm-1"></div>
                     <div class="col-md-5 col-sm-5">
-                        <img data-src="../static/pic/summary/section/section3Study.png">
+                        <img src='' data-src="../static/pic/summary/section/section3Study.png">
                     </div>
                     <div class="col-md-5 col-sm-5">
                         <div style="margin-left: 30px">
                             <h1>我的学习</h1>
-                            <p></br></p>
+                            <p><br /></p>
                             <p id="p3-1">
                                 <!-- ret_study = {'count_lib':count_lib, 'count_acad': count_acad, 'count_sci':count_sci} -->
                                 {% if vals_summary['ret_study']['count_acad'] == -1 %}
@@ -202,7 +202,7 @@
                                     {% else %}
                                         远离实验室。
                                     {% endif %}
-                                    </br>
+                                    <br />
                                     {% if vals_summary['ret_study']['percent_asc'] > 0.9 %}
                                         比全校 <span>{{ vals_summary['ret_study']['percent_asc']|round(3)*100 }}</span> ％的人都更加努力，可以被称为五星级准学霸！
                                     {% elif vals_summary['ret_study']['percent_asc'] > 0.5 %}
@@ -228,12 +228,12 @@
                     <div class="row">
                         <div class="col-md-1 col-sm-1"></div>
                         <div class="col-md-5 col-sm-5">
-                            <img data-src="../static/pic/summary/section/section4Friends.png">
+                            <img src='' data-src="../static/pic/summary/section/section4Friends.png">
                         </div>
                         <div class="col-md-5 col-sm-5">
                             <div style="margin-left: 30px">
                                 <h1>我的朋友</h1>
-                                <p></br></p>
+                                <p><br /></p>
                                 <p id="p4-1">
                                     <!-- ret_social = {'num_relations': num_relations, 'top_name':top_name, 'top_value':top_value } -->
                                     {% if vals_summary['ret_social']['top_value'] == -1 %}
@@ -242,7 +242,7 @@
                                         同学，最近你在玩失踪么……
                                     {% else %}
                                         奋斗的路上有更多同伴才更有动力，有 <span>{{ vals_summary['ret_social']['num_relations'] }}</span>
-                                        位同学曾与我擦肩而过。</br>
+                                        位同学曾与我擦肩而过。<br />
                                         <span>{{ vals_summary['ret_social']['top_name'] }}</span> 童鞋，
                                         我们 <span>{{ vals_summary['ret_social']['top_value'] }}</span> 次不断相遇，难道是缘分，难道是天意。
                                     {% endif %}
@@ -261,7 +261,7 @@
                         <div class="col-md-1 col-sm-1"></div>
                         <div class="col-md-10 col-sm-10">
                             <!-- chart_relation -->
-                            <div id="chartRelation" class="center-block" style="width: inherit; height: 474.65px;"></div>
+                            <div id="chartRelation" class="center-block" style="width: inherit; height: 475px;"></div>
                         </div>
                         <div class="col-md-1 col-sm-1">
                         </div>
@@ -287,12 +287,12 @@
                     <div class="row">
                         <div class="col-md-1 col-sm-1"></div>
                         <div class="col-md-5 col-sm-5">
-                            <img data-src="../static/pic/summary/section/section5Bill.png">
+                            <img src='' data-src="../static/pic/summary/section/section5Bill.png">
                         </div>
                         <div class="col-md-5 col-sm-5">
                             <div style="margin-left: 30px">
                                 <h1>我的账单</h1>
-                                <p></br></p>
+                                <p><br /></p>
                                 <p id="p5-1">
                                     <!-- ret_bill = {'total_expend':total_expend, 'con_items': json_ConCategory['seriesData'],
                                 'con_per_month': con_per_month} -->
@@ -300,9 +300,9 @@
                                         没有找到相关记录。
                                     {% else %}
                                         最近一年来，我总共花了 <span>{{ vals_summary['ret_bill']['total_expend'] }}</span> 元，
-                                        </br>
+                                        <br />
                                         <span>{{ vals_summary['ret_bill']['top_cate'] }}</span>
-                                        打榜成功，成为我的消费分类TOP 1。</br>
+                                        打榜成功，成为我的消费分类TOP 1。<br />
 
                                         根据长期统计，我的月均支出是 <span>{{ vals_summary['ret_bill']['con_per_month'] }}</span>
                                         元。
@@ -322,7 +322,7 @@
                         <div class="col-md-1 col-sm-1"></div>
                         <div class="col-md-10 col-sm-10">
                             <!-- chart_concategory -->
-                            <div id="chartConCategory" class="center-block" style="width: inherit; height: 474.65px;"></div>
+                            <div id="chartConCategory" class="center-block" style="width: inherit; height: 475px;"></div>
                         </div>
                         <div class="col-md-1 col-sm-1"></div>
                     </div>
@@ -347,12 +347,12 @@
                     <div class="row">
                         <div class="col-md-1 col-sm-1"></div>
                         <div class="col-md-5 col-sm-5">
-                            <img data-src="../static/pic/summary/section/section6Penalty.png">
+                            <img src='' data-src="../static/pic/summary/section/section6Penalty.png">
                         </div>
                         <div class="col-md-5 col-sm-5">
                             <div style="margin-left: 30px">
                                 <h1>我的信用</h1>
-                                <p></br></p>
+                                <p><br /></p>
                                 <p id="p6-1">
                                     <!-- ret_penalty = {'user_penalty': user_penalty, 'percent_asc': percent_asc} -->
                                     {% if vals_summary['ret_penalty']['user_penalty'] == -1 %}
@@ -364,7 +364,7 @@
                                         {% else %}
                                             产生了 <span>{{ vals_summary['ret_penalty']['user_penalty'] }}</span> 元滞纳金。
                                         {% endif %}
-                                        </br>
+                                        <br />
                                         {% if vals_summary['ret_penalty']['percent_asc'] < 0.3 %}
                                             信用记录打败了
                                             <span>{{ (1-vals_summary[ 'ret_penalty'][ 'percent_asc']|round(2))*100 }}</span>
@@ -392,7 +392,7 @@
                         <div class="col-md-1 col-sm-1"></div>
                         <div class="col-md-10 col-sm-10">
                             <!-- chart_penalty -->
-                            <div id="chartPenalty" class="center-block" style="width: inherit; height: 474.65px;"></div>
+                            <div id="chartPenalty" class="center-block" style="width: inherit; height: 475px;"></div>
                         </div>
                         <div class="col-md-1 col-sm-1"></div>
                     </div>
@@ -443,7 +443,7 @@
     };
 
     has_userID = function(tar_userID){
-        var ret_val;
+        var ret_val = false;
         $.ajax('/check_user_id?userID='+tar_userID, {
             async: false,
             type: 'GET',
@@ -592,9 +592,7 @@
             chartACPeriodCateTime.hideLoading();
             // 还原图表选项
             chartACPeriodCateTime.setOption(opt_chartACPeriodCateTime);
-            var json_dateTrend;
             var json_timeDistribution;
-            json_dateTrend = json_response.json_dateTrend;
             json_timeDistribution = json_response.json_timeDistribution;
             if (!json_response.errMsg) {
                 // 时间分布图表设定。
@@ -890,24 +888,25 @@
     // Chart radar
     var chartRadar = echarts.init(document.getElementById('chartRadar'));
 
+    // 将val限定在min和max间 并取decimal个小数位数返回
     clamp_val = function (val, min, max, decimal) {
         val = val < min ? min : val;
         val = val > max ? max : val;
         return val.toFixed(decimal);
     };
 
-    var value_ACCategory = {{ vals_summary['ret_access']['count_nodes'] }} / (430.298 / 0.7) * 10;
+    var value_ACCategory = ({{ vals_summary['ret_access']['count_nodes'] }}) / (430.3 / 0.7) * 10;
         value_ACCategory = clamp_val(value_ACCategory,1,10,1);
-    var value_ACPeriodCate = {{ vals_summary['ret_habit']['count_early'] }} * 7 - {{ vals_summary['ret_habit']['count_night'] }} / 25.273 * 10;
+    var value_ACPeriodCate = ({{ vals_summary['ret_habit']['count_early'] }}) * 7 - ({{ vals_summary['ret_habit']['count_night'] }}) / 25.3 * 10;
         value_ACPeriodCate = clamp_val(value_ACPeriodCate, 1, 10,1);
-    var value_Study = {{ vals_summary['ret_study']['percent_asc'] }} * 10;
+    var value_Study = ({{ vals_summary['ret_study']['percent_asc'] }}) * 10;
         value_Study = clamp_val(value_Study, 1,10,1);
-    var value_Relation = {{ vals_summary['ret_social']['num_relations'] }} / 44 * 10;
+    var value_Relation = ({{ vals_summary['ret_social']['num_relations'] }}) / 44 * 10;
         value_Relation = clamp_val(value_Relation, 1, 10,1);
-    var value_ConCategory = {{ vals_summary['ret_bill']['con_per_month'] }};
-        value_ConCategory = value_ConCategory < 202.167 * 1.3 ? 10 : (10 - (value_ConCategory - 202.167 * 1.3) / 202.167);
+    var value_ConCategory = ({{ vals_summary['ret_bill']['con_per_month'] }});
+        value_ConCategory = value_ConCategory < 202.2 * 1.3 ? 10 : (10 - (value_ConCategory - 202.2 * 1.3) / 202.2);
         value_ConCategory = clamp_val(value_ConCategory, 1,10,1);
-    var value_penalty = {{ (1 - vals_summary['ret_penalty']['percent_asc']) * 10 }};
+    var value_penalty = (1 - {{vals_summary['ret_penalty']['percent_asc']}}) * 10 ;
         value_penalty = clamp_val(value_penalty, 1, 10,1);
 
     var values = [];
@@ -1006,7 +1005,7 @@
             // afterRender: function(){},
             // afterResize: function(){},
             // afterSlideLoad: function(anchorLink, index, slideAnchor, slideIndex){},
-            onSlideLeave: function(anchorLink, index, slideIndex, direction, nextSlideIndex) {
+            onSlideLeave: function(anchorLink, index, slideIndex) {
                 // var leavingSlide = $(this);
                 // callback ACCategory
                 if (index == 2 && slideIndex == 0  && !isChartRefreshed[0]) {
