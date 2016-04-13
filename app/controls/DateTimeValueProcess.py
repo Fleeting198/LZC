@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# 02-16 Created -C
-# 02-18 Weekly done.
-# 02-24 Pandas imported.
-
 from pandas import Series
 from decimal import *
 import types
