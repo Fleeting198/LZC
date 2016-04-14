@@ -1,12 +1,6 @@
 ﻿#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# 02-09 Built
-# 02-11 将数据处理交给controlls，日期查询筛选
-# 02-12 acperiod, income
-# 02-16 Implementing dateRangePicker. Saved lots of code.
-# 02-20 acvalid, accategory
-
 from app import app
 from flask import render_template, request, jsonify, redirect
 from app.models import *
