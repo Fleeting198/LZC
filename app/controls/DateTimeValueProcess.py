@@ -28,7 +28,7 @@ class DateTimeValueProcess:
         axisLabels = map(lambda x: x.strftime('%Y-%m-%d'), ts.index.tolist())
         pointVals = map(lambda x: round(float(x), 2), ts.values.tolist())
         accumulatedVals = pointVals[:]
-        for i in range(1, len(accumulatedVals)):
+        for i in xrange(1, len(accumulatedVals)):
             accumulatedVals[i] = round(accumulatedVals[i] + accumulatedVals[i - 1], 2)
 
         return axisLabels, accumulatedVals, pointVals
@@ -52,7 +52,7 @@ class DateTimeValueProcess:
         if mode_time == 0:
             # 按天 - 24小时分割时间段
             dates = map(lambda x: x.time().hour, dates)
-            for i in range(24):
+            for i in xrange(24):
                 periods.append(i)
                 axisLabels.append(str(i) + u'点~' + str((i + 1) % 24) + u'点')
             # 跨多少天
@@ -77,15 +77,15 @@ class DateTimeValueProcess:
         vals = [Decimal(0)] * len(periods)  # Init vals
 
         dividers = [0]*len(periods) # 用以取平均值的除数
-        for i in range(len(dates)):
-            for j in range(len(periods)):
+        for i in xrange(len(dates)):
+            for j in xrange(len(periods)):
                 if dates[i] == periods[j]:
                     dividers[j] += 1
                     vals[j] += values[i]
 
         # vals 取平均值
         # 求日期跨度
-        for i in range(len(vals)):
+        for i in xrange(len(vals)):
             vals[i] = vals[i]/divider if divider!= 0 else 0
 
         vals = map(lambda x:float(x), vals)

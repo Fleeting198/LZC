@@ -66,6 +66,8 @@
         chartConCategory.setOption(optionChartConCategory);
 
         refresh_chart = function () {
+            if ($("#userID").val() == '') return;
+
             chartConCategory.showLoading();
             $.ajax('/charts/concategory/getData?' + $("#form-ipt").serialize(), {
                 type: 'GET',
@@ -92,6 +94,9 @@
                 dataType: 'json'
             });
         };
+        $(document).ready(function () {
+            refresh_chart();
+        });
     </script>
 
 {% endblock %}

@@ -4,7 +4,6 @@
 from app.models import *
 from sqlalchemy import and_
 
-
 def GetJson_ACPeriodCate(userID, modeDate, startDate, endDate):
     """返回Json：门禁类型时间分布
     :param userID: 查询工号
@@ -25,7 +24,9 @@ def GetJson_ACPeriodCate(userID, modeDate, startDate, endDate):
     res_categorys = [result.category for result in results]
 
     from ACPeriodCate import ACPeriodCate
-    json_dateTrend, json_timeDistribution = ACPeriodCate(res_datetimes, res_categorys, modeDate)
+    process = ACPeriodCate(res_datetimes, res_categorys)
+    json_dateTrend = process.get_date_trend(modeDate)
+    json_timeDistribution = process.get_time_distribution()
 
     json_response = {'json_dateTrend':json_dateTrend, 'json_timeDistribution':json_timeDistribution}
 

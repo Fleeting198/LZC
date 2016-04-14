@@ -163,6 +163,8 @@
 
         // get向后端请求json刷新图表。
         refresh_chart = function(){
+            if ($("#userID").val() == '') return;
+
             chartDateTrend.showLoading();
             chartTimeDistribution.showLoading();
 
@@ -212,5 +214,8 @@
                 dataType: 'json'
             });
         };
+        $(document).ready(function () {
+            refresh_chart();
+        });
     </script>
 {% endblock %}

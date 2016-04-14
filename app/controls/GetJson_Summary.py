@@ -38,7 +38,7 @@ def ac_overall(userID, startDate, endDate):
     total_count = sum(count)  # 总门禁次数
 
     ac_items = []
-    for i in range(len(node_des)):
+    for i in xrange(len(node_des)):
         sql = db.session.query(ac_loc.category).filter(ac_loc.node_des == node_des[i])  # 查询地点的分类
         node_cate.append(helpers.translate(sql.first()))  # 翻译并加入
         ac_items.append({'node_des': node_des[i], 'count': count[i], 'node_cate': node_cate[i]})
@@ -96,7 +96,7 @@ def ac_study(userID, startDate, endDate):
 
     # 获取个体在全体数据中排名
     idx_user = len(sum_per_month)
-    for i in range(len(sum_per_month)):
+    for i in xrange(len(sum_per_month)):
         if int(sum_per_month[i]) > count_total:
             idx_user = i
             break
@@ -168,9 +168,6 @@ def con_penalty(userID):
     from GetJson_Penalty import GetJson_Penalty
     json_Penalty = GetJson_Penalty(userID)
 
-    # json_userAmount = json_Penalty['json_userAmount']
-    # json_penalty = json_Penalty['json_penalty']
-
     if 'errMsg' in json_Penalty:
         return {'user_penalty': -1, 'percent_asc': -1}
     else:
@@ -179,7 +176,7 @@ def con_penalty(userID):
         num = json_Penalty['num']
         # 获取个体在全体数据中排名
         idx_user = len(amount)
-        for i in range(len(amount)):
+        for i in xrange(len(amount)):
             if int(amount[i]) > user_penalty:
                 idx_user = i
                 break

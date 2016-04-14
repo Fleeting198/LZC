@@ -73,6 +73,8 @@
         chartConAbility.setOption(optionChartConAbility);
 
         refresh_chart = function () {
+            if ($("#userID").val() == '') return;
+
             chartConAbility.showLoading();
             $.ajax('/charts/conability/getData?' + $("#form-ipt").serialize(), {
                 type: 'GET',
@@ -108,8 +110,7 @@
                                         }
                                     },
                                     data: [
-                                        {
-                                            name: '此人',
+                                        {   name: '此人',
                                             coord: [index_userAmount, num[index_userAmount]]
                                         }]
                                 }
@@ -136,6 +137,9 @@
                 dataType: 'json'
             });
         };
+        $(document).ready(function () {
+            refresh_chart();
+        });
     </script>
 
 {% endblock %}

@@ -41,7 +41,7 @@ def GetJson_ACRelation(userID):
     # 第一轮处理，与目标有直接关系的对象
     min_val = 2     # 最小关系值阈值
     max_concern = 25    # 这一轮最大进行处理的二级点数量
-    for i in range(len(list_relation)):
+    for i in xrange(len(list_relation)):
         if i < max_concern:     # 数量限制
 
             # 取项的属性
@@ -75,13 +75,13 @@ def GetJson_ACRelation(userID):
 
     # 第二轮加边
     max_concern = 7  # 最大进行处理的二级点数量
-    for j in range(1, len(nodes)):  # 遍历关系中心外的点
+    for j in xrange(1, len(nodes)):  # 遍历关系中心外的点
         source = nodes[j]['name']   # 取名字
         list_relation = query_list_relation(source) # 查询
         if len(list_relation) == 0: continue
 
         max_concern = min(max_concern, len(nodes))
-        for i in range(len(list_relation)):     # 遍历查询结果
+        for i in xrange(len(list_relation)):     # 遍历查询结果
             if i < max_concern:     # 处理数量限制
                 k = list_relation[i][0];  v = list_relation[i][1]  # 取项的属性
 

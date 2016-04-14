@@ -2,7 +2,7 @@
 {% block chartField %}
 
     <form id="form-ipt" class="form-inline" >
-        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='XQXXQQTQ')}}
+        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='PPPWQHXW')}}
         <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
     </form>
 
@@ -11,7 +11,7 @@
     <script>
         var chartPenalty = echarts.init(document.getElementById('chartPenalty'));
         window.addEventListener('resize', function () {
-            chartPenalty.resize()
+            chartPenalty.resize();
         });
 
         var optionChartPenalty = {
@@ -19,7 +19,12 @@
             tooltip: {
                 trigger: 'axis',
                 formatter: function (params) {
-                    var str_return = '总 ' + params[0].name + ' 元<br/>';
+                    var str_return;
+                    if (params[0].name == '') {
+                        str_return = '总 0 元<br/>';
+                    } else {
+                        str_return = '总 ' + params[0].name + ' 元<br/>';
+                    }
                     str_return += params[0].seriesName + ' : ' + params[0].value + ' 人<br/>';
                     return str_return;
                 }
@@ -66,8 +71,9 @@
         chartPenalty.setOption(optionChartPenalty);
 
         refresh_chart = function () {
-            chartPenalty.showLoading();
+            if ($("#userID").val() == '') return;
 
+            chartPenalty.showLoading();
             $.ajax('/charts/penalty/getData?' + $("#form-ipt").serialize(), {
                 type: 'GET',
                 success: function (json_response) {
@@ -129,5 +135,8 @@
                 dataType: 'json'
             });
         };
+        $(document).ready(function () {
+            refresh_chart();
+        });
     </script>
 {% endblock %}

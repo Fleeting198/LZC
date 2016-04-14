@@ -18,8 +18,7 @@
             }
         });
         require(
-                [
-                    'echarts',
+                [   'echarts',
                     'echarts/chart/force',
                     'echarts/chart/chord'
                 ],
@@ -57,10 +56,8 @@
 {#        };#}
 {#        chartRelation.setOption(optionChartRelation);#}
 
-
         refresh_chart = function () {
             chartRelation.showLoading();
-
             $.ajax('/charts/relation/getData?' + $("#form-ipt").serialize(), {
                 type: 'GET',
                 success: function (json_response) {

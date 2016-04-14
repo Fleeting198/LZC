@@ -65,6 +65,7 @@
         chartACCategory.setOption(optionChartACCategory);
 
         refresh_chart = function () {
+            if ($("#userID").val() == '') return;
 
             chartACCategory.showLoading();
             $.ajax('/charts/accategory/getData?' + $("#form-ipt").serialize(), {
@@ -93,5 +94,8 @@
                 dataType: 'json'
             });
         };
+        $(document).ready(function () {
+            refresh_chart();
+        });
     </script>
 {% endblock %}

@@ -148,6 +148,8 @@
         chartTimeDistribution.setOption(optionChartTime);
 
         refresh_chart = function () {
+            if ($("#userID").val() == '') return;
+
             chartDateTrend.showLoading();
             chartTimeDistribution.showLoading();
 
@@ -175,7 +177,8 @@
                             }]
                         });
 
-                        var i=0;    // 定义重复要使用到的变量
+                        // 以下遇到更新部分数据时新数据合并旧数据而不是覆盖的问题
+                        var i = 0;    // 定义重复要使用到的变量
                         var tmp_option;
 
                         // 清空series 并以notMerge 方式更新option.
@@ -244,6 +247,9 @@
                 dataType: 'json'
             });
         };
+        $(document).ready(function () {
+            refresh_chart();
+        });
     </script>
 
 {% endblock %}

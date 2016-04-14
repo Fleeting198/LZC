@@ -68,6 +68,8 @@
         chartACValid.setOption(optionChartACValid);
 
         refresh_chart = function () {
+            if ($("#userID").val() == '') return;
+
             chartACValid.showLoading();
             $.ajax('/charts/acvalid/getData?' + $("#form-ipt").serialize(),{
                 type: 'GET',
@@ -95,6 +97,9 @@
                 dataType: 'json'
             });
         };
+        $(document).ready(function () {
+            refresh_chart();
+        });
     </script>
 
 {% endblock %}
