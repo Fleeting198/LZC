@@ -16,6 +16,9 @@ def GetJson_ConWaterTime(modeTime):
         axisLabels = [u'一月', u'二月', u'三月', u'四月', u'五月', u'六月', u'七月', u'八月', u'九月', u'十月', u'十一月', u'十二月', ]
         strQuery = db.session.query(con_water_12m.con_axis, con_water_12m.sum_amount).order_by(
             con_water_12m.con_axis)
+    else:
+        return {'errMsg':'Nonexistent modeTime.'}
+
     results = strQuery.all()
 
     vals = [float(result.sum_amount) for result in results]
