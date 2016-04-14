@@ -16,7 +16,9 @@ class DateTimeValueProcess:
         """日期趋势，输入日期模式，输出合并后的日期、节点值和累积值。
         :param mode_date: 日期模式，合并到最短时间单位. 0-day, 1-week, 2-month, 3-Quarter. (default 2)
         """
-        # TODO: 日期坐标字符串调整
+        if len(self.oriDate) == 0:
+            return [], [], []
+
         ts = Series(self.oriValues, index=self.oriDate)
 
         rule_mode = {'0': 'D', '1': 'W', '2': 'M', '3': 'Q'}
@@ -35,12 +37,11 @@ class DateTimeValueProcess:
         """时间分布，输出各时间段总计数，目的在于对比。
         :param mode_time: period for time distribution. 0-day, 1-week, 2-month. (default 1)
         """
+        if len(self.oriDate) == 0:
+            return [], []
+
         dates = self.oriDate[:]
         values = self.oriValues[:]
-
-        # TODO: 修复
-        # if len(dates) == 0:
-        #     return [],[]
 
         span_d = (dates[-1] - dates[0]).days
         span_w = float((dates[-1] - dates[0]).days) / 7

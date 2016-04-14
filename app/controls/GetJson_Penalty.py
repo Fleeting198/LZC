@@ -14,7 +14,7 @@ def GetJson_Penalty(userID):
         # unpacking results
         userAmount = float(result[0])
     else:
-        return {'errMsg': u'无记录。'}
+        return {'errMsg': u'没有找到记录。'}
 
     # process conability for all
     amount = [float(result.amount) for result in resultsLine]

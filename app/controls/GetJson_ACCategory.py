@@ -12,7 +12,7 @@ def GetJson_ACCategory(userID, startDate, endDate):
         strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
     results = strQuery.all()
     if len(results) == 0:
-        return {'errMsg': u'无记录。'}
+        return {'errMsg': u'没有找到记录。'}
 
     # Process data.
     from CategoryProcess import CategoryProcess
