@@ -21,10 +21,14 @@ def GetJson_Income(devID, modeDate, modeTime, startDate, endDate):
 
     # Get and pack dateTrend() return.
     axisLabels, accumulatedVals, pointVals = process.get_date_trend(modeDate)
+    if len(axisLabels) == 0:
+        return {'errMsg':u'没有找到记录。'}
     json_dateTrend = {'axisLabels': axisLabels, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
 
     # Get and pack timeDistribution() return.
     axisLabels, vals = process.get_time_distribution(modeTime)
+    if len(axisLabels) == 0:
+        return {'errMsg': u'没有找到记录。'}
     json_timeDistribution = {'axisLabels': axisLabels, 'vals': vals}
 
     json_response = {'json_dateTrend':json_dateTrend, 'json_timeDistribution':json_timeDistribution}

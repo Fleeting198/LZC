@@ -13,7 +13,7 @@ def GetJson_ConAbility(userID):
         userAmount, role = result
         userAmount = float(userAmount)
     else:
-        return {'errMsg': u'无记录。'}
+        return {'errMsg': u'没有找到记录。'}
 
 
     strQueryLine = db.session.query(conability_line.amount, conability_line.num).filter(

@@ -20,8 +20,13 @@
             tooltip: {
                 trigger: 'axis',
                 formatter: function (params) {
-                    var str_return = '月均 ' + params[0].name + ' 元<br/>';
-                        str_return += params[0].seriesName + ' : ' + params[0].value  + ' 人<br/>';
+                    var str_return;
+                    if(params[0].name == ''){
+                        str_return = '月均 0 元<br/>';
+                    }else{
+                        str_return = '月均 ' + params[0].name + ' 元<br/>';
+                    }
+                    str_return += params[0].seriesName + ' : ' + params[0].value + ' 人<br/>';
                     return str_return;
                 }
             },

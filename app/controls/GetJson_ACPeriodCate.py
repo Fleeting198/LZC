@@ -19,7 +19,7 @@ def GetJson_ACPeriodCate(userID, modeDate, startDate, endDate):
         strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
     results = strQuery.all()
     if len(results) == 0:
-        return {'errMsg': u'无记录。'}
+        return {'errMsg': u'没有找到记录。'}
 
     res_datetimes = [result.ac_datetime for result in results]
     res_categorys = [result.category for result in results]
