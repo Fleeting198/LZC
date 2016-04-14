@@ -48,7 +48,9 @@
                     var str_return = params[0].name + '<br/>';
                     for (var i=0; i<params.length; i++){
                         if(params[i].seriesName != '宿舍比重'){
-                            str_return += params[i].seriesName + ' : ' + params[i].value + ' 次<br/>'
+                            if(params[i].value != 0){
+                                str_return += params[i].seriesName + ' : ' + params[i].value + ' 次<br/>'
+                            }
                         }else
                             str_return += params[i].seriesName + ' : ' + (params[i].value*100).toFixed(2) + ' %<br/>'
                     }
@@ -78,6 +80,7 @@
                         formatter: '{value} 次'
                     }
                 },
+                /*
                 {   type: 'value',
                     name: '比例',
                     axisLine: {
@@ -91,6 +94,7 @@
                         }
                     }
                 }
+                */
             ],
             dataZoom: [
                 {   type: 'inside',
@@ -113,7 +117,9 @@
                 formatter: function (params) {
                     var str_return = params[0].name + '<br/>';
                     for (var i = 0; i < params.length; i++) {
-                        str_return += params[i].seriesName + ' : ' + params[i].value + ' 次<br/>'
+                        if (params[i].value != 0){
+                            str_return += params[i].seriesName + ' : ' + params[i].value + ' 次<br/>'
+                        }
                     }
                     return str_return;
                 }
@@ -211,7 +217,6 @@
                                     data: json_dateTrend.seriesData[i].data
                                 });
                             }
-                            console.log(tmp_option);
                             chartDateTrend.setOption(tmp_option, true);
                         }
 

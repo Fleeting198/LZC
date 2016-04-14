@@ -584,7 +584,9 @@
             formatter: function (params) {
                 var str_return = params[0].name + '<br/>';
                 for (var i = 0; i < params.length; i++) {
-                    str_return += params[i].seriesName + ' : ' + params[i].value + ' 次<br/>'
+                    if (params[i].value != 0) {
+                        str_return += params[i].seriesName + ' : ' + params[i].value + ' 次<br/>'
+                    }
                 }
                 return str_return;
             }
@@ -700,7 +702,6 @@
                     tooltip: {
                         trigger: 'item',
                         formatter: function (params) {
-                            console.log(params);
                             if (typeof(params[3]) === 'undefined') {    // nodes
                                 return params[1] + ' : ' + params[2];
                             } else {                                    // links

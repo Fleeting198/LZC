@@ -23,7 +23,6 @@ class ACPeriodCate:
         """
         :param mode_date: 日期模式，合并到最短时间单位. 0-day, 1-week, 2-month, 3-Quarter. (default 2)
         """
-        # Copy source data.
         axisLabels = self.oriDate[:]
         pointVals = [{copy.deepcopy(oriValue): 1} for oriValue in self.oriValues]
 
@@ -33,14 +32,17 @@ class ACPeriodCate:
         df = df.resample(rule_mode[str(mode_date)], how='sum')
         df = df.fillna(0)
 
-        cols_name = []
-        for name, col in df.iteritems():
-            cols_name.append(name)
-        df['SUM'] = 0
-        for i in xrange(len(cols_name)):
-            df['SUM'] += df[cols_name[i]]
+        """各项总和"""
+        # cols_name = []
+        # for name, col in df.iteritems():
+        #     cols_name.append(name)
+        # df['SUM'] = 0
+        # for i in xrange(len(cols_name)):
+        #     df['SUM'] += df[cols_name[i]]
 
-        df['PER_DORM'] = df['dorm']/df['SUM'] if 'dorm' in df else 0  # 仅当存在宿舍值时才计算宿舍比重，否则设为0
+        """宿舍比重"""
+        # df['PER_DORM'] = df['dorm']/df['SUM'] if 'dorm' in df else 0  # 仅当存在宿舍值时才计算宿舍比重，否则设为0
+
         axisLabels = map(lambda x: x.strftime('%Y-%m-%d'), df.index.tolist())  # 从dataframe 中取出作为索引的日期标签成为队列
         seriesData = []
         legendLabels = []
@@ -53,7 +55,6 @@ class ACPeriodCate:
         return json_dateTrend
 
     def get_time_distribution(self):
-        # Copy source data.
         dates = self.oriDate[:]
         values = [{copy.deepcopy(oriValue): 1} for oriValue in self.oriValues]
 

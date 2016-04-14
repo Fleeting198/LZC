@@ -22,11 +22,9 @@ def GetJson_expenditure(userID, modeDate, modeTime, startDate, endDate):
     from app.controls.DateTimeValueProcess import DateTimeValueProcess
     process = DateTimeValueProcess(res_datetimes, res_amounts)
 
-    # Get and pack dateTrend() return.
     axisLabels, accumulatedVals, pointVals = process.get_date_trend(modeDate)
     json_dateTrend = {'axisLabels': axisLabels, 'accumulatedVals': accumulatedVals, 'pointVals': pointVals}
 
-    # Get and pack timeDistribution() return.
     axisLabels, vals = process.get_time_distribution(modeTime)
     json_timeDistribution = {'axisLabels': axisLabels, 'vals':vals}
 
