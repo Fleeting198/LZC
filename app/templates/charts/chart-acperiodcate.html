@@ -165,14 +165,17 @@
                                 data: json_dateTrend.axisLabels
                             }]
                         });
-                        
+
+                        var i=0;    // 定义重复要使用到的变量
+                        var tmp_option;
+
                         // 清空series 并以notMerge 方式更新option.
-                        var tmp_option = chartDateTrend.getOption();
+                        tmp_option = chartDateTrend.getOption();
                         tmp_option.series = [];
                         chartDateTrend.setOption(tmp_option, true);
 
-                        for (var i = 0; i < json_dateTrend.seriesData.length; i++) {
-                            var tmp_option = chartDateTrend.getOption();
+                        for ( i = 0; i < json_dateTrend.seriesData.length; i++) {
+                            tmp_option = chartDateTrend.getOption();
                             if (json_dateTrend.seriesData[i].name == '宿舍比重') {
                                 tmp_option.series.push({
                                     name: json_dateTrend.seriesData[i].name,
@@ -207,12 +210,12 @@
                         });
 
                         // 清空series 并以notMerge 方式更新option.
-                        var tmp_option = chartTimeDistribution.getOption();
+                        tmp_option = chartTimeDistribution.getOption();
                         tmp_option.series = [];
                         chartTimeDistribution.setOption(tmp_option, true);
 
-                        for (var i = 0; i < json_timeDistribution.seriesData.length; i++) {
-                            var tmp_option = chartTimeDistribution.getOption();
+                        for ( i = 0; i < json_timeDistribution.seriesData.length; i++) {
+                            tmp_option = chartTimeDistribution.getOption();
                             tmp_option.series.push({
                                 name: json_timeDistribution.seriesData[i].name,
                                 stack: 'ac',
