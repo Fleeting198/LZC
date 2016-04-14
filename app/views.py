@@ -1,12 +1,6 @@
 ﻿#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# 02-09 Built
-# 02-11 将数据处理交给controlls，日期查询筛选
-# 02-12 acperiod, income
-# 02-16 Implementing dateRangePicker. Saved lots of code.
-# 02-20 acvalid, accategory
-
 from app import app
 from flask import render_template, request, jsonify, redirect
 from app.models import *
@@ -119,28 +113,27 @@ def refresh_chart_acperiodcate():
     from controls.GetJson_ACPeriodCate import GetJson_ACPeriodCate
     json_response = GetJson_ACPeriodCate(userID,modeDate,startDate,endDate)
 
-    # ===========================
-    # 解包，翻译，打包
-    legendLabels = json_response['json_dateTrend']['legendLabels']
-    seriesData = json_response['json_dateTrend']['seriesData']
+    if 'errMsg' not in json_response:
+        # 解包，翻译，打包
+        legendLabels = json_response['json_dateTrend']['legendLabels']
+        seriesData = json_response['json_dateTrend']['seriesData']
 
-    legendLabels = map(lambda x: helpers.translate(x), legendLabels)
-    for datum in seriesData:
-        datum['name'] = helpers.translate(datum['name'])
+        legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
 
-    json_response['json_dateTrend']['legendLabels'] = legendLabels
-    json_response['json_dateTrend']['seriesData'] = seriesData
+        json_response['json_dateTrend']['legendLabels'] = legendLabels
+        json_response['json_dateTrend']['seriesData'] = seriesData
 
-    legendLabels = json_response['json_timeDistribution']['legendLabels']
-    seriesData = json_response['json_timeDistribution']['seriesData']
+        legendLabels = json_response['json_timeDistribution']['legendLabels']
+        seriesData = json_response['json_timeDistribution']['seriesData']
 
-    legendLabels = map(lambda x: helpers.translate(x), legendLabels)
-    for datum in seriesData:
-        datum['name'] = helpers.translate(datum['name'])
+        legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
 
-    json_response['json_timeDistribution']['legendLabels'] = legendLabels
-    json_response['json_timeDistribution']['seriesData'] = seriesData
-    # ===========================
+        json_response['json_timeDistribution']['legendLabels'] = legendLabels
+        json_response['json_timeDistribution']['seriesData'] = seriesData
 
     return jsonify(json_response)
 
@@ -221,17 +214,16 @@ def refresh_chart_acvalid():
     from controls.GetJson_ACValid import GetJson_ACValid
     json_response = GetJson_ACValid(userID, startDate, endDate)
 
-    # =======================
-    titles = json_response['titles']
-    seriesData = json_response['seriesData']
+    if 'errMsg' not in json_response:
+        titles = json_response['titles']
+        seriesData = json_response['seriesData']
 
-    titles = map(lambda x: helpers.translate(x), titles)
-    for datum in seriesData:
-        datum['name'] = helpers.translate(datum['name'])
+        titles = map(lambda x: helpers.translate(x), titles)
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
 
-    json_response['titles'] = titles
-    json_response['seriesData'] = seriesData
-    # =======================
+        json_response['titles'] = titles
+        json_response['seriesData'] = seriesData
 
     return jsonify(json_response)
 
@@ -258,20 +250,18 @@ def refresh_chart_accategory():
     endDate = form.dateRange.data[-10:]
 
     from controls.GetJson_ACCategory import GetJson_ACCategory
-
     json_response = GetJson_ACCategory(userID, startDate, endDate)
 
-    # ==================
-    titles = json_response['titles']
-    seriesData = json_response['seriesData']
+    if 'errMsg' not in json_response:
+        titles = json_response['titles']
+        seriesData = json_response['seriesData']
 
-    for datum in seriesData:
-        datum['name'] = helpers.translate(datum['name'])
-    titles = [helpers.translate(title) for title in titles]
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
+        titles = [helpers.translate(title) for title in titles]
 
-    json_response['titles'] = titles
-    json_response['seriesData'] = seriesData
-    # ==================
+        json_response['titles'] = titles
+        json_response['seriesData'] = seriesData
 
     return jsonify(json_response)
 
@@ -300,17 +290,16 @@ def refresh_chart_concategory():
     from controls.GetJson_ConCategory import GetJson_ConCategory
     json_response = GetJson_ConCategory(userID, startDate, endDate)
 
-    # ==================
-    titles = json_response['titles']
-    seriesData = json_response['seriesData']
+    if 'errMsg' not in json_response:
+        titles = json_response['titles']
+        seriesData = json_response['seriesData']
 
-    for datum in seriesData:
-        datum['name'] = helpers.translate(datum['name'])
-    titles = [helpers.translate(title) for title in titles]
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
+        titles = [helpers.translate(title) for title in titles]
 
-    json_response['titles'] = titles
-    json_response['seriesData'] = seriesData
-    # ==================
+        json_response['titles'] = titles
+        json_response['seriesData'] = seriesData
 
     return jsonify(json_response)
 
