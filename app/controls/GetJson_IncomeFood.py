@@ -3,8 +3,7 @@
 
 from app.models import *
 
-def GetJson_IncomeFood(modeTime):
-    # Query.
+def GetJson_IncomeFood(modeTime=0):
     if modeTime == 0:
         strQuery = db.session.query(con_food_24h.sum_amount).order_by(con_food_24h.con_axis)
         axisLabels = []
@@ -16,6 +15,7 @@ def GetJson_IncomeFood(modeTime):
     elif modeTime == 2:
         axisLabels = [u'一月', u'二月', u'三月', u'四月', u'五月', u'六月', u'七月', u'八月', u'九月', u'十月', u'十一月', u'十二月', ]
         strQuery = db.session.query(con_food_12m.con_axis, con_food_12m.sum_amount).order_by(con_food_12m.con_axis)
+
 
     results = strQuery.all()
 

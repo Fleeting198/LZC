@@ -1,14 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-# 02-16 Created -C
-# 02-18 Weekly done.
-# 02-24 Pandas imported.
-
 from pandas import Series
 from decimal import *
 import types
-
 
 class DateTimeValueProcess:
     """输入坐标（日期，可重复）与对应值，对其进行统计。
@@ -42,6 +37,10 @@ class DateTimeValueProcess:
         """
         dates = self.oriDate[:]
         values = self.oriValues[:]
+
+        # TODO: 修复
+        # if len(dates) == 0:
+        #     return [],[]
 
         span_d = (dates[-1] - dates[0]).days
         span_w = float((dates[-1] - dates[0]).days) / 7

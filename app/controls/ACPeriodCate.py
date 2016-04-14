@@ -36,7 +36,7 @@ def ACPeriodCate(oriDate, oriValues, mode_date):
     for i in range(len(cols_name)):
         df['SUM'] += df[cols_name[i]]
 
-    df['PER_DORM'] = df['dorm']/df['SUM']  if 'dorm' in df  else df['PER_DORM'] = 0  # 仅当存在宿舍值时才计算宿舍比重
+    df['PER_DORM'] = df['dorm']/df['SUM'] if 'dorm' in df else 0  # 仅当存在宿舍值时才计算宿舍比重，否则设为0
     axisLabels = map(lambda x: x.strftime('%Y-%m-%d'), df.index.tolist())  # 从dataframe 中取出作为索引的日期标签成为队列
     seriesData = []
     legendLabels = []

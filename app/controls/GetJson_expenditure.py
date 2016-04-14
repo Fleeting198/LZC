@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 from app.models import *
-from sqlalchemy import and_, func
+from sqlalchemy import and_
 
 def GetJson_expenditure(userID, modeDate, modeTime, startDate, endDate):
     # Query.
