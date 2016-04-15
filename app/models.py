@@ -153,7 +153,7 @@ class penalty_line(db.Model):
 
 #  用于查询食物和用水消费时间分布的现成表
 class con_food_1440i(db.Model):
-    con_time = db.Column(db.DateTime, primary_key=True)
+    con_time = db.Column(db.Time, primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
 class con_food_12m(db.Model):
     con_axis = db.Column(db.Integer, primary_key=True)
@@ -166,7 +166,7 @@ class con_food_24h(db.Model):
     sum_amount = db.Column(db.DECIMAL())
 
 class con_water_1440i(db.Model):
-    con_time = db.Column(db.DateTime, primary_key=True)
+    con_time = db.Column(db.Time, primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
 class con_water_12m(db.Model):
     con_axis = db.Column(db.Integer(), primary_key=True)

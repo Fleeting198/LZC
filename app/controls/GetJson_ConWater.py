@@ -28,7 +28,7 @@ def GetJson_ConWaterTime(modeTime):
         results = strQuery.all()
         axisLabels = [str(result.con_time)[-8:-3] for result in results]
     elif modeTime == 4:
-        tSect = ['17:00', '23:00']
+        tSect = ['19:30', '21:30']
         tSect = [datetime.strptime(t, '%H:%M') for t in tSect]
         strQuery = db.session.query(con_water_1440i).filter(
             and_(tSect[0] < con_water_1440i.con_time, con_water_1440i.con_time < tSect[1])).order_by(
