@@ -10,9 +10,7 @@ def GetJson_ACRelation(userID):
     if num_total == 0:
         return {'num_total': 0, 'nodes': [], 'links': []}
 
-    # 获得最大关系值
-    max_val = list_relation[0][1]
-
+    max_val = list_relation[0][1] if list_relation[0][1] > 1 else 2  # 获得最大关系值
     source = str(userID)
 
     # symbolSize max and min
