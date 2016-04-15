@@ -21,7 +21,7 @@
         });
 
         var optionChartTime = {
-            title: {text: '餐饮收入分布'},
+            title: {text: '餐饮消费分布'},
             tooltip: {
                 trigger: 'axis',
                 formatter: function (params) {
@@ -42,7 +42,7 @@
                     saveAsImage: {show: true}
                 }
             },
-            legend: {data: ['收入总额']},
+            legend: {data: ['消费总额']},
             xAxis: {
                 type: 'category',
                 boundaryGap: true,
@@ -50,10 +50,11 @@
             },
             yAxis: {
                 type: 'value',
-                name: '平均收入',
+                name: '平均消费',
                 axisLabel: {
                     formatter: function (value, index) {
-                        return value / 10000 + '万元';
+                        if (value > 10000) return value / 10000 + '万元';
+                        else return value + '元';
                     }
                 }
             },
@@ -70,7 +71,7 @@
                 }
             ],
             series: [{
-                name: '收入总额',
+                name: '消费总额',
                 type: 'bar',
                 data: []
             }]
@@ -106,7 +107,7 @@
                     }
                 },
                 error: function () {
-                    showDialog("出错了", "与服务器断开连接");
+                    showDialog("出错了", "出现意外情况");
                 },
                 dataType: 'json'
             });

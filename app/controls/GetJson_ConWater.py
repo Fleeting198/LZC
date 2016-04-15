@@ -2,6 +2,8 @@
 # -*- coding: UTF-8 -*-
 
 from app.models import *
+from datetime import datetime
+from sqlalchemy import and_
 
 def GetJson_ConWaterTime(modeTime):
     if modeTime == 0:
@@ -16,6 +18,24 @@ def GetJson_ConWaterTime(modeTime):
         axisLabels = [u'一月', u'二月', u'三月', u'四月', u'五月', u'六月', u'七月', u'八月', u'九月', u'十月', u'十一月', u'十二月', ]
         strQuery = db.session.query(con_water_12m.con_axis, con_water_12m.sum_amount).order_by(
             con_water_12m.con_axis)
+    elif modeTime == 3:
+        tSect = ['11:00', '13:00']
+        tSect = [datetime.strptime(t, '%H:%M') for t in tSect]
+        strQuery = db.session.query(con_water_1440i).filter(
+            and_(tSect[0] < con_water_1440i.con_time, con_water_1440i.con_time < tSect[1])).order_by(
+            con_water_1440i.con_time)
+
+        results = strQuery.all()
+        axisLabels = [str(result.con_time)[-8:-3] for result in results]
+    elif modeTime == 4:
+        tSect = ['17:00', '23:00']
+        tSect = [datetime.strptime(t, '%H:%M') for t in tSect]
+        strQuery = db.session.query(con_water_1440i).filter(
+            and_(tSect[0] < con_water_1440i.con_time, con_water_1440i.con_time < tSect[1])).order_by(
+            con_water_1440i.con_time)
+
+        results = strQuery.all()
+        axisLabels = [str(result.con_time)[-8:-3] for result in results]
     else:
         return {'errMsg':'Nonexistent modeTime.'}
 

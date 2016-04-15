@@ -471,7 +471,7 @@
                 ret_val = json_response['has_user'] == true;
             },
             error: function () {
-                showDialog("出错了", "与服务器断开连接");
+                showDialog("出错了", "出现意外情况");
                 ret_val = false;
             },
             dataType: 'json'

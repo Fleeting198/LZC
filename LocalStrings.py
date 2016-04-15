@@ -16,7 +16,7 @@ warn_devIDLength = u'设备号长度最大为10'
 warn_userIDNon = u'找不到这个工号'
 
 opts_modeDate = (u'日', u'周', u'月', u'季', u'年')
-opts_modeTime = (u'24小时', u'7天', u'12月')
+opts_modeTime = (u'24小时', u'7天', u'12月', u'午高峰', u'晚高峰')
 
 dictTrans = {
     'water' : u'生活用水',

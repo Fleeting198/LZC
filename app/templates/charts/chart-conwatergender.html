@@ -1,0 +1,69 @@
+{% extends "charts/charts.html" %}
+{% block chartField %}
+
+    <div id="chartConWaterGender" style="width: inherit; height: 90%;"></div>
+
+    <script>
+        var chartConWaterGender = echarts.init(document.getElementById('chartConWaterGender'));
+        window.addEventListener('resize', function () {
+            chartConWaterGender.resize();
+        });
+
+        // start options for charts
+        var optChartConWaterGender = {
+            title: {text: '男女生用水情况'},
+            tooltip: {trigger: 'axis'},
+            toolbox: {
+                show: true,
+                feature: {
+                    mark: {show: true},
+                    dataView: {show: true, readOnly: false},
+                    restore: {show: true},
+                    saveAsImage: {show: true}
+                }
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: true,
+                data: ['男生', '女生']
+            },
+            yAxis: {
+                type: 'value',
+                name: '用水量',
+                axisLabel: {
+                    formatter: function (value, index) {
+                        return value/10000 + "万元";
+                    }
+                }
+            },
+            series: [
+                {   name: '金额',
+                    type: 'bar',
+                    data: []
+                }
+            ]
+        };
+        chartConWaterGender.setOption(optChartConWaterGender);
+        load_number = function () {
+            chartConWaterGender.setOption({
+                series: {
+                    data: [
+                        {   name: '男生',
+                            value: 1180323.72,
+                            itemStyle: {
+                                normal: {
+                                    color: '#314656'
+                                }
+                            }
+                        },
+                        {   name: '女生',
+                            value: 1180773.48
+                        }
+                    ]
+                }
+            });
+        };
+        load_number();
+    </script>
+
+{% endblock %}

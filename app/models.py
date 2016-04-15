@@ -4,8 +4,7 @@
 from app import db
 
 class device(db.Model):
-    """
-    刷卡机：设备号，地点序号(外键：设备地点表 序号)
+    """刷卡机：设备号，地点序号(外键：设备地点表 序号)
     """
     dev_id = db.Column(db.String(10), primary_key=True)
     node_id = db.Column(db.String, db.ForeignKey('dev_loc.node_id'))
@@ -18,8 +17,7 @@ class device(db.Model):
 
 
 class individual(db.Model):
-    """
-    个体：工号，角色[老师，学生，其他]，年级[只有学生描述年级]
+    """个体：工号，角色[老师，学生，其他]，年级[只有学生描述年级]
     """
     user_id = db.Column(db.String(8), primary_key=True)
     role = db.Column(db.String(3))
@@ -47,8 +45,7 @@ class individual(db.Model):
 
 
 class dev_loc(db.Model):
-    """
-    设备地点：地点序号(自增)，地点描述。
+    """设备地点：地点序号(自增)，地点描述。
     分类：
     """
     node_id = db.Column(db.Integer, primary_key=True)
@@ -64,8 +61,7 @@ class dev_loc(db.Model):
 
 
 class ac_loc(db.Model):
-    """
-    门禁地点：地点序号(自增)，地点描述。
+    """门禁地点：地点序号(自增)，地点描述。
     分类：
     """
     node_id = db.Column(db.Integer, primary_key=True)
@@ -80,8 +76,7 @@ class ac_loc(db.Model):
 
 
 class acrec(db.Model):
-    """
-    门禁记录：工号(外键：个体 工号)，日期时间，合法，地点序号(外键：门禁地点 序号)。
+    """门禁记录：工号(外键：个体 工号)，日期时间，合法，地点序号(外键：门禁地点 序号)。
     """
     user_id = db.Column(db.String(8), db.ForeignKey('individual.user_id'), primary_key=True)
     ac_datetime = db.Column(db.DateTime, primary_key=True)
@@ -100,8 +95,7 @@ class acrec(db.Model):
 
 
 class consumption(db.Model):
-    """
-    消费记录：工号(外键：个体 工号)，日期时间，设备号(外键：设备 设备号)，金额
+    """消费记录：工号(外键：个体 工号)，日期时间，设备号(外键：设备 设备号)，金额
     """
     user_id = db.Column(db.String(8), db.ForeignKey('individual.user_id'), primary_key=True)
     con_datetime = db.Column(db.DateTime, primary_key=True)
@@ -116,8 +110,7 @@ class consumption(db.Model):
 
 
 class acr_friendlist(db.Model):
-    """
-    来自门禁表的人际关系字典
+    """来自门禁表的人际关系字典
     """
     user_id = db.Column(db.String(8), db.ForeignKey('individual.user_id'), primary_key=True)
     str_relation = db.Column(db.String)
@@ -132,56 +125,55 @@ class acr_friendlist(db.Model):
 
 
 class conability(db.Model):
-    """
-    个人月消费能力：工号,月平均消费金额(保留2位小数),角色[老师，学生]
+    """个人月消费能力：工号,月平均消费金额(保留2位小数),角色[老师，学生]
     """
     user_id = db.Column(db.String(8), primary_key=True)
     amount_avg = db.Column(db.DECIMAL())
     role = db.Column(db.String(3))
 
 class conability_line(db.Model):
-    """
-    月消费能力统计：月平均消费金额(取整),人数,角色[老师，学生]
+    """月消费能力统计：月平均消费金额(取整),人数,角色[老师，学生]
     """
     amount = db.Column(db.Integer(), primary_key=True)
     num = db.Column(db.Integer())
     role = db.Column(db.String(3))
 
 class penalty(db.Model):
-    """
-    个体滞纳金缴纳情况：工号,缴纳总额
+    """个体滞纳金缴纳情况：工号,缴纳总额
     """
     user_id = db.Column(db.String(8), primary_key=True)
     amount = db.Column(db.DECIMAL())
 
 class penalty_line(db.Model):
-    """
-    滞纳金缴纳情况统计：缴纳总额(取整),人数
+    """滞纳金缴纳情况统计：缴纳总额(取整),人数
     """
     amount = db.Column(db.Integer(), primary_key=True)
     num = db.Column(db.Integer())
 
+
 #  用于查询食物和用水消费时间分布的现成表
+class con_food_1440i(db.Model):
+    con_time = db.Column(db.DateTime, primary_key=True)
+    sum_amount = db.Column(db.DECIMAL())
 class con_food_12m(db.Model):
-    con_axis = db.Column(db.Integer(), primary_key=True)
+    con_axis = db.Column(db.Integer, primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
-
 class con_food_7d(db.Model):
-    con_axis = db.Column(db.Integer(), primary_key=True)
+    con_axis = db.Column(db.Integer, primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
-
 class con_food_24h(db.Model):
-    con_axis = db.Column(db.Integer(), primary_key=True)
+    con_axis = db.Column(db.Integer, primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
 
+class con_water_1440i(db.Model):
+    con_time = db.Column(db.DateTime, primary_key=True)
+    sum_amount = db.Column(db.DECIMAL())
 class con_water_12m(db.Model):
     con_axis = db.Column(db.Integer(), primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
-
 class con_water_7d(db.Model):
     con_axis = db.Column(db.Integer(), primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
-
 class con_water_24h(db.Model):
     con_axis = db.Column(db.Integer(), primary_key=True)
     sum_amount = db.Column(db.DECIMAL())

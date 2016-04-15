@@ -40,7 +40,7 @@
             chartTimeDistribution.resize();
         });
 
-        var optionChartDate = {
+        var optChartDate = {
             title: {text: '门禁类型日期趋势'},
             tooltip: {
                 trigger: 'axis',
@@ -110,7 +110,7 @@
             ],
             series: []
         };
-        var optionChartTime = {
+        var optChartTime = {
             title: {text: '门禁类型时间分布'},
             tooltip: {
                 trigger: 'axis',
@@ -150,8 +150,8 @@
             series: []
         };
 
-        chartDateTrend.setOption(optionChartDate);
-        chartTimeDistribution.setOption(optionChartTime);
+        chartDateTrend.setOption(optChartDate);
+        chartTimeDistribution.setOption(optChartTime);
 
         refresh_chart = function () {
             if ($("#userID").val() == '') return;
@@ -166,8 +166,8 @@
                     chartTimeDistribution.hideLoading();
 
                     // 还原图表选项
-                    chartDateTrend.setOption(optionChartDate);
-                    chartTimeDistribution.setOption(optionChartTime);
+                    chartDateTrend.setOption(optChartDate);
+                    chartTimeDistribution.setOption(optChartTime);
 
                     if (!json_response.errMsg) {
                         var json_dateTrend;
@@ -247,7 +247,7 @@
                     }
                 },
                 error: function () {
-                    showDialog("出错了", "与服务器断开连接");
+                    showDialog("出错了", "出现意外情况");
                 },
                 dataType: 'json'
             });

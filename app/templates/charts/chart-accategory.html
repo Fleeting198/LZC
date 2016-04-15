@@ -31,11 +31,11 @@
             chartACCategory.resize();
         });
 
-        var optionChartACCategory = {
+        var optChartACCategory = {
             title: {text: '门禁分类'},
             tooltip: {
                 trigger: 'item',
-                formatter: "{b} : {c} 次 ({d}%)"
+                formatter: "{b} <br/>{c} 次 ({d}%)"
             },
             toolbox: {
                 show: true,
@@ -62,7 +62,7 @@
             }]
         };
 
-        chartACCategory.setOption(optionChartACCategory);
+        chartACCategory.setOption(optChartACCategory);
 
         refresh_chart = function () {
             if ($("#userID").val() == '') return;
@@ -72,7 +72,7 @@
                 type: 'GET',
                 success: function (json_response) {
                     chartACCategory.hideLoading();
-                    chartACCategory.setOption(optionChartACCategory);
+                    chartACCategory.setOption(optChartACCategory);
 
                     if (!json_response.errMsg) {
                         var titles;
@@ -89,7 +89,7 @@
                     }
                 },
                 error: function () {
-                    showDialog("出错了","与服务器断开连接");
+                    showDialog("出错了","出现意外情况");
                 },
                 dataType: 'json'
             });

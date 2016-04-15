@@ -137,7 +137,7 @@ def bill(userID, startDate, endDate):
     con_per_month = -1
 
     # Get total_expend 总支出
-    from GetJson_expenditure import GetJson_expenditure
+    from GetJson_Expenditure import GetJson_expenditure
     json_Expenditure = GetJson_expenditure(userID, 0, 2, startDate, endDate)
     if 'errMsg' not in json_Expenditure:
         dateTrend = json_Expenditure['json_dateTrend']

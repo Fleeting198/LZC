@@ -55,13 +55,13 @@ def show_charts():
 
 @app.route('/charts/expenditure')
 def show_chart_expenditure():
-    form = Form_User_DR_MD_MT()
+    form = Form_Expenditure()
     return render_template('charts/chart-expenditure.html', form=form)
 
 
 @app.route('/charts/expenditure/getData', methods=['GET'])
 def refresh_chart_expenditure():
-    form = Form_User_DR_MD_MT()
+    form = Form_Expenditure()
     form.userID.data = request.args.get('userID')
     form.modeDate.data = request.args.get('modeDate')
     form.modeTime.data = request.args.get('modeTime')
@@ -78,14 +78,14 @@ def refresh_chart_expenditure():
     startDate = form.dateRange.data[:10]
     endDate = form.dateRange.data[-10:]
 
-    from controls.GetJson_expenditure import GetJson_expenditure
+    from controls.GetJson_Expenditure import GetJson_expenditure
     json_response = GetJson_expenditure(userID,modeDate,modeTime,startDate,endDate)
     return jsonify(json_response)
 
 
 @app.route('/charts/acperiodcate')
 def show_chart_acperiodcate():
-    form = Form_User_DR_MD()
+    form = Form_Acperiodcate()
     return render_template('charts/chart-acperiodcate.html', form=form)
 
 
@@ -95,7 +95,7 @@ def refresh_chart_acperiodcate():
     门禁分类日期趋势时间分布    -C
     Codes mainly in controls.ACPeriodCate.py.
     """
-    form = Form_User_DR_MD()
+    form = Form_Acperiodcate()
     form.userID.data = request.args.get('userID')
     form.dateRange.data = request.args.get('dateRange')
     form.modeDate.data = request.args.get('modeDate')
@@ -140,13 +140,13 @@ def refresh_chart_acperiodcate():
 
 @app.route('/charts/income')
 def show_chart_income():
-    form = Form_Dev_DR_MD_MT()
+    form = Form_Income()
     return render_template('charts/chart-income.html', form=form)
 
 
 @app.route('/charts/income/getData', methods=['GET'])
 def refresh_chart_income():
-    form = Form_Dev_DR_MD_MT()
+    form = Form_Income()
     form.devID.data = request.args.get('devID')
     form.modeDate.data = request.args.get('modeDate')
     form.modeTime.data = request.args.get('modeTime')
@@ -168,8 +168,8 @@ def refresh_chart_income():
 
 @app.route('/charts/foodIncome')
 def show_chart_foodIncome():
-    form = Form_MT()
-    return render_template('charts/chart-foodIncome.html', form=form)
+    form = Form_FoodIncome()
+    return render_template('charts/chart-confood.html', form=form)
 
 
 @app.route('/charts/foodIncome/getData', methods=['GET'])
@@ -177,7 +177,7 @@ def refresh_chart_foodIncome():
     """
     获得设备地点表中分类为“餐饮”的地点的设备的金额总数。
     """
-    form = Form_MT()
+    form = Form_FoodIncome()
     form.modeTime.data = request.args.get('modeTime')
 
     if not form.validate():
@@ -185,20 +185,20 @@ def refresh_chart_foodIncome():
 
     modeTime = int(form.modeTime.data)
 
-    from controls.GetJson_IncomeFood import GetJson_IncomeFood
-    json_response = GetJson_IncomeFood(modeTime)
+    from controls.GetJson_ConFood import GetJson_ConFood
+    json_response = GetJson_ConFood(modeTime)
     return jsonify(json_response)
 
 
 @app.route('/charts/acvalid')
 def show_chart_acvalid():
-    form = Form_User_DR()
+    form = Form_Acvalid()
     return render_template('charts/chart-acvalid.html', form=form)
 
 
 @app.route('/charts/acvalid/getData')
 def refresh_chart_acvalid():
-    form = Form_User_DR()
+    form = Form_Acvalid()
     form.userID.data = request.args.get('userID')
     form.dateRange.data = request.args.get('dateRange')
 
@@ -230,13 +230,13 @@ def refresh_chart_acvalid():
 
 @app.route('/charts/accategory')
 def show_chart_accategory():
-    form = Form_User_DR()
+    form = Form_Accategory()
     return render_template('charts/chart-accategory.html', form=form)
 
 
 @app.route('/charts/accategory/getData')
 def refresh_chart_accategory():
-    form = Form_User_DR()
+    form = Form_Accategory()
     form.userID.data = request.args.get('userID')
     form.dateRange.data = request.args.get('dateRange')
 
@@ -268,13 +268,13 @@ def refresh_chart_accategory():
 
 @app.route('/charts/concategory')
 def show_chart_concategory():
-    form = Form_User_DR()
+    form = Form_Concategory()
     return render_template('charts/chart-concategory.html', form=form)
 
 
 @app.route('/charts/concategory/getData')
 def refresh_chart_concategory():
-    form = Form_User_DR()
+    form = Form_Concategory()
     form.userID.data = request.args.get('userID')
     form.dateRange.data = request.args.get('dateRange')
 
@@ -377,33 +377,33 @@ def refresh_chart_number():
 
 @app.route('/charts/conwatertime')
 def show_chart_conWaterTime():
-    form = Form_DR_MD_MT()
-    return render_template('charts/chart-conwatertime.html', form=form)
+    form = Form_Conwatertime()
+    return render_template('charts/chart-conwater.html', form=form)
 
 
 @app.route('/charts/conwatertime/getData', methods=['GET'])
 def refresh_chart_conWaterTime():
-    form = Form_MT()
+    form = Form_Conwatertime()
     form.modeTime.data = request.args.get('modeTime')
 
     if not form.validate():
         return jsonify(errMsg=form.errors)
 
     modeTime = int(form.modeTime.data)  # 赋值给变量
-    from controls.GetJson_ConWaterTime import GetJson_ConWaterTime
+    from controls.GetJson_ConWater import GetJson_ConWaterTime
     json_response = GetJson_ConWaterTime(modeTime)
     return jsonify(json_response)
 
 
 @app.route('/charts/conability')
 def show_chart_conability():
-    form = Form_User()
+    form = Form_Conability()
     return render_template('charts/chart-conability.html', form=form)
 
 
 @app.route('/charts/conability/getData', methods=['GET'])
 def refresh_chart_conability():
-    form = Form_User()
+    form = Form_Conability()
     form.userID.data = request.args.get('userID')
 
     if not form.validate():
@@ -418,18 +418,18 @@ def refresh_chart_conability():
 
 @app.route('/charts/conwater')
 def show_chart_conwater():
-    return render_template('charts/chart-conwater.html')
+    return render_template('charts/chart-conwatergender.html')
 
 
 @app.route('/charts/penalty')
 def show_chart_penalty():
-    form = Form_User()
+    form = Form_Penalty()
     return render_template('charts/chart-penalty.html', form=form)
 
 
 @app.route('/charts/penalty/getData', methods=['GET'])
 def refresh_chart_penalty():
-    form = Form_User()
+    form = Form_Penalty()
     form.userID.data = request.args.get('userID')
 
     if not form.validate():
@@ -444,13 +444,13 @@ def refresh_chart_penalty():
 
 @app.route('/charts/relation')
 def show_chart_relation():
-    form = Form_User()
+    form = Form_Relation()
     return render_template('charts/chart-relation.html', form=form)
 
 
 @app.route('/charts/relation/getData', methods=['GET'])
 def refresh_chart_relation():
-    form = Form_User()
+    form = Form_Relation()
     form.userID.data = request.args.get('userID')
 
     if not form.validate():
