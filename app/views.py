@@ -91,9 +91,7 @@ def show_chart_acperiodcate():
 
 @app.route('/charts/acperiodcate/getData', methods=['GET'])
 def refresh_chart_acperiodcate():
-    """
-    门禁分类日期趋势时间分布    -C
-    Codes mainly in controls.ACPeriodCate.py.
+    """Codes mainly in controls.ACPeriodCate.py.
     """
     form = Form_Acperiodcate()
     form.userID.data = request.args.get('userID')

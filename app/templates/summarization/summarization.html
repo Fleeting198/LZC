@@ -115,9 +115,9 @@
                     <div class="row">
                         <div class="col-md-7 col-sm-7"></div>
                         <div class="col-md-1 col-sm-1">
-                            <a href='{{ url_for('show_chart_acperiodcate') }}' target="_blank">
+                            <a href='{{ url_for('show_chart_accategory') }}' target="_blank">
                                 <button class="button button-highlight button-box button-large button-longshadow-right" style="width: 300px;">
-                                        <i class="fa fa-pie-chart"> 查看门禁类型日期趋势</i>
+                                        <i class="fa fa-pie-chart"> 查看门禁分类计数</i>
                                 </button>
                             </a>
                         </div>
@@ -179,7 +179,7 @@
                         <div class="col-md-1 col-sm-1">
                             <a href='{{ url_for('show_chart_acperiodcate') }}' target="_blank">
                                 <button class="button button-primary button-box button-large button-longshadow-right" style="width: 300px;">
-                                        <i class="fa fa-bar-chart"> 查看门禁类型时间分布</i>
+                                        <i class="fa fa-bar-chart"> 查看门禁趋势与分布</i>
                                 </button>
                             </a>
                         </div>
@@ -349,7 +349,7 @@
                     <div class="row">
                         <div class="col-md-7 col-sm-7"></div>
                         <div class="col-md-1 col-sm-1">
-                            <a href='{{ url_for('show_chart_accategory') }}' target="_blank">
+                            <a href='{{ url_for('show_chart_concategory') }}' target="_blank">
                                 <button class="button button-highlight button-box button-large button-longshadow-right" style="width: 300px;">
                                         <i class="fa fa-pie-chart"> 查看消费分类计数 </i>
                                 </button>
@@ -563,7 +563,7 @@
     var chartACPeriodCateTime = echarts.init(document.getElementById('chartACPeriodCateTime'));
     var opt_chartACPeriodCateTime = {
         title: {
-            text: '门禁类型时间分布',
+            text: '门禁趋势与分布',
             textStyle: {
                 color: '#34495E',
                 fontSize: 30
