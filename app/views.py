@@ -91,7 +91,7 @@ def show_chart_acperiodcate():
 
 @app.route('/charts/acperiodcate/getData', methods=['GET'])
 def refresh_chart_acperiodcate():
-    """Codes mainly in controls.ACPeriodCate.py.
+    """Codes mainly in controls.ProAcPeriodCate.py.
     """
     form = Form_Acperiodcate()
     form.userID.data = request.args.get('userID')

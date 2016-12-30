@@ -8,8 +8,8 @@ from app import helpers
 import copy
 import types
 
+"""时间分布趋势"""
 class ACPeriodCate:
-
     def __init__(self, oriDate, oriValues):
         """
         :param oriDate: 日期标签数组
@@ -29,7 +29,7 @@ class ACPeriodCate:
         rule_mode = {'0': 'D', '1': 'W', '2': 'M', '3': 'Q'}
 
         df = DataFrame(pointVals, index=axisLabels)
-        df = df.resample(rule_mode[str(mode_date)], how='sum')
+        df = df.resample(rule_mode[str(mode_date)]).sum()
         df = df.fillna(0)
 
         """各项总和"""
@@ -39,9 +39,6 @@ class ACPeriodCate:
         # df['SUM'] = 0
         # for i in xrange(len(cols_name)):
         #     df['SUM'] += df[cols_name[i]]
-
-        """宿舍比重"""
-        # df['PER_DORM'] = df['dorm']/df['SUM'] if 'dorm' in df else 0  # 仅当存在宿舍值时才计算宿舍比重，否则设为0
 
         axisLabels = map(lambda x: x.strftime('%Y-%m-%d'), df.index.tolist())  # 从dataframe 中取出作为索引的日期标签成为队列
         seriesData = []

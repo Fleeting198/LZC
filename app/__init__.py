@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 from flask import Flask
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 
 # 注意：必须先实例化app才能导入依赖app的views和models。
 app = Flask(__name__)

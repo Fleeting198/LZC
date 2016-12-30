@@ -1,5 +1,5 @@
 {% extends 'base.html' %} {% block content %}
-    <!-- 社区分享 来自百度分享 share.baidu.com -->
+     <!--社区分享 来自百度分享 share.baidu.com--> 
     <div class="bdsharebuttonbox"
          style="background: #ECF0F1; border-radius: 5px; padding-left: 7px; position: fixed; z-index: 1100; right: 20px; bottom: 20px">
         <a href="#" class="bds_more" data-cmd="more"></a>
@@ -944,6 +944,9 @@
     values.push(value_Relation);
     values.push(value_ConCategory);
     values.push(value_penalty);
+    
+    console.log(values);
+    
     var opt_chartRadar = {
         color: ['#ECF0F1'],
         textStyle: {
@@ -951,9 +954,9 @@
             fontSize: 14
         },
         tooltip: {
-            trigger: 'axis'
+            trigger: 'axis',
         },
-        radar:{
+        radar:[{
             indicator: [
                 {text: '足迹', max: 10},
                 {text: '作息', max: 10},
@@ -964,7 +967,7 @@
             ],
             center: ['50%', '50%'],
             radius: 120
-        },
+        }],
         series: [{
             type: 'radar',
             tooltip: {

@@ -12,7 +12,7 @@ def GetJson_ACValid(userID, startDate, endDate):
     results = strQuery.all()
 
     # Process data.
-    from CategoryProcess import CategoryProcess
+    from ProCate import CategoryProcess
     titles, vals = CategoryProcess(results)
 
     # seriesData = []  # [{value: , name: }, {value: , name: }, ...]

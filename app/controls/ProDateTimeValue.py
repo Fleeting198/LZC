@@ -23,7 +23,7 @@ class DateTimeValueProcess:
 
         rule_mode = {'0': 'D', '1': 'W', '2': 'M', '3': 'Q'}
         # 按照modeDate 合并数据
-        ts = ts.resample(rule_mode[str(mode_date)], how='sum')
+        ts = ts.resample(rule_mode[str(mode_date)]).sum()
 
         axisLabels = map(lambda x: x.strftime('%Y-%m-%d'), ts.index.tolist())
         pointVals = map(lambda x: round(float(x), 2), ts.values.tolist())

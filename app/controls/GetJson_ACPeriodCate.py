@@ -23,7 +23,7 @@ def GetJson_ACPeriodCate(userID, modeDate, startDate, endDate):
     res_datetimes = [result.ac_datetime for result in results]
     res_categorys = [result.category for result in results]
 
-    from ACPeriodCate import ACPeriodCate
+    from ProAcPeriodCate import ACPeriodCate
     process = ACPeriodCate(res_datetimes, res_categorys)
     json_dateTrend = process.get_date_trend(modeDate)
     json_timeDistribution = process.get_time_distribution()

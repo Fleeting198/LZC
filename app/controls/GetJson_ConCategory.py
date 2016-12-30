@@ -17,7 +17,7 @@ def GetJson_ConCategory(userID, startDate, endDate):
         return {'errMsg': u'没有找到记录。'}
 
     # Process data.
-    from CategoryProcess import CategoryProcess
+    from ProCate import CategoryProcess
     titles, vals = CategoryProcess(results)
 
     # seriesData = []  # [{value: , name: }, {value: , name: }, ...]

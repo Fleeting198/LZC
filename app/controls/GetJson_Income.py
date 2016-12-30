@@ -19,7 +19,7 @@ def GetJson_Income(devID, modeDate, modeTime, startDate, endDate):
     res_amounts = [result.amount for result in results]
 
     # Process data.
-    from app.controls.DateTimeValueProcess import DateTimeValueProcess
+    from app.controls.ProDateTimeValue import DateTimeValueProcess
     process = DateTimeValueProcess(res_datetimes, res_amounts)
 
     # Get and pack dateTrend() return.

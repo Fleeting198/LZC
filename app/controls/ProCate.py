@@ -5,10 +5,10 @@ import operator
 
 def CategoryProcess(ipt_list):
     """
-    :param ipt_list:队列，元素为元组(名称，值)
+    :param ipt_list:输入队列，元素为元组(名称，值)
     """
 
-    vals = {}  # = {'title0': val1, 'title1': val2, ...}
+    vals = {}    # {'title0': val1, 'title1': val2, ...}
     titles = []  # ['title0', 'title1', ...]
 
     for result in ipt_list:
@@ -16,14 +16,14 @@ def CategoryProcess(ipt_list):
         # Into tmp_data.
         vals[str(result[0])] = float(result[1])
 
-    # 若项目数量少，直接返回，否则将比例小的归入其他
-    if len(vals) < 4: return titles, vals
+    # 若项目数量少，直接返回
+    if len(vals) < 4:
+        return titles, vals
 
-    titles = []
-    list_vals=[]
+    # 若项目数量较多，将值最小的几个归到其他类中
+    titles = []  # 清空
     total_sum = 0
     for k, v in vals.iteritems():
-        list_vals.append({k:v})
         total_sum += v
 
     list_vals = sorted(vals.iteritems(), key=operator.itemgetter(1), reverse=True)
@@ -36,7 +36,7 @@ def CategoryProcess(ipt_list):
             cur_count += val[1]
             tmp_vals.append(val)
             titles.append(val[0])
-    titles.append('other')
+    # titles.append('other')
 
     if cur_count != total_sum:
         tmp_vals.append(('other', total_sum - cur_count))

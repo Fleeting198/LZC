@@ -1,6 +1,7 @@
 {% extends "charts/charts.html" %}
 {% block chartField %}
 
+	<!--输入表单-->
     <form id="form-ipt" class="form-inline" >
         {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='PPPWQHXW')}}
         {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
@@ -31,7 +32,7 @@
             $(this).val('');
         });
 
-        // 图表初始化。
+        // 图表初始化
         var chartDateTrend = echarts.init(document.getElementById('chartDateTrend'));
         var chartTimeDistribution = echarts.init(document.getElementById('chartTimeDistribution'));
 
@@ -47,12 +48,9 @@
                 formatter: function(params){
                     var str_return = params[0].name + '<br/>';
                     for (var i=0; i<params.length; i++){
-                        if(params[i].seriesName != '宿舍比重'){
-                            if(params[i].value != 0){
-                                str_return += params[i].seriesName + ' : ' + params[i].value + ' 次<br/>'
-                            }
-                        }else
-                            str_return += params[i].seriesName + ' : ' + (params[i].value*100).toFixed(2) + ' %<br/>'
+                        if(params[i].value != 0){
+                            str_return += params[i].seriesName + ' : ' + params[i].value + ' 次<br/>'
+                        }
                     }
                     return str_return;
                 }
@@ -60,11 +58,10 @@
             toolbox: {
                 show: true,
                 feature: {
-                    mark: {show: true},
+                    mark: {show: false},
                     dataView: {show: true, readOnly: false},
                     magicType: {show: true, type: ['line', 'bar']},
                     restore: {show: true},
-                    saveAsImage: {show: true}
                 }
             },
             legend: {data: []},
@@ -80,21 +77,6 @@
                         formatter: '{value} 次'
                     }
                 },
-                /*
-                {   type: 'value',
-                    name: '比例',
-                    axisLine: {
-                        show: false,
-                        lineStyle: {width:10}
-                    },
-                    axisLabel: {
-                        formatter: function(value){
-                            value *= 100;
-                            return value+"%";
-                        }
-                    }
-                }
-                */
             ],
             dataZoom: [
                 {   type: 'inside',
@@ -131,7 +113,6 @@
                     dataView: {show: true, readOnly: false},
                     magicType: {show: true, type: ['line', 'bar']},
                     restore: {show: true},
-                    saveAsImage: {show: true}
                 }
             },
             legend: {data: []},
