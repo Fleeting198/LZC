@@ -1,0 +1,168 @@
+{% extends "charts/charts.html" %} {% block chartField %}
+
+<form id="form-ipt" class="form-inline">
+	{{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='PPPWQHXW')}} 
+	{{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
+	<input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()" />
+</form>
+
+<div id="chartAcTimeDistr" style="width: inherit; height: 90%;"></div>
+
+<script>
+	var dateRangePicker = $("input[name='dateRange']");
+	dateRangePicker.daterangepicker({
+		autoUpdateInput: false,
+		locale: {
+			format: 'YYYY-MM-DD',
+			cancelLabel: 'Clear'
+		}
+	});
+	dateRangePicker.on('apply.daterangepicker', function(ev, picker) {
+		$(this).val(picker.startDate.format('YYYY-MM-DD') + ' ~ ' + picker.endDate.format('YYYY-MM-DD'));
+	});
+	dateRangePicker.on('cancel.daterangepicker', function(ev, picker) {
+		$(this).val('');
+	});
+
+	// 图表初始化
+	var chartAcTimeDistr = echarts.init(document.getElementById('chartAcTimeDistr'));
+
+	// 自动缩放注册
+	window.addEventListener('resize',
+		function() {
+			chartAcTimeDistr.resize();
+		});
+
+	// 默认Echarts配置
+	var optchartAcTimeDistr = {
+		title: {
+			text: '门禁时间分布'
+		},
+		legend:{},
+		tooltip: {
+			trigger: 'axis',
+			formatter: function(params) {
+				var str_return = params[0].name + '<br/>';
+				for(var i = 0; i < params.length; i++) {
+					if(params[i].value != 0) {
+						str_return += params[i].seriesName + ' : ' + params[i].value.toFixed(2) + ' 次<br/>'
+					}
+				}
+				return str_return;
+			}
+		},
+		toolbox: {
+			show: true,
+			feature: {
+				dataView: {
+					show: true,
+					readOnly: false
+				},
+				magicType: {
+					show: true,
+					type: ['line', 'bar']
+				},
+				restore: {
+					show: true
+				},
+			}
+		},
+		xAxis: {
+			type: 'category',
+			boundaryGap: true,
+			data: []
+		},
+		yAxis: {
+			type: 'value',
+			name: '次数',
+			axisLabel: {
+				formatter: '{value} 次'
+			}
+		},
+		dataZoom: [
+			{
+				type: 'inside',
+				xAxisIndex: [0],
+				start: 0,
+				end: 100
+			}, 
+			{
+				type: 'slider',
+				xAxisIndex: [0],
+				start: 0,
+				end: 100
+			}
+		],
+		series:[]
+	};
+	
+	// 设置默认配置
+	chartAcTimeDistr.setOption(optchartAcTimeDistr);
+
+	refresh_chart = function() {
+		if($("#userID").val() == '') {
+			showDialog("ID不可为空", json_response.errMsg);
+			return;
+		};
+
+		chartAcTimeDistr.showLoading();
+
+		$.ajax('/charts/actimedistr/getData?' + $("#form-ipt").serialize(), {
+			type: 'GET',
+			success: function(json_response) {
+				chartAcTimeDistr.hideLoading();
+
+				// 还原图表选项
+				chartAcTimeDistr.setOption(optchartAcTimeDistr);
+
+				if(!json_response.errMsg) {
+					var legendLabels = json_response.legendLabels;
+					var axisLabels = json_response.axisLabels;
+					var seriesData=json_response.seriesData
+
+					// 配置设定
+					chartAcTimeDistr.setOption({
+						legend: {
+							data: legendLabels
+						},
+						xAxis: [{
+							data: axisLabels
+						}]
+					});
+
+					// 以下遇到更新部分数据时新数据合并旧数据而不是覆盖的问题
+					var i = 0; // 定义重复要使用到的变量
+					var tmp_option;
+
+					// 清空series 并以notMerge 方式更新option.
+					tmp_option = chartAcTimeDistr.getOption();
+					tmp_option.series = [];
+					chartAcTimeDistr.setOption(tmp_option, true);
+
+					for(i = 0; i < seriesData.length; i++) {
+						tmp_option = chartAcTimeDistr.getOption();
+						tmp_option.series.push({
+							name: seriesData[i].name,
+							stack: 'ac',
+							type: 'bar',
+							data: seriesData[i].data
+						});
+						chartAcTimeDistr.setOption(tmp_option, true);
+					}
+				} else {
+					showDialog("出错了", json_response.errMsg);
+				}
+			},
+			error: function() {
+				showDialog("出错了", "出现意外情况");
+			},
+			dataType: 'json'
+		});
+	};
+	
+	$(document).ready(function() {
+		refresh_chart();
+	});
+</script>
+
+{% endblock %}

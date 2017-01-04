@@ -1,15 +1,16 @@
 ﻿#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-from app import app
 from flask import render_template, request, jsonify, redirect
-from app.models import *
-from app.forms import *
 from sqlalchemy import func
+
+from app import app
 from app import helpers
-import types
+from app.forms import *
+from app.models import *
 
 
+# 主页
 @app.route('/')
 def show_index():
     return render_template('index.html')
@@ -53,50 +54,20 @@ def show_charts():
     return render_template('charts/charts.html')
 
 
-@app.route('/charts/expenditure')
-def show_chart_expenditure():
-    form = Form_Expenditure()
-    return render_template('charts/chart-expenditure.html', form=form)
+# ========================
+# 门禁类型比例
+# ========================
+@app.route('/charts/accategory')
+def show_chart_accategory():
+    form = Form_AcCategory()
+    return render_template('charts/chart-accategory.html', form=form)
 
 
-@app.route('/charts/expenditure/getData', methods=['GET'])
-def refresh_chart_expenditure():
-    form = Form_Expenditure()
-    form.userID.data = request.args.get('userID')
-    form.modeDate.data = request.args.get('modeDate')
-    form.modeTime.data = request.args.get('modeTime')
-    form.dateRange.data = request.args.get('dateRange')
-
-    if not form.validate():
-        return jsonify(errMsg=form.errors['userID'])
-    if not check_user_id(form.userID.data):
-        return jsonify(errMsg=lstr.warn_userIDNon)
-
-    userID = form.userID.data
-    modeDate = int(form.modeDate.data)
-    modeTime = int(form.modeTime.data)
-    startDate = form.dateRange.data[:10]
-    endDate = form.dateRange.data[-10:]
-
-    from controls.GetJson_Expenditure import GetJson_expenditure
-    json_response = GetJson_expenditure(userID,modeDate,modeTime,startDate,endDate)
-    return jsonify(json_response)
-
-
-@app.route('/charts/acperiodcate')
-def show_chart_acperiodcate():
-    form = Form_Acperiodcate()
-    return render_template('charts/chart-acperiodcate.html', form=form)
-
-
-@app.route('/charts/acperiodcate/getData', methods=['GET'])
-def refresh_chart_acperiodcate():
-    """Codes mainly in controls.ProAcPeriodCate.py.
-    """
-    form = Form_Acperiodcate()
+@app.route('/charts/accategory/getData')
+def refresh_chart_accategory():
+    form = Form_AcCategory()
     form.userID.data = request.args.get('userID')
     form.dateRange.data = request.args.get('dateRange')
-    form.modeDate.data = request.args.get('modeDate')
 
     if not form.validate():
         return jsonify(errMsg=form.errors['userID'])
@@ -106,34 +77,290 @@ def refresh_chart_acperiodcate():
     userID = form.userID.data
     startDate = form.dateRange.data[:10]
     endDate = form.dateRange.data[-10:]
-    modeDate = int(form.modeDate.data)
 
-    from controls.GetJson_ACPeriodCate import GetJson_ACPeriodCate
-    json_response = GetJson_ACPeriodCate(userID,modeDate,startDate,endDate)
+    from app.controls.individual.access.GetJson_AcCategory import GetJson_AcCategory
+    json_response = GetJson_AcCategory(userID, startDate, endDate)
 
     if 'errMsg' not in json_response:
-        # 解包，翻译，打包
-        legendLabels = json_response['json_dateTrend']['legendLabels']
-        seriesData = json_response['json_dateTrend']['seriesData']
 
-        legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+        # 翻译
+        titles=json_response['titles']
+        seriesData=json_response['seriesData']
+
         for datum in seriesData:
             datum['name'] = helpers.translate(datum['name'])
+        titles = [helpers.translate(title) for title in titles]
 
-        json_response['json_dateTrend']['legendLabels'] = legendLabels
-        json_response['json_dateTrend']['seriesData'] = seriesData
-
-        legendLabels = json_response['json_timeDistribution']['legendLabels']
-        seriesData = json_response['json_timeDistribution']['seriesData']
-
-        legendLabels = map(lambda x: helpers.translate(x), legendLabels)
-        for datum in seriesData:
-            datum['name'] = helpers.translate(datum['name'])
-
-        json_response['json_timeDistribution']['legendLabels'] = legendLabels
-        json_response['json_timeDistribution']['seriesData'] = seriesData
+        json_response['titles']=titles
+        json_response['seriesData']=seriesData
 
     return jsonify(json_response)
+
+
+
+# ========================
+# 门禁日期变化
+# ========================
+@app.route('/charts/acdatetrend')
+def show_chart_acdatetrend():
+    form = Form_AcDateTrend()
+    return render_template('charts/chart-acdatetrend.html', form=form)
+
+
+@app.route('/charts/acdatetrend/getData', methods=['GET'])
+def refresh_chart_acdatetrend():
+    form = Form_AcDateTrend()
+    form.userID.data = request.args.get('userID')
+    form.modeDate.data = request.args.get('modeDate')
+    form.dateRange.data = request.args.get('dateRange')
+
+    if not form.validate():
+        return jsonify(errMsg=form.errors['userID'])
+    if not check_user_id(form.userID.data):
+        return jsonify(errMsg=lstr.warn_userIDNon)
+
+    userID = form.userID.data
+    modeDate = form.modeDate.data
+    startDate = form.dateRange.data[:10]
+    endDate = form.dateRange.data[-10:]
+
+    from controls.individual.access.GetJson_AcDateTrend import GetJson_AcDateTrend
+    json_response = GetJson_AcDateTrend(userID, startDate, endDate, modeDate)
+
+    if 'errMsg' not in json_response:
+        # 翻译
+        legendLabels = json_response['legendLabels']
+        seriesData = json_response['seriesData']
+
+        legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
+
+        json_response['legendLabels'] = legendLabels
+        json_response['seriesData'] = seriesData
+
+    return jsonify(json_response)
+
+
+
+# ========================
+# 门禁时间分布
+# ========================
+@app.route('/charts/actimedistr')
+def show_chart_actimedistr():
+    form = Form_AcTimeDistr()
+    return render_template('charts/chart-actimedistr.html', form=form)
+
+
+@app.route('/charts/actimedistr/getData', methods=['GET'])
+def refresh_chart_actimedistr():
+    form = Form_AcTimeDistr()
+    form.userID.data = request.args.get('userID')
+    form.dateRange.data = request.args.get('dateRange')
+
+    if not form.validate():
+        return jsonify(errMsg=form.errors['userID'])
+    if not check_user_id(form.userID.data):
+        return jsonify(errMsg=lstr.warn_userIDNon)
+
+    userID = form.userID.data
+    startDate = form.dateRange.data[:10]
+    endDate = form.dateRange.data[-10:]
+
+    from controls.individual.access.GetJson_AcTimeDistri import GetJson_AcTimeDistri
+    json_response = GetJson_AcTimeDistri(userID, startDate, endDate)
+
+    if 'errMsg' not in json_response:
+        # 翻译
+        legendLabels = json_response['legendLabels']
+        seriesData = json_response['seriesData']
+
+        legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
+
+        json_response['legendLabels'] = legendLabels
+        json_response['seriesData'] = seriesData
+
+    return jsonify(json_response)
+
+
+
+# ========================
+# 门禁合法
+# ========================
+@app.route('/charts/acvalid')
+def show_chart_acvalid():
+    form = Form_Acvalid()
+    return render_template('charts/chart-acvalid.html', form=form)
+
+
+@app.route('/charts/acvalid/getData')
+def refresh_chart_acvalid():
+    form = Form_Acvalid()
+    form.userID.data = request.args.get('userID')
+    form.dateRange.data = request.args.get('dateRange')
+
+    if not form.validate():
+        return jsonify(errMsg=form.errors['userID'])
+    if not check_user_id(form.userID.data):
+        return jsonify(errMsg=lstr.warn_userIDNon)
+
+    userID = form.userID.data
+    startDate = form.dateRange.data[:10]
+    endDate = form.dateRange.data[-10:]
+
+    from app.controls.individual.access.GetJson_AcValid import GetJson_AcValid
+    json_response = GetJson_AcValid(userID, startDate, endDate)
+
+    if 'errMsg' not in json_response:
+        # 翻译
+        titles = json_response['titles']
+        seriesData = json_response['seriesData']
+
+        titles = map(lambda x: helpers.translate(x), titles)
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
+
+        json_response['titles'] = titles
+        json_response['seriesData'] = seriesData
+
+    return jsonify(json_response)
+
+
+
+# ========================
+# 消费类型比例
+# ========================
+@app.route('/charts/concategory')
+def show_chart_concategory():
+    form = Form_Concategory()
+    return render_template('charts/chart-concategory.html', form=form)
+
+
+@app.route('/charts/concategory/getData')
+def refresh_chart_concategory():
+    form = Form_Concategory()
+    form.userID.data = request.args.get('userID')
+    form.dateRange.data = request.args.get('dateRange')
+
+    if not form.validate():
+        return jsonify(errMsg=form.errors['userID'])
+    if not check_user_id(form.userID.data):
+        return jsonify(errMsg=lstr.warn_userIDNon)
+
+    userID = form.userID.data
+    startDate = form.dateRange.data[:10]
+    endDate = form.dateRange.data[-10:]
+
+    from app.controls.individual.consumption.GetJson_ConCategory import GetJson_ConCategory
+    json_response = GetJson_ConCategory(userID, startDate, endDate)
+
+    if 'errMsg' not in json_response:
+        # 翻译
+        titles = json_response['titles']
+        seriesData = json_response['seriesData']
+
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
+        titles = [helpers.translate(title) for title in titles]
+
+        json_response['titles'] = titles
+        json_response['seriesData'] = seriesData
+
+    return jsonify(json_response)
+
+
+# ========================
+# 消费日期变化
+# ========================
+@app.route('/charts/condatetrend')
+def show_chart_condatetrend():
+    form = Form_ConDateTrend()
+    return render_template('charts/chart-condatetrend.html', form=form)
+
+
+@app.route('/charts/condatetrend/getData')
+def refresh_chart_condatetrend():
+    form = Form_ConDateTrend()
+    form.userID.data = request.args.get('userID')
+    form.modeDate.data=request.args.get('modeDate')
+    form.dateRange.data = request.args.get('dateRange')
+
+    if not form.validate():
+        return jsonify(errMsg=form.errors['userID'])
+    if not check_user_id(form.userID.data):
+        return jsonify(errMsg=lstr.warn_userIDNon)
+
+    userID = form.userID.data
+    modeDate = form.modeDate.data
+    startDate = form.dateRange.data[:10]
+    endDate = form.dateRange.data[-10:]
+
+    from app.controls.individual.consumption.GetJson_ConDateTrend import GetJson_ConDateTrend
+    json_response = GetJson_ConDateTrend(userID, startDate, endDate,modeDate)
+
+    if 'errMsg' not in json_response:
+        # 翻译
+        legendLabels = json_response['legendLabels']
+        seriesData = json_response['seriesData']
+
+        legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
+
+        json_response['legendLabels'] = legendLabels
+        json_response['seriesData'] = seriesData
+
+    return jsonify(json_response)
+
+
+
+# ========================
+# 消费时间分布
+# ========================
+@app.route('/charts/contimedistr')
+def show_chart_contimedistr():
+    form = Form_ConTimeDistr()
+    return render_template('charts/chart-contimedistr.html', form=form)
+
+
+@app.route('/charts/contimedistr/getData', methods=['GET'])
+def refresh_chart_contimedistr():
+    form = Form_ConTimeDistr()
+    form.userID.data = request.args.get('userID')
+    form.dateRange.data = request.args.get('dateRange')
+
+    if not form.validate():
+        return jsonify(errMsg=form.errors['userID'])
+    if not check_user_id(form.userID.data):
+        return jsonify(errMsg=lstr.warn_userIDNon)
+
+    userID = form.userID.data
+    startDate = form.dateRange.data[:10]
+    endDate = form.dateRange.data[-10:]
+
+    from app.controls.individual.consumption.GetJson_ConTimeDistri import GetJson_ConTimeDistri
+    json_response = GetJson_ConTimeDistri(userID,startDate,endDate)
+    if 'errMsg' not in json_response:
+        # 翻译
+        legendLabels = json_response['legendLabels']
+        seriesData = json_response['seriesData']
+
+        legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
+
+        json_response['legendLabels'] = legendLabels
+        json_response['seriesData'] = seriesData
+    return jsonify(json_response)
+
+
+
+
+
+
+
 
 
 @app.route('/charts/income')
@@ -187,119 +414,6 @@ def refresh_chart_foodIncome():
     json_response = GetJson_ConFood(modeTime)
     return jsonify(json_response)
 
-
-@app.route('/charts/acvalid')
-def show_chart_acvalid():
-    form = Form_Acvalid()
-    return render_template('charts/chart-acvalid.html', form=form)
-
-
-@app.route('/charts/acvalid/getData')
-def refresh_chart_acvalid():
-    form = Form_Acvalid()
-    form.userID.data = request.args.get('userID')
-    form.dateRange.data = request.args.get('dateRange')
-
-    if not form.validate():
-        return jsonify(errMsg=form.errors['userID'])
-    if not check_user_id(form.userID.data):
-        return jsonify(errMsg=lstr.warn_userIDNon)
-
-    userID = form.userID.data
-    startDate = form.dateRange.data[:10]
-    endDate = form.dateRange.data[-10:]
-
-    from controls.GetJson_ACValid import GetJson_ACValid
-    json_response = GetJson_ACValid(userID, startDate, endDate)
-
-    if 'errMsg' not in json_response:
-        titles = json_response['titles']
-        seriesData = json_response['seriesData']
-
-        titles = map(lambda x: helpers.translate(x), titles)
-        for datum in seriesData:
-            datum['name'] = helpers.translate(datum['name'])
-
-        json_response['titles'] = titles
-        json_response['seriesData'] = seriesData
-
-    return jsonify(json_response)
-
-
-@app.route('/charts/accategory')
-def show_chart_accategory():
-    form = Form_Accategory()
-    return render_template('charts/chart-accategory.html', form=form)
-
-
-@app.route('/charts/accategory/getData')
-def refresh_chart_accategory():
-    form = Form_Accategory()
-    form.userID.data = request.args.get('userID')
-    form.dateRange.data = request.args.get('dateRange')
-
-    if not form.validate():
-        return jsonify(errMsg=form.errors['userID'])
-    if not check_user_id(form.userID.data):
-        return jsonify(errMsg=lstr.warn_userIDNon)
-
-    userID = form.userID.data
-    startDate = form.dateRange.data[:10]
-    endDate = form.dateRange.data[-10:]
-
-    from controls.GetJson_ACCategory import GetJson_ACCategory
-    json_response = GetJson_ACCategory(userID, startDate, endDate)
-
-    if 'errMsg' not in json_response:
-        titles = json_response['titles']
-        seriesData = json_response['seriesData']
-
-        for datum in seriesData:
-            datum['name'] = helpers.translate(datum['name'])
-        titles = [helpers.translate(title) for title in titles]
-
-        json_response['titles'] = titles
-        json_response['seriesData'] = seriesData
-
-    return jsonify(json_response)
-
-
-@app.route('/charts/concategory')
-def show_chart_concategory():
-    form = Form_Concategory()
-    return render_template('charts/chart-concategory.html', form=form)
-
-
-@app.route('/charts/concategory/getData')
-def refresh_chart_concategory():
-    form = Form_Concategory()
-    form.userID.data = request.args.get('userID')
-    form.dateRange.data = request.args.get('dateRange')
-
-    if not form.validate():
-        return jsonify(errMsg=form.errors['userID'])
-    if not check_user_id(form.userID.data):
-        return jsonify(errMsg=lstr.warn_userIDNon)
-
-    userID = form.userID.data
-    startDate = form.dateRange.data[:10]
-    endDate = form.dateRange.data[-10:]
-
-    from controls.GetJson_ConCategory import GetJson_ConCategory
-    json_response = GetJson_ConCategory(userID, startDate, endDate)
-
-    if 'errMsg' not in json_response:
-        titles = json_response['titles']
-        seriesData = json_response['seriesData']
-
-        for datum in seriesData:
-            datum['name'] = helpers.translate(datum['name'])
-        titles = [helpers.translate(title) for title in titles]
-
-        json_response['titles'] = titles
-        json_response['seriesData'] = seriesData
-
-    return jsonify(json_response)
 
 
 @app.route('/charts/number')
@@ -480,8 +594,8 @@ def refresh_summary_accategory():
     startDate = request.args.get('startDate')
     endDate = request.args.get('startDate')
 
-    from controls.GetJson_ACCategory import GetJson_ACCategory
-    json_response = GetJson_ACCategory(userID, startDate, endDate)
+    from app.controls.individual.access.GetJson_AcCategory import GetJson_AcCategory
+    json_response = GetJson_AcCategory(userID, startDate, endDate)
 
     if 'errMsg' not in json_response:
         titles = json_response['titles']
@@ -504,7 +618,7 @@ def refresh_summary_concategory():
     startDate = request.args.get('startDate')
     endDate = request.args.get('startDate')
 
-    from controls.GetJson_ConCategory import GetJson_ConCategory
+    from app.controls.individual.consumption.GetJson_ConCategory import GetJson_ConCategory
     json_response = GetJson_ConCategory(userID, startDate, endDate)
 
     if 'errMsg' not in json_response:

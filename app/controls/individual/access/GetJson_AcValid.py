@@ -4,18 +4,20 @@
 from app.models import *
 from sqlalchemy import and_, func
 
-def GetJson_ACValid(userID, startDate, endDate):
-    # Query.
+"""门禁合法比例"""
+
+def GetJson_AcValid(userID, startDate, endDate):
+    # Query
     strQuery = db.session.query(acrec.legal, func.count('*')).filter(acrec.user_id == userID).group_by(acrec.legal)
     if len(startDate) != 0:
         strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
     results = strQuery.all()
 
-    # Process data.
-    from ProCate import CategoryProcess
-    titles, vals = CategoryProcess(results)
+    from app.controls.Pro_Cate import CategoryProcess
+    vals = CategoryProcess(results)
 
     # seriesData = []  # [{value: , name: }, {value: , name: }, ...]
+    titles=vals.keys()
     seriesData = []
     for k, v in vals.iteritems():
         seriesData.append({'value': v, 'name': k})

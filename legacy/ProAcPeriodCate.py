@@ -15,7 +15,6 @@ class ACPeriodCate:
         :param oriDate: 日期标签数组
         :param oriValues: 与oriDate 对应的值数组
         """
-
         self.oriDate = oriDate
         self.oriValues = oriValues
 
@@ -55,25 +54,25 @@ class ACPeriodCate:
         dates = self.oriDate[:]
         values = [{copy.deepcopy(oriValue): 1} for oriValue in self.oriValues]
 
-        # 生成时间点和时间标签队列。
+        # 生成时间点和时间标签队列
         periods = []
         axisLabels = []
         for i in xrange(24):
             periods.append(time(i))
             axisLabels.append(str(i) + u'点~' + str((i + 1) % 24) + u'点')
 
-        # 时间点队列 -> 时间区间队列。
+        # 时间点队列 -> 时间区间队列
         periodRanges = []
         for i in xrange(len(periods)):
             periodRange = [periods[i], periods[(i + 1) % len(periods)]]
             periodRanges.append(periodRange)
 
-        lTimes = map(lambda d: d.time(), dates)  # Keep time.
-        vals = []  # Init vals
+        lTimes = map(lambda d: d.time(), dates)  # Keep time
+        vals = []     # Init vals
         for i in xrange(len(periods)):
             vals.append({})
 
-        # Add to total vals.
+        # Add to total vals
         for i in xrange(len(lTimes)):
             for j in xrange(len(periodRanges)):
                 if periodRanges[j][0] <= lTimes[i] < periodRanges[j][1]:

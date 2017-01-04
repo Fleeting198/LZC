@@ -1,95 +1,115 @@
-{% extends 'base.html' %}
-{% block content %}
-    <div class="container-fluid" style="padding-top: 72px">
-    <div class="row">
-        <div id="chart_list" style="height: 100%; width: 280px; position: absolute; left: 0; margin-left: 10px;" >
-            {% block sideList %}
+{% extends 'base.html' %} {% block content %}
+<div class="container-fluid" style="padding-top: 72px">
+	<div class="row">
+		<div id="chart_list" style="height: 100%; width: 280px; position: absolute; left: 0; margin-left: 10px;">
+			{% block sideList %}
+            {% macro nav_side(url_fun, value) -%}
+            {% if request.path == url_for(url_fun) %}
+			<li class="active">
+				<a href="{{ url_for(url_fun) }}">{{ value }}</a>
+			</li>
+			<script>
+				$("li.active").parent("ul").parent('li').navgoco('toggle', true | false);
+			</script>
+			{% else %}
+			<li>
+				<a href="{{ url_for(url_fun) }}">{{ value }}</a>
+			</li>
+			{% endif %} {%- endmacro %}
 
-                {% macro nav_side(url_fun, value) -%}
-                    {% if request.path == url_for(url_fun) %}
-                        <li class="active"><a href="{{ url_for(url_fun) }}">{{ value }}</a></li>
-                        <script>
-                            $("li.active").parent("ul").parent('li').navgoco('toggle', true|false);
-                        </script>
-                    {% else %}
-                        <li><a href="{{ url_for(url_fun) }}">{{ value }}</a></li>
-                    {% endif %}
-                {%- endmacro %}
+			<div class="panel-group">
 
-                <div class="panel-group">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">个体</h3>
-                        </div>
-                        <div class="panel-body">
-                            <ul class="navgoco nav nav-pills nav-stacked">
-                                <li><a href="#">门禁</a>
-                                    <ul class="nav nav-pills nav-stacked" style="padding-left: 20px">
-                                        {{ nav_side('show_chart_accategory','门禁分类计数') }}
-                                        {{ nav_side('show_chart_acperiodcate','门禁趋势与分布') }}
-                                        {{ nav_side('show_chart_acvalid','合法门禁比例') }}
-                                    </ul>
-                                </li>
-                                {{ nav_side('show_chart_relation','人际关系') }}
-                                <li><a href="#">消费</a>
-                                    <ul class="nav nav-pills nav-stacked" style="padding-left: 20px">
-                                        {{ nav_side('show_chart_concategory','消费分类分布') }}
-                                        {{ nav_side('show_chart_expenditure','支出趋势与分布') }}
-                                        {{ nav_side('show_chart_conability','消费能力认定') }}
-                                        {{ nav_side('show_chart_penalty','滞纳金缴费情况') }}
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">学校</h3>
-                        </div>
-                        <div class="panel-body">
-                            <ul class="navgoco nav nav-pills nav-stacked">
-                                {{ nav_side('show_chart_number','人数统计') }}
-                                <li><a href="#">收入报表</a>
-                                    <ul class="nav nav-pills nav-stacked" style="padding-left: 20px">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">个人</h3>
+					</div>
+					<div class="panel-body">
+						<ul class="navgoco nav nav-pills nav-stacked">
+							<li>
+								<a href="#">门禁</a>
+								<ul class="nav nav-pills nav-stacked" style="padding-left: 20px">
+									{{ nav_side('show_chart_accategory','门禁类型比例') }}
+									{{ nav_side('show_chart_acdatetrend','门禁日期变化') }}
+									{{ nav_side('show_chart_actimedistr','门禁时间分布') }}
+									{{ nav_side('show_chart_acvalid','合法门禁比例') }}
+								</ul>
+							</li>
 
-                                        <!--{{ nav_side('show_chart_income','刷卡机收入趋势与分布') }}-->
-                                        {{ nav_side('show_chart_foodIncome','餐饮消费分布') }}
-                                        {{ nav_side('show_chart_conWaterTime','用水消费分布') }}
-                                        {{ nav_side('show_chart_conwater','男女生用水情况') }}
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            {% endblock %}
-        </div>
-        <div id="chart_container" style="position: absolute; left: 290px; right: 0; height: 85%;">
-            {% block chartField %}
-            {% endblock %}
-        </div>
-    </div>
-    </div>
+							<li>
+								<a href="#">消费</a>
+								<ul class="nav nav-pills nav-stacked" style="padding-left: 20px">
+									{{ nav_side('show_chart_concategory','消费类型比例') }}
+                                    {{ nav_side('show_chart_condatetrend','消费日期变化') }}
+                                    {{ nav_side('show_chart_contimedistr','消费时间分布') }}
 
-    <script>
-        $(window).resize(function(){
-            $('#chart_container').css('left', $('#chart_list').width()+30) ;
-        });
-        $(".navgoco").navgoco({
-            caretHtml: '<i class="fa fa-angle-right"></i>',
-            accordion: false,
-            openClass: 'open',
-            save: true,
-            cookie: {
-                name: 'navgoco',
-                expires: false,
-                path: '/'
-            },
-            slide: {
-                duration: 400,
-                easing: 'swing'
-            }
-        });
-    </script>
+									{{ nav_side('show_chart_conability','消费能力认定') }}
+									{{ nav_side('show_chart_penalty','滞纳金缴费情况') }}
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">学校</h3>
+					</div>
+					<div class="panel-body">
+						<ul class="navgoco nav nav-pills nav-stacked">
+							{{ nav_side('show_chart_number','人数统计') }}
+							<li>
+								<a href="#">收入报表</a>
+								<ul class="nav nav-pills nav-stacked" style="padding-left: 20px">
+
+									<!--{{ nav_side('show_chart_income','刷卡机收入趋势与分布') }}-->
+									{{ nav_side('show_chart_foodIncome','餐饮消费分布') }}
+                                    {{ nav_side('show_chart_conWaterTime','用水消费分布') }}
+                                    {{ nav_side('show_chart_conwater','男女生用水情况') }}
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+                <div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">挖掘测试</h3>
+					</div>
+					<div class="panel-body">
+						<ul class="navgoco nav nav-pills nav-stacked">
+                            {{ nav_side('show_chart_relation','人际关系') }}
+						</ul>
+					</div>
+				</div>
+
+			</div>
+			{% endblock %}
+		</div>
+		<div id="chart_container" style="position: absolute; left: 290px; right: 0; height: 85%;">
+			{% block chartField %} {% endblock %}
+		</div>
+	</div>
+</div>
+
+<script>
+	$(window).resize(function() {
+		$('#chart_container').css('left', $('#chart_list').width() + 30);
+	});
+	$(".navgoco").navgoco({
+		caretHtml: '<i class="fa fa-angle-right"></i>',
+		accordion: false,
+		openClass: 'open',
+		save: true,
+		cookie: {
+			name: 'navgoco',
+			expires: false,
+			path: '/'
+		},
+		slide: {
+			duration: 400,
+			easing: 'swing'
+		}
+	});
+</script>
 
 {% endblock %}

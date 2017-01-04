@@ -3,7 +3,6 @@
 
 from pandas import Series
 from decimal import *
-import types
 
 class DateTimeValueProcess:
     """输入坐标（日期，可重复）与对应值，对其进行统计。

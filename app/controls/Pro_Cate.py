@@ -7,42 +7,34 @@ def CategoryProcess(ipt_list):
     """
     :param ipt_list:输入队列，元素为元组(名称，值)
     """
-
+    # 类型名称为key 数量为val
     vals = {}    # {'title0': val1, 'title1': val2, ...}
-    titles = []  # ['title0', 'title1', ...]
 
     for result in ipt_list:
-        titles.append(str(result[0]))
-        # Into tmp_data.
         vals[str(result[0])] = float(result[1])
 
     # 若项目数量少，直接返回
     if len(vals) < 4:
-        return titles, vals
+        return vals
 
     # 若项目数量较多，将值最小的几个归到其他类中
-    titles = []  # 清空
-    total_sum = 0
-    for k, v in vals.iteritems():
-        total_sum += v
 
+    sumValue=sum(vals.values())
     list_vals = sorted(vals.iteritems(), key=operator.itemgetter(1), reverse=True)
 
     cur_count = 0
     tmp_vals = []
 
     for val in list_vals:
-        if cur_count / float(total_sum) < 0.9:
+        if cur_count / float(sumValue) < 0.9:
             cur_count += val[1]
             tmp_vals.append(val)
-            titles.append(val[0])
-    # titles.append('other')
 
-    if cur_count != total_sum:
-        tmp_vals.append(('other', total_sum - cur_count))
+    if cur_count != sumValue:
+        tmp_vals.append(('other', sumValue - cur_count))
 
     list_vals = {}
     for i in xrange(len(tmp_vals)):
         list_vals[tmp_vals[i][0]] = round(tmp_vals[i][1],2)
 
-    return titles, list_vals
+    return list_vals

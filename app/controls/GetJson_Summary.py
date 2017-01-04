@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-from app.models import *
 from pandas import DataFrame
+
 from app import helpers
+from app.models import *
+
 
 def GetJson_Summary(userID, startDate, endDate):
 
@@ -78,8 +80,8 @@ def ac_time(userID, startDate, endDate):
 def ac_study(userID, startDate, endDate):
     # 最近一个月图书馆、教学楼次数
 
-    from GetJson_ACCategory import GetJson_ACCategory
-    json_ACCategory = GetJson_ACCategory(userID, startDate, startDate)
+    from app.controls.individual.access.GetJson_AcCategory import GetJson_AcCategory
+    json_ACCategory = GetJson_AcCategory(userID, startDate, startDate)
 
     if 'errMsg' in json_ACCategory:
         return {'count_lib': -1, 'count_acad': -1, 'count_sci': -1, 'percent_asc': -1}
@@ -128,7 +130,7 @@ def relation(userID):
 # 账单
 def bill(userID, startDate, endDate):
     # 账单： 最近一月：
-    # 消费类型比例 concategory, conablilty, expenditure
+    # 消费类型比例 concategory, conablilty, consumption
     # 一月消费总额
 
     # init
@@ -137,14 +139,14 @@ def bill(userID, startDate, endDate):
     con_per_month = -1
 
     # Get total_expend 总支出
-    from GetJson_Expenditure import GetJson_expenditure
+    from GetJson_ConExpend import GetJson_expenditure
     json_Expenditure = GetJson_expenditure(userID, 0, 2, startDate, endDate)
     if 'errMsg' not in json_Expenditure:
         dateTrend = json_Expenditure['json_dateTrend']
         total_expend = dateTrend['accumulatedVals'][-1]
 
     # 消费分类排名
-    from GetJson_ConCategory import GetJson_ConCategory
+    from app.controls.individual.consumption.GetJson_ConCategory import GetJson_ConCategory
     json_ConCategory = GetJson_ConCategory(userID, startDate, endDate)
 
     if 'errMsg' not in json_ConCategory:

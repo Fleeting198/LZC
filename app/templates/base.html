@@ -2,11 +2,9 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <meta name="description" content="基于智慧校园学生大数据分析与挖掘">
-        <meta name="keywords" content="witcampus,智慧校园">
-        <meta name="author" content="华东政法大学,刘文炎,陈骏杰,顾旻杰">
+        <meta name="description" content="基于大学生校园卡数据的分析与挖掘">
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-        <title>智慧校园 Witcampus</title>
+        <title>Witcampus</title>
         
         <link href="{{ url_for('static',filename='css/font-awesome.min.css') }}" rel="stylesheet"/>
         <link href="{{ url_for('static',filename='css/bootstrap-theme.min.css') }}" rel="stylesheet"/>
@@ -36,7 +34,7 @@
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </button>
-                        <a class="navbar-brand" href="{{ url_for('show_index') }}">智慧校园 WitCampus</a>
+                        <a class="navbar-brand" href="{{ url_for('show_index') }}">WitCampus</a>
                     </div>
                     <div id="navbar" class="navbar-collapse collapse">
                         <ul class="nav navbar-nav">
@@ -47,33 +45,41 @@
                                     <span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu">
+
                                     {% macro charts_navbtn(url_fun, value) -%}
                                         <li><a href="{{ url_for(url_fun) }}">{{ value }}</a></li>
                                     {%- endmacro %}
-                                    <li class="dropdown-header">个人足迹地图</li>
-                                    {{ charts_navbtn('show_chart_accategory','门禁分类计数') }}
-                                    {{ charts_navbtn('show_chart_acperiodcate','门禁趋势与分布') }}
-                                    {{ charts_navbtn('show_chart_acvalid','合法门禁比例') }}
+
+                                    <li class="dropdown-header">个人</li>
+                                    <li class="dropdown-header">门禁</li>
+		                            {{ charts_navbtn('show_chart_accategory','门禁类型比例') }}
+									{{ charts_navbtn('show_chart_acdatetrend','门禁日期变化') }}
+									{{ charts_navbtn('show_chart_actimedistr','门禁时间分布') }}
+									{{ charts_navbtn('show_chart_acvalid','合法门禁比例') }}
+
+                                    <li class="dropdown-header">消费</li>
+									{{ charts_navbtn('show_chart_concategory','消费类型比例') }}
+                                    {{ charts_navbtn('show_chart_condatetrend','消费日期变化') }}
+                                    {{ charts_navbtn('show_chart_contimedistr','消费时间分布') }}
+
+									{{ charts_navbtn('show_chart_conability','消费能力认定') }}
+									{{ charts_navbtn('show_chart_penalty','滞纳金缴费情况') }}
+
                                     <li class="divider"></li>
 
-                                    {{ charts_navbtn('show_chart_relation','人际关系') }}
-                                    <li class="divider"></li>
-
-                                    <li class="dropdown-header">个人支出报表</li>
-                                    {{ charts_navbtn('show_chart_concategory','消费分类分布') }}
-                                    {{ charts_navbtn('show_chart_expenditure','支出趋势与分布') }}
-                                    {{ charts_navbtn('show_chart_conability','消费能力认定') }}
-                                    {{ charts_navbtn('show_chart_penalty','滞纳金缴费情况') }}
-                                    <li class="divider center"></li>
-                                    {{ charts_navbtn('show_chart_number','人数统计') }}
-                                    <li class="divider center"></li>
-
-                                    <li class="dropdown-header">收入报表</li>
+                                    <li class="dropdown-header">学校</li>
                                     <!-- 刷卡机在查询速度优化之前不使用 -->
                                     <!--{{ charts_navbtn('show_chart_income','刷卡机收入趋势与分布') }}-->
+                                    {{ charts_navbtn('show_chart_number','人数统计') }}
                                     {{ charts_navbtn('show_chart_foodIncome','餐饮消费分布') }}
                                     {{ charts_navbtn('show_chart_conWaterTime','用水消费分布') }}
                                     {{ charts_navbtn('show_chart_conwater','男女生用水情况') }}
+
+                                    <li class="divider"></li>
+
+                                    <li class="dropdown-header">挖掘测试</li>
+                                    {{ charts_navbtn('show_chart_relation','人际关系') }}
+
                                 </ul>
                             </li>
                             <li><a href="{{ url_for('show_summary_default') }}">个人成就报告</a></li>
@@ -109,7 +115,7 @@
             };
             force_window_resize();
 
-            // 模态提示框的显示。
+            // 模态提示框显示
             showDialog = function (title, content) {
                 document.getElementById("modal-err-title").innerText = title;
                 document.getElementById("modal-err-content").innerText = content;
