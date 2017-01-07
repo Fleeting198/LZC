@@ -13,7 +13,7 @@ def GetJson_AcValid(userID, startDate, endDate):
         strQuery = strQuery.filter(and_(acrec.ac_datetime >= startDate, acrec.ac_datetime <= endDate))
     results = strQuery.all()
 
-    from app.controls.Pro_Cate import CategoryProcess
+    from app.controllers.Pro_Cate import CategoryProcess
     vals = CategoryProcess(results)
 
     # seriesData = []  # [{value: , name: }, {value: , name: }, ...]

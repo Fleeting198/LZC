@@ -1,15 +1,16 @@
 {% extends "charts/charts.html" %}
 {% block chartField %}
 
-    <form id="form-ipt" class="form-inline" >
-        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='NIHHXTXQ')}}
+    <form id="form-ipt" class="form-inline">
+        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='AQPHPWPQ') }}
         {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
         <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
     </form>
 
-    <div id="chartACValid" style="width: inherit; height: 90%;"></div>
+    <div id="chartConCategory" class="chartField"></div>
 
     <script>
+        // Init dateRange.
         var dateRangePicker = $("input[name='dateRange']");
         dateRangePicker.daterangepicker({
             autoUpdateInput: false,
@@ -19,25 +20,23 @@
             }
         });
         dateRangePicker.on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('YYYY-MM-DD')+' ~ '+picker.endDate.format('YYYY-MM-DD'));
+            $(this).val(picker.startDate.format('YYYY-MM-DD') + ' ~ ' + picker.endDate.format('YYYY-MM-DD'));
         });
         dateRangePicker.on('cancel.daterangepicker', function (ev, picker) {
             $(this).val('');
         });
 
-        // 图表初始化。
-        var chartACValid = echarts.init(document.getElementById('chartACValid'));
+        // Init charts.
+        var chartConCategory = echarts.init(document.getElementById('chartConCategory'));
         window.addEventListener('resize', function () {
-            chartACValid.resize();
+            chartConCategory.resize();
         });
 
-        var optionChartACValid = {
-            title: {
-                text: '门禁合法比例'
-            },
+        var optionChartConCategory = {
+            title: {text: '消费分类计数'},
             tooltip: {
                 trigger: 'item',
-                formatter: "{b} <br/>{c} ({d}%)"
+                formatter: "{a} <br/>{b} : {c} 元 ({d}%)"
             },
             toolbox: {
                 show: true,
@@ -56,36 +55,35 @@
                 data: []
             },
             series: [{
-                name: '访问合法',
+                name: '消费分布',
                 type: 'pie',
                 radius: '50%',
-                center: ['45%', '45%'],
+                center: ['45%','45%'],
                 data: []
             }]
         };
 
-        chartACValid.setOption(optionChartACValid);
+        chartConCategory.setOption(optionChartConCategory);
 
         refresh_chart = function () {
             if ($("#userID").val() == '') return;
 
-            chartACValid.showLoading();
-            $.ajax('/charts/acvalid/getData?' + $("#form-ipt").serialize(),{
+            chartConCategory.showLoading();
+            $.ajax('/charts/concategory/getData?' + $("#form-ipt").serialize(), {
                 type: 'GET',
                 success: function (json_response) {
-                    chartACValid.hideLoading();
-                    chartACValid.setOption(optionChartACValid);
+                    chartConCategory.hideLoading();
+                    chartConCategory.setOption(optionChartConCategory);
 
                     if (!json_response.errMsg) {
-                        var titles;
-                        var seriesData;
-                        titles = json_response.titles;
-                        seriesData = json_response.seriesData;
+                        var titles = json_response.titles;
+                        var seriesData = json_response.seriesData;
 
-                        chartACValid.setOption({
+                        chartConCategory.setOption({
                             legend: {data: titles},
                             series: [{data: seriesData}]
                         });
+
                     } else {
                         showDialog("出错了", json_response.errMsg);
                     }

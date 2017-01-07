@@ -8,6 +8,7 @@ from pandas import DataFrame
 消费日期分类访问总价趋势
 """
 
+
 def get_date_trend(dateList, categoryList, valList, modeDate):
     """
     通过resample合并日期相同的访问量
@@ -15,10 +16,11 @@ def get_date_trend(dateList, categoryList, valList, modeDate):
     :param categoryList: 与日期对应的访问类型，记一次访问
     :return df: DataFrame的形式，索引是日期，包含两列：门禁分类和访问数量
     """
-    modeDate=int(modeDate)
+
+    modeDate = int(modeDate)
     rule_mode = "DWMQ"  # 分别代表日、周、月、季度
 
-    recordDictList=[]
+    recordDictList = []
     for i in xrange(len(categoryList)):
         recordDictList.append({categoryList[i]: valList[i]})
 

@@ -7,6 +7,7 @@ from numpy import isnan
 
 """门禁时间分布，每天24小时的平均门禁分类次数"""
 
+
 def GetJson_AcTimeDistri(userID, startDate, endDate):
     """
     返回Json：门禁趋势与分布
@@ -27,13 +28,13 @@ def GetJson_AcTimeDistri(userID, startDate, endDate):
 
     dateList = [result.ac_datetime for result in results]
     categoryList = [result.category for result in results]
-    valList=[1]*len(categoryList)
+    valList = [1] * len(categoryList)
 
-    from app.controls.Pro_TimeDistr import get_time_distribution
-    data = get_time_distribution(dateList, categoryList,valList)
+    from app.controllers.Pro_TimeDistr import get_time_distribution
+    data = get_time_distribution(dateList, categoryList, valList)
 
     # 把数据包装成Echarts需要的格式
-    axisLabels=[]
+    axisLabels = []
     for i in xrange(24):
         axisLabels.append(str(i) + u'点~' + str((i + 1) % 24) + u'点')
 

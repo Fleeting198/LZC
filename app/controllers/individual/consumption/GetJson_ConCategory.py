@@ -6,6 +6,7 @@ from sqlalchemy import and_, func
 
 """消费类型金额比例"""
 
+
 def GetJson_ConCategory(userID, startDate, endDate):
     # Query
     strQuery = db.session.query(dev_loc.category, func.sum(consumption.amount)).filter(
@@ -20,16 +21,16 @@ def GetJson_ConCategory(userID, startDate, endDate):
         return {'errMsg': u'没有找到记录。'}
 
     # Process data
-    from app.controls.Pro_Cate import CategoryProcess
+    from app.controllers.Pro_Cate import CategoryProcess
     vals = CategoryProcess(results)
-    titles=vals.keys()
+    titles = vals.keys()
 
     # seriesData = []  # [{value: , name: }, {value: , name: }, ...]
     seriesData = []
     for k, v in vals.iteritems():
         seriesData.append({'value': v, 'name': k})
 
-    seriesData = sorted(seriesData, cmp_dictVN,reverse=True)
+    seriesData = sorted(seriesData, cmp_dictVN, reverse=True)
 
     json_response = {'titles': titles, 'seriesData': seriesData}
     return json_response

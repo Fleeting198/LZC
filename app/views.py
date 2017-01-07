@@ -43,7 +43,7 @@ def show_summary(user_id):
     startDate = ''
     endDate = ''
 
-    from controls.GetJson_Summary import GetJson_Summary
+    from controllers.GetJson_Summary import GetJson_Summary
     vals_summary = GetJson_Summary(user_id,startDate,endDate)
 
     return render_template('summarization/summarization.html', userID=userID, startDate=startDate, endDate=endDate, vals_summary=vals_summary)
@@ -60,7 +60,7 @@ def show_charts():
 @app.route('/charts/accategory')
 def show_chart_accategory():
     form = Form_AcCategory()
-    return render_template('charts/chart-accategory.html', form=form)
+    return render_template('charts/individual/access/chart-accategory.html', form=form)
 
 
 @app.route('/charts/accategory/getData')
@@ -78,7 +78,7 @@ def refresh_chart_accategory():
     startDate = form.dateRange.data[:10]
     endDate = form.dateRange.data[-10:]
 
-    from app.controls.individual.access.GetJson_AcCategory import GetJson_AcCategory
+    from app.controllers.individual.access.GetJson_AcCategory import GetJson_AcCategory
     json_response = GetJson_AcCategory(userID, startDate, endDate)
 
     if 'errMsg' not in json_response:
@@ -104,7 +104,7 @@ def refresh_chart_accategory():
 @app.route('/charts/acdatetrend')
 def show_chart_acdatetrend():
     form = Form_AcDateTrend()
-    return render_template('charts/chart-acdatetrend.html', form=form)
+    return render_template('charts/individual/access/chart-acdatetrend.html', form=form)
 
 
 @app.route('/charts/acdatetrend/getData', methods=['GET'])
@@ -124,7 +124,7 @@ def refresh_chart_acdatetrend():
     startDate = form.dateRange.data[:10]
     endDate = form.dateRange.data[-10:]
 
-    from controls.individual.access.GetJson_AcDateTrend import GetJson_AcDateTrend
+    from controllers.individual.access.GetJson_AcDateTrend import GetJson_AcDateTrend
     json_response = GetJson_AcDateTrend(userID, startDate, endDate, modeDate)
 
     if 'errMsg' not in json_response:
@@ -149,7 +149,7 @@ def refresh_chart_acdatetrend():
 @app.route('/charts/actimedistr')
 def show_chart_actimedistr():
     form = Form_AcTimeDistr()
-    return render_template('charts/chart-actimedistr.html', form=form)
+    return render_template('charts/individual/access/chart-actimedistr.html', form=form)
 
 
 @app.route('/charts/actimedistr/getData', methods=['GET'])
@@ -167,7 +167,7 @@ def refresh_chart_actimedistr():
     startDate = form.dateRange.data[:10]
     endDate = form.dateRange.data[-10:]
 
-    from controls.individual.access.GetJson_AcTimeDistri import GetJson_AcTimeDistri
+    from controllers.individual.access.GetJson_AcTimeDistri import GetJson_AcTimeDistri
     json_response = GetJson_AcTimeDistri(userID, startDate, endDate)
 
     if 'errMsg' not in json_response:
@@ -192,7 +192,7 @@ def refresh_chart_actimedistr():
 @app.route('/charts/acvalid')
 def show_chart_acvalid():
     form = Form_Acvalid()
-    return render_template('charts/chart-acvalid.html', form=form)
+    return render_template('charts/individual/access/chart-acvalid.html', form=form)
 
 
 @app.route('/charts/acvalid/getData')
@@ -210,7 +210,7 @@ def refresh_chart_acvalid():
     startDate = form.dateRange.data[:10]
     endDate = form.dateRange.data[-10:]
 
-    from app.controls.individual.access.GetJson_AcValid import GetJson_AcValid
+    from app.controllers.individual.access.GetJson_AcValid import GetJson_AcValid
     json_response = GetJson_AcValid(userID, startDate, endDate)
 
     if 'errMsg' not in json_response:
@@ -235,7 +235,7 @@ def refresh_chart_acvalid():
 @app.route('/charts/concategory')
 def show_chart_concategory():
     form = Form_Concategory()
-    return render_template('charts/chart-concategory.html', form=form)
+    return render_template('charts/individual/consumption/chart-concategory.html', form=form)
 
 
 @app.route('/charts/concategory/getData')
@@ -253,7 +253,7 @@ def refresh_chart_concategory():
     startDate = form.dateRange.data[:10]
     endDate = form.dateRange.data[-10:]
 
-    from app.controls.individual.consumption.GetJson_ConCategory import GetJson_ConCategory
+    from app.controllers.individual.consumption.GetJson_ConCategory import GetJson_ConCategory
     json_response = GetJson_ConCategory(userID, startDate, endDate)
 
     if 'errMsg' not in json_response:
@@ -277,7 +277,7 @@ def refresh_chart_concategory():
 @app.route('/charts/condatetrend')
 def show_chart_condatetrend():
     form = Form_ConDateTrend()
-    return render_template('charts/chart-condatetrend.html', form=form)
+    return render_template('charts/individual/consumption/chart-condatetrend.html', form=form)
 
 
 @app.route('/charts/condatetrend/getData')
@@ -297,7 +297,7 @@ def refresh_chart_condatetrend():
     startDate = form.dateRange.data[:10]
     endDate = form.dateRange.data[-10:]
 
-    from app.controls.individual.consumption.GetJson_ConDateTrend import GetJson_ConDateTrend
+    from app.controllers.individual.consumption.GetJson_ConDateTrend import GetJson_ConDateTrend
     json_response = GetJson_ConDateTrend(userID, startDate, endDate,modeDate)
 
     if 'errMsg' not in json_response:
@@ -322,7 +322,7 @@ def refresh_chart_condatetrend():
 @app.route('/charts/contimedistr')
 def show_chart_contimedistr():
     form = Form_ConTimeDistr()
-    return render_template('charts/chart-contimedistr.html', form=form)
+    return render_template('charts/individual/consumption/chart-contimedistr.html', form=form)
 
 
 @app.route('/charts/contimedistr/getData', methods=['GET'])
@@ -340,7 +340,7 @@ def refresh_chart_contimedistr():
     startDate = form.dateRange.data[:10]
     endDate = form.dateRange.data[-10:]
 
-    from app.controls.individual.consumption.GetJson_ConTimeDistri import GetJson_ConTimeDistri
+    from app.controllers.individual.consumption.GetJson_ConTimeDistri import GetJson_ConTimeDistri
     json_response = GetJson_ConTimeDistri(userID,startDate,endDate)
     if 'errMsg' not in json_response:
         # 翻译
@@ -355,6 +355,37 @@ def refresh_chart_contimedistr():
         json_response['seriesData'] = seriesData
     return jsonify(json_response)
 
+
+
+
+# ========================
+# 学校门禁类型比例
+# ========================
+@app.route('/charts/schaccategory')
+def show_chart_schaccategory():
+    return render_template('charts/school/chart-schaccategory.html')
+
+
+@app.route('/charts/schaccategory/getData')
+def refresh_chart_schaccategory():
+
+    from app.controllers.school.GetJson_SchAcCategory import GetJson_SchAcCategory
+    json_response = GetJson_SchAcCategory()
+
+    if 'errMsg' not in json_response:
+
+        # 翻译
+        titles=json_response['titles']
+        seriesData=json_response['seriesData']
+
+        for datum in seriesData:
+            datum['name'] = helpers.translate(datum['name'])
+        titles = [helpers.translate(title) for title in titles]
+
+        json_response['titles']=titles
+        json_response['seriesData']=seriesData
+
+    return jsonify(json_response)
 
 
 
@@ -386,7 +417,7 @@ def refresh_chart_income():
     startDate = form.dateRange.data[:10]
     endDate = form.dateRange.data[-10:]
 
-    from controls.GetJson_Income import GetJson_Income
+    from controllers.GetJson_Income import GetJson_Income
     json_response = GetJson_Income(devID,modeDate, modeTime, startDate, endDate)
     return jsonify(json_response)
 
@@ -410,7 +441,7 @@ def refresh_chart_foodIncome():
 
     modeTime = int(form.modeTime.data)
 
-    from controls.GetJson_ConFood import GetJson_ConFood
+    from controllers.GetJson_ConFood import GetJson_ConFood
     json_response = GetJson_ConFood(modeTime)
     return jsonify(json_response)
 
@@ -453,7 +484,7 @@ def refresh_chart_number():
     # process numberGrade
     grade = {'10', '11', '12', '13', '14', '15'}
 
-    # func convert result to json
+    # convert result to json
     def result_to_jsonUnicode(resultGrade):
         json = {'unknown': 0}
         for result in resultGrade:
@@ -487,6 +518,10 @@ def refresh_chart_number():
     return json_response
 
 
+
+
+
+
 @app.route('/charts/conwatertime')
 def show_chart_conWaterTime():
     form = Form_Conwatertime()
@@ -502,7 +537,7 @@ def refresh_chart_conWaterTime():
         return jsonify(errMsg=form.errors)
 
     modeTime = int(form.modeTime.data)  # 赋值给变量
-    from controls.GetJson_ConWater import GetJson_ConWaterTime
+    from controllers.GetJson_ConWater import GetJson_ConWaterTime
     json_response = GetJson_ConWaterTime(modeTime)
     return jsonify(json_response)
 
@@ -523,7 +558,7 @@ def refresh_chart_conability():
 
     userID = form.userID.data
 
-    from controls.GetJson_ConAbility import GetJson_ConAbility
+    from controllers.GetJson_ConAbility import GetJson_ConAbility
     json_response = GetJson_ConAbility(userID)
     return jsonify(json_response)
 
@@ -549,7 +584,7 @@ def refresh_chart_penalty():
 
     userID = form.userID.data
 
-    from controls.GetJson_Penalty import GetJson_Penalty
+    from controllers.GetJson_Penalty import GetJson_Penalty
     json_response = GetJson_Penalty(userID)
     return jsonify(json_response)
 
@@ -569,7 +604,7 @@ def refresh_chart_relation():
         return jsonify(errMsg=form.errors['userID'])
 
     userID = form.userID.data
-    from controls.GetJson_ACRelation import GetJson_ACRelation
+    from controllers.GetJson_ACRelation import GetJson_ACRelation
     json_response = GetJson_ACRelation(userID)
     return jsonify(json_response)
 
@@ -582,7 +617,7 @@ def refresh_chart_relation():
 def refresh_summary_penalty():
     userID = request.args.get('userID')
 
-    from controls.GetJson_Penalty import GetJson_Penalty
+    from controllers.GetJson_Penalty import GetJson_Penalty
     json_response = GetJson_Penalty(userID)
     return jsonify(json_response)
 
@@ -594,7 +629,7 @@ def refresh_summary_accategory():
     startDate = request.args.get('startDate')
     endDate = request.args.get('startDate')
 
-    from app.controls.individual.access.GetJson_AcCategory import GetJson_AcCategory
+    from app.controllers.individual.access.GetJson_AcCategory import GetJson_AcCategory
     json_response = GetJson_AcCategory(userID, startDate, endDate)
 
     if 'errMsg' not in json_response:
@@ -618,7 +653,7 @@ def refresh_summary_concategory():
     startDate = request.args.get('startDate')
     endDate = request.args.get('startDate')
 
-    from app.controls.individual.consumption.GetJson_ConCategory import GetJson_ConCategory
+    from app.controllers.individual.consumption.GetJson_ConCategory import GetJson_ConCategory
     json_response = GetJson_ConCategory(userID, startDate, endDate)
 
     if 'errMsg' not in json_response:
@@ -644,7 +679,7 @@ def refresh_summary_acperiodcate():
 
     modeDate = 2
 
-    from controls.GetJson_ACPeriodCate import GetJson_ACPeriodCate
+    from controllers.GetJson_ACPeriodCate import GetJson_ACPeriodCate
     json_response = GetJson_ACPeriodCate(userID, modeDate, startDate, endDate)
 
     if 'errMsg' not in json_response:
@@ -676,7 +711,7 @@ def refresh_summary_acperiodcate():
 def refresh_summary_relation():
     userID = request.args.get('userID')
 
-    from controls.GetJson_ACRelation import GetJson_ACRelation
+    from controllers.GetJson_ACRelation import GetJson_ACRelation
     json_response = GetJson_ACRelation(userID)
     return jsonify(json_response)
 

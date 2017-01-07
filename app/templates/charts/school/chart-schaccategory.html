@@ -1,41 +1,22 @@
 {% extends "charts/charts.html" %} {% block chartField %}
 
-<form id="form-ipt" class="form-inline">
-	{{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='PPPWQHXW') }} {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
-	<input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()" />
-</form>
-
-<div id="chartACCategory" style="width: inherit; height: 90%;"></div>
+<div id="chartACCategory" class="chartField"></div>
 
 <script>
-	var dateRangePicker = $("input[name='dateRange']");
-	dateRangePicker.daterangepicker({
-		autoUpdateInput: false,
-		locale: {
-			format: 'YYYY-MM-DD',
-			cancelLabel: 'Clear'
-		}
-	});
-	dateRangePicker.on('apply.daterangepicker', function(ev, picker) {
-		$(this).val(picker.startDate.format('YYYY-MM-DD') + ' ~ ' + picker.endDate.format('YYYY-MM-DD'));
-	});
-	dateRangePicker.on('cancel.daterangepicker', function(ev, picker) {
-		$(this).val('');
-	});
-
 	// 图表初始化
 	var chartACCategory = echarts.init(document.getElementById('chartACCategory'));
+
 	window.addEventListener('resize', function() {
 		chartACCategory.resize();
 	});
 
 	var optChartACCategory = {
 		title: {
-			text: '门禁类型比例'
+			text: '学校门禁类型比例'
 		},
 		tooltip: {
 			trigger: 'item',
-			formatter: "{b} <br/>{c} 次 ({d}%)"
+			formatter: "{b} <br/>{c} 个 ({d}%)"
 		},
 		toolbox: {
 			show: true,
@@ -60,7 +41,7 @@
 			data: []
 		},
 		series: [{
-			name: '门禁类型比例',
+			name: '学校门禁类型比例',
 			type: 'pie',
 			radius: '50%',
 			center: ['45%', '45%'],
@@ -71,14 +52,9 @@
 	chartACCategory.setOption(optChartACCategory);
 
 	refresh_chart = function() {
-		if($("#userID").val() == '') {
-			showDialog("ID不可为空", json_response.errMsg);
-			return;
-		};
-
 		chartACCategory.showLoading();
 		
-		$.ajax('/charts/accategory/getData?' + $("#form-ipt").serialize(), {
+		$.ajax('/charts/schaccategory/getData?' + $("#form-ipt").serialize(), {
 			type: 'GET',
 			success: function(json_response) {
 				chartACCategory.hideLoading();
@@ -110,5 +86,6 @@
 	$(document).ready(function() {
 		refresh_chart();
 	});
+
 </script>
 {% endblock %}

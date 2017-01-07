@@ -3,23 +3,24 @@
 
 import operator
 
-def CategoryProcess(ipt_list):
+
+def CategoryProcess(ipt_list, fold=True):
     """
     :param ipt_list:输入队列，元素为元组(名称，值)
     """
     # 类型名称为key 数量为val
-    vals = {}    # {'title0': val1, 'title1': val2, ...}
+    vals = {}  # {'title0': val1, 'title1': val2, ...}
 
     for result in ipt_list:
         vals[str(result[0])] = float(result[1])
 
     # 若项目数量少，直接返回
-    if len(vals) < 4:
+    if len(vals) < 4 and not fold:
         return vals
 
     # 若项目数量较多，将值最小的几个归到其他类中
 
-    sumValue=sum(vals.values())
+    sumValue = sum(vals.values())
     list_vals = sorted(vals.iteritems(), key=operator.itemgetter(1), reverse=True)
 
     cur_count = 0
@@ -35,6 +36,6 @@ def CategoryProcess(ipt_list):
 
     list_vals = {}
     for i in xrange(len(tmp_vals)):
-        list_vals[tmp_vals[i][0]] = round(tmp_vals[i][1],2)
+        list_vals[tmp_vals[i][0]] = round(tmp_vals[i][1], 2)
 
     return list_vals

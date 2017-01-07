@@ -1,0 +1,22 @@
+
+.chartField{
+    height: 400px;
+    width: 100%;
+}
+
+.formField{
+    margin-top: 20px;
+}
+
+.allnav{
+    height: 100%;
+    width: 280px;
+    position: absolute;
+    left: 0;
+}
+
+.rightContainer{
+    position: absolute;
+    left: 290px;
+    right: 0;
+}

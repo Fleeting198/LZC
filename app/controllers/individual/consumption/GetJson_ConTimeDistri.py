@@ -34,7 +34,7 @@ def GetJson_ConTimeDistri(userID, startDate, endDate):
     categoryList = [result.category for result in results]
     valList = [result.amount for result in results]
 
-    from app.controls.Pro_TimeDistr import get_time_distribution
+    from app.controllers.Pro_TimeDistr import get_time_distribution
     data = get_time_distribution(dateList, categoryList, valList)
 
     # 把数据包装成Echarts需要的格式

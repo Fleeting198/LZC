@@ -27,21 +27,28 @@ def GetJson_AcDateTrend(userID, startDate, endDate, modeDate):
         return {'errMsg': u'没有找到记录。'}
 
     # 处理数据，返回一个DataFrame
+
     dateList = [result.ac_datetime for result in results]
+
     recordList = [result.category for result in results]
     valList = [1] * len(recordList)
 
-    from app.controls.Pro_DateTrend import get_date_trend
+    from app.controllers.Pro_DateTrend import get_date_trend
     df = get_date_trend(dateList, recordList, valList, modeDate)
+
+    # 构建表格输出变量
+
 
     # 把数据包装成Echarts需要的格式
     axisLabels = map(lambda x: x.strftime('%Y-%m-%d'), df.index.tolist())  # 从dataframe 中取出作为索引的日期标签成为队列
     seriesData = []
     legendLabels = []
+
     for colName, col in df.iteritems():
         legendLabels.append(colName)
         data = map(lambda x: float(x), col.tolist())
         seriesData.append({'name': colName, 'data': data})
+
 
     json_response = {'axisLabels': axisLabels, 'legendLabels': legendLabels, 'seriesData': seriesData}
     return json_response

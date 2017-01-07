@@ -1,18 +1,36 @@
 {% extends "charts/charts.html" %} {% block chartField %}
 
 <form id="form-ipt" class="form-inline">
-	{{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='PPPWQHXW')}}
-	{{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
-	{% for subfield in form.modeDate %}
-		{{ subfield }}{{ subfield.label }}
-		&nbsp;&nbsp;
-	{% endfor %}
+	{{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='PPPWQHXW')}} {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }} {% for subfield in form.modeDate %} {{ subfield }} {{ subfield.label }} &nbsp;&nbsp; {% endfor %}
 	<input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()" />
 </form>
 
-<div id="chartAcDateTrend" style="width: inherit; height: 90%;"></div>
+<!--Echarts图表-->
+<div id="chartAcDateTrend" class="chartField"></div>
+
+<!--DataTables表格-->
+<div class="formField">
+	<table id="tableAcDateTrend">
+		<thead>
+			<tr>
+				<th>placeholder</th>
+			</tr>
+		</thead>
+	</table>
+</div>
 
 <script>
+	var legendLabels;
+	var axisLabels;
+	var seriesData;
+
+	// 自动缩放注册
+	window.addEventListener('resize',
+		function() {
+			chartAcDateTrend.resize();
+		});
+
+	// 日期选择表单
 	var dateRangePicker = $("input[name='dateRange']");
 	dateRangePicker.daterangepicker({
 		autoUpdateInput: false,
@@ -28,21 +46,12 @@
 		$(this).val('');
 	});
 
-	// 图表初始化
-	var chartAcDateTrend = echarts.init(document.getElementById('chartAcDateTrend'));
-
-	// 自动缩放注册
-	window.addEventListener('resize',
-		function() {
-			chartAcDateTrend.resize();
-		});
-
 	// 默认Echarts配置
 	var optChartAcDateTrend = {
 		title: {
 			text: '门禁日期变化'
 		},
-		legend:{},
+		legend: {},
 		tooltip: {
 			trigger: 'axis',
 			formatter: function(params) {
@@ -83,27 +92,21 @@
 				formatter: '{value} 次'
 			}
 		},
-		dataZoom: [
-			{
-				type: 'inside',
-				xAxisIndex: [0],
-				start: 0,
-				end: 100
-			}, 
-			{
-				type: 'slider',
-				xAxisIndex: [0],
-				start: 0,
-				end: 100
-			}
-		],
-		series:[]
+		dataZoom: [{
+			type: 'inside',
+			xAxisIndex: [0],
+			start: 0,
+			end: 100
+		}, {
+			type: 'slider',
+			xAxisIndex: [0],
+			start: 0,
+			end: 100
+		}],
+		series: []
 	};
-	
-	// 设置默认配置
-	chartAcDateTrend.setOption(optChartAcDateTrend);
 
-	refresh_chart = function() {
+	refresh_data = function() {
 		if($("#userID").val() == '') {
 			showDialog("ID不可为空", json_response.errMsg);
 			return;
@@ -120,10 +123,11 @@
 				chartAcDateTrend.setOption(optChartAcDateTrend);
 
 				if(!json_response.errMsg) {
-					var legendLabels = json_response.legendLabels;
-					var axisLabels = json_response.axisLabels;
-					var seriesData=json_response.seriesData
+					legendLabels = json_response.legendLabels;
+					axisLabels = json_response.axisLabels;
+					seriesData = json_response.seriesData;
 
+					// 刷新图表
 					// 日期趋势图表设定
 					chartAcDateTrend.setOption({
 						legend: {
@@ -153,6 +157,43 @@
 						});
 						chartAcDateTrend.setOption(tmp_option, true);
 					}
+
+					// 刷新表格
+
+					// 准备表头列表
+					var form_columns = [];
+					form_columns = form_columns.concat({
+						data: "日期"
+					});
+					var tableHeadRowJQ = $("#tableAcDateTrend > thead > tr");
+					tableHeadRowJQ.empty();
+					tableHeadRowJQ.append("<th>日期</th>");
+
+					for(i = 0; i < legendLabels.length; i++) {
+						form_columns = form_columns.concat({
+							data: legendLabels[i]
+						});
+						tableHeadRowJQ.append("<th>" + legendLabels[i] + "</th>");
+					}
+					// 准备表内容列表
+					var form_data = [];
+					for(i = 0; i < axisLabels.length; i++) {
+						var row = new Object();
+						row["日期"] = axisLabels[i];
+						for(var j = 0; j < seriesData.length; j++) {
+							var colName = seriesData[j].name;
+							var colData = seriesData[j].data;
+							row[colName] = colData[i];
+						}
+						form_data = form_data.concat(row);
+					}
+
+					$("#tableAcDateTrend").dataTable({
+						destroy: true,
+						columns: form_columns,
+						data: form_data,
+					});
+
 				} else {
 					showDialog("出错了", json_response.errMsg);
 				}
@@ -163,10 +204,17 @@
 			dataType: 'json'
 		});
 	};
-	
+
+	// 图表初始化
+	var chartAcDateTrend = echarts.init(document.getElementById('chartAcDateTrend'));
+
+	// 设置图表默认配置
+	chartAcDateTrend.setOption(optChartAcDateTrend);
+
 	$(document).ready(function() {
-		refresh_chart();
-	});
+		$('#tableAcDateTrend').DataTable();
+		refresh_data();
+	})
 </script>
 
 {% endblock %}

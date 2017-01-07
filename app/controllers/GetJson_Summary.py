@@ -80,7 +80,7 @@ def ac_time(userID, startDate, endDate):
 def ac_study(userID, startDate, endDate):
     # 最近一个月图书馆、教学楼次数
 
-    from app.controls.individual.access.GetJson_AcCategory import GetJson_AcCategory
+    from app.controllers.individual.access.GetJson_AcCategory import GetJson_AcCategory
     json_ACCategory = GetJson_AcCategory(userID, startDate, startDate)
 
     if 'errMsg' in json_ACCategory:
@@ -146,7 +146,7 @@ def bill(userID, startDate, endDate):
         total_expend = dateTrend['accumulatedVals'][-1]
 
     # 消费分类排名
-    from app.controls.individual.consumption.GetJson_ConCategory import GetJson_ConCategory
+    from app.controllers.individual.consumption.GetJson_ConCategory import GetJson_ConCategory
     json_ConCategory = GetJson_ConCategory(userID, startDate, endDate)
 
     if 'errMsg' not in json_ConCategory:

@@ -1,21 +1,24 @@
 {% extends 'base.html' %} {% block content %}
 <div class="container-fluid" style="padding-top: 72px">
-	<div class="row">
-		<div id="chart_list" style="height: 100%; width: 280px; position: absolute; left: 0; margin-left: 10px;">
+		<div class="allnav">
 			{% block sideList %}
+			
+			<!--宏函数，创建左侧导航列表按钮-->
             {% macro nav_side(url_fun, value) -%}
-            {% if request.path == url_for(url_fun) %}
-			<li class="active">
-				<a href="{{ url_for(url_fun) }}">{{ value }}</a>
-			</li>
-			<script>
-				$("li.active").parent("ul").parent('li').navgoco('toggle', true | false);
-			</script>
-			{% else %}
-			<li>
-				<a href="{{ url_for(url_fun) }}">{{ value }}</a>
-			</li>
-			{% endif %} {%- endmacro %}
+	            {% if request.path == url_for(url_fun) %}
+				<li class="active">
+					<a href="{{ url_for(url_fun) }}">{{ value }}</a>
+				</li>
+				<script>
+					$("li.active").parent("ul").parent('li').navgoco('toggle', true | false);
+				</script>
+				{% else %}
+				<li>
+					<a href="{{ url_for(url_fun) }}">{{ value }}</a>
+				</li>
+				{% endif %}
+			{%- endmacro %}
+			
 
 			<div class="panel-group">
 
@@ -57,6 +60,7 @@
 					<div class="panel-body">
 						<ul class="navgoco nav nav-pills nav-stacked">
 							{{ nav_side('show_chart_number','人数统计') }}
+							{{ nav_side('show_chart_schaccategory','学校门禁类型比例') }}
 							<li>
 								<a href="#">收入报表</a>
 								<ul class="nav nav-pills nav-stacked" style="padding-left: 20px">
@@ -85,16 +89,13 @@
 			</div>
 			{% endblock %}
 		</div>
-		<div id="chart_container" style="position: absolute; left: 290px; right: 0; height: 85%;">
+		<div class="rightContainer">
 			{% block chartField %} {% endblock %}
 		</div>
-	</div>
 </div>
 
 <script>
-	$(window).resize(function() {
-		$('#chart_container').css('left', $('#chart_list').width() + 30);
-	});
+	// 左侧导航列表配置
 	$(".navgoco").navgoco({
 		caretHtml: '<i class="fa fa-angle-right"></i>',
 		accordion: false,
