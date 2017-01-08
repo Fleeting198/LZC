@@ -8,7 +8,6 @@ from sqlalchemy import and_, func
 
 
 def GetJson_AcCategory(userID, startDate, endDate):
-    # Query
     strQuery = db.session.query(ac_loc.category, func.count('*')).filter(
         and_(ac_loc.node_id == acrec.node_id, acrec.user_id == userID)).group_by(ac_loc.category)
 
