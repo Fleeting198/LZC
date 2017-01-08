@@ -8,14 +8,14 @@ from sqlalchemy import and_
 
 
 def GetJson_AcDateTrend(userID, startDate, endDate, modeDate):
-    """返回Json：门禁趋势与分布
+    """
+    返回Json：门禁日期趋势
     :param userID: 工号
-    :param modeDate: 日期模式，决定数据按怎样的粒度合并
     :param startDate: 限定数据起始日期
     :param endDate: 限定数据结束日期
-    :return json_response: Echarts格式字典{'axisLabels': , 'legendLabels': , 'seriesData': }
+    :param modeDate: 日期模式，决定数据按怎样的粒度合并
+    :return json_response: Echarts格式字典{'axisLabels': , 'legendLabels': , 'seriesData': , 'statRows': }
     """
-    # Query
     strQuery = db.session.query(acrec.ac_datetime, ac_loc.category).filter(
         and_(acrec.user_id == userID, acrec.node_id == ac_loc.node_id)).order_by(acrec.ac_datetime)
 
@@ -27,19 +27,14 @@ def GetJson_AcDateTrend(userID, startDate, endDate, modeDate):
         return {'errMsg': u'没有找到记录。'}
 
     # 处理数据，返回一个DataFrame
-
-    dateList = [result.ac_datetime for result in results]
-
+    datetimeList = [result.ac_datetime for result in results]
     recordList = [result.category for result in results]
     valList = [1] * len(recordList)
 
     from app.controllers.Pro_DateTrend import get_date_trend
-    df = get_date_trend(dateList, recordList, valList, modeDate)
+    df, dfStat = get_date_trend(datetimeList, recordList, valList, modeDate)
 
-    # 构建表格输出变量
-
-
-    # 把数据包装成Echarts需要的格式
+    # 包装成Echarts需要的格式
     axisLabels = map(lambda x: x.strftime('%Y-%m-%d'), df.index.tolist())  # 从dataframe 中取出作为索引的日期标签成为队列
     seriesData = []
     legendLabels = []
@@ -49,6 +44,18 @@ def GetJson_AcDateTrend(userID, startDate, endDate, modeDate):
         data = map(lambda x: float(x), col.tolist())
         seriesData.append({'name': colName, 'data': data})
 
+    # 把只需要用表格显示的统计数据单独用字典列表返回
+    statRows = []
+    for dfIndex, dfRow in dfStat.iterrows():
+        dfRowDict = dfRow.to_dict()  # Series转为字典
 
-    json_response = {'axisLabels': axisLabels, 'legendLabels': legendLabels, 'seriesData': seriesData}
+        # 把np的float64转成python的float
+        for k, v in dfRowDict.iteritems():
+            dfRowDict[k] = float(v)
+
+        dfRowDict["index"] = dfIndex  # 代表这条数据的索引，前端会用到"index" （耦合）
+        statRows.append(dfRowDict)
+
+    json_response = {'axisLabels': axisLabels, 'legendLabels': legendLabels, 'seriesData': seriesData,
+                     'statRows': statRows}
     return json_response

@@ -9,6 +9,8 @@ from app import helpers
 from app.forms import *
 from app.models import *
 
+import logging
+
 
 # 主页
 @app.route('/')
@@ -138,6 +140,18 @@ def refresh_chart_acdatetrend():
 
         json_response['legendLabels'] = legendLabels
         json_response['seriesData'] = seriesData
+
+
+        statRows=  json_response['statRows']
+        for datum in statRows:
+            datumKeys = datum.keys()
+            for key in datumKeys:
+                val = datum[key]
+                del datum[key]
+                nkey = helpers.translate(key)
+                val = helpers.translate(val)
+                datum[nkey] = val
+        json_response['statRows'] = statRows
 
     return jsonify(json_response)
 
@@ -312,6 +326,16 @@ def refresh_chart_condatetrend():
         json_response['legendLabels'] = legendLabels
         json_response['seriesData'] = seriesData
 
+        statRows = json_response['statRows']
+        for datum in statRows:
+            datumKeys = datum.keys()
+            for key in datumKeys:
+                val = datum[key]
+                del datum[key]
+                nkey = helpers.translate(key)
+                val = helpers.translate(val)
+                datum[nkey] = val
+        json_response['statRows'] = statRows
     return jsonify(json_response)
 
 
@@ -354,7 +378,6 @@ def refresh_chart_contimedistr():
         json_response['legendLabels'] = legendLabels
         json_response['seriesData'] = seriesData
     return jsonify(json_response)
-
 
 
 

@@ -2,14 +2,14 @@
 
 <form id="form-ipt" class="form-inline">
 	{{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='PPPWQHXW')}} {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }} {% for subfield in form.modeDate %} {{ subfield }} {{ subfield.label }} &nbsp;&nbsp; {% endfor %}
-	<input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()" />
+	<input class="btn btn-primary" type="button" value="确认" onclick="refresh_data()" />
 </form>
 
 <!--Echarts图表-->
 <div id="chartAcDateTrend" class="chartField"></div>
 
 <!--DataTables表格-->
-<div class="formField">
+<div id="dataTableContainer" class="formField">
 	<table id="tableAcDateTrend">
 		<thead>
 			<tr>
@@ -20,16 +20,6 @@
 </div>
 
 <script>
-	var legendLabels;
-	var axisLabels;
-	var seriesData;
-
-	// 自动缩放注册
-	window.addEventListener('resize',
-		function() {
-			chartAcDateTrend.resize();
-		});
-
 	// 日期选择表单
 	var dateRangePicker = $("input[name='dateRange']");
 	dateRangePicker.daterangepicker({
@@ -45,6 +35,12 @@
 	dateRangePicker.on('cancel.daterangepicker', function(ev, picker) {
 		$(this).val('');
 	});
+
+	// 自动缩放注册
+	window.addEventListener('resize',
+		function() {
+			chartAcDateTrend.resize();
+		});
 
 	// 默认Echarts配置
 	var optChartAcDateTrend = {
@@ -123,9 +119,9 @@
 				chartAcDateTrend.setOption(optChartAcDateTrend);
 
 				if(!json_response.errMsg) {
-					legendLabels = json_response.legendLabels;
-					axisLabels = json_response.axisLabels;
-					seriesData = json_response.seriesData;
+					var legendLabels = json_response['legendLabels'];
+					var axisLabels = json_response['axisLabels'];
+					var seriesData = json_response['seriesData'];
 
 					// 刷新图表
 					// 日期趋势图表设定
@@ -175,6 +171,7 @@
 						});
 						tableHeadRowJQ.append("<th>" + legendLabels[i] + "</th>");
 					}
+
 					// 准备表内容列表
 					var form_data = [];
 					for(i = 0; i < axisLabels.length; i++) {
@@ -188,10 +185,26 @@
 						form_data = form_data.concat(row);
 					}
 
+					var statRows = json_response['statRows'];
+
+					for(i = 0; i < statRows.length; i++) {
+						statRows[i]["日期"] = statRows[i]["index"];
+						delete statRows[i]["index"];
+						for(var val in statRows[i]) {
+							// 是数字且不是整数
+							if(typeof(statRows[i][val]) == "number" && parseInt(statRows[i][val]) != statRows[i][val]) {
+								statRows[i][val] = statRows[i][val].toFixed(3);
+							}
+						}
+					}
+
+					form_data = statRows.concat(form_data);
+
 					$("#tableAcDateTrend").dataTable({
 						destroy: true,
 						columns: form_columns,
 						data: form_data,
+						ordering: false,
 					});
 
 				} else {

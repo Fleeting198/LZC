@@ -1,32 +1,38 @@
 #!/usr/bin/env python
-# -*- coding: UTF-8 -*-
+# coding: UTF-8
 
 from pandas import DataFrame
+import pandas as pd
+
 
 """
-门禁日期分类访问总数趋势
-消费日期分类访问总价趋势
+日期趋势的数据处理，用于消费和门禁的处理
 """
 
 
-def get_date_trend(dateList, categoryList, valList, modeDate):
+def get_date_trend(datetimeList, categoryList, valList, modeDate):
     """
     通过resample合并日期相同的访问量
-    :param dateList: 日期列表
+    :param datetimeList: 日期列表
     :param categoryList: 与日期对应的访问类型，记一次访问
-    :return df: DataFrame的形式，索引是日期，包含两列：门禁分类和访问数量
+    :param valList: 值列表，门禁是1，消费是金额
+    :param modeDate: 数据粒度选项，0日、1周、2月、3季度
+    :return df: DataFrame的形式，索引是日期，列是存在的门禁和消费分类，内容是合并量
+    :return dfStat: DataFrame，df的统计信息
     """
 
     modeDate = int(modeDate)
     rule_mode = "DWMQ"  # 分别代表日、周、月、季度
-
     recordDictList = []
     for i in xrange(len(categoryList)):
         recordDictList.append({categoryList[i]: valList[i]})
 
-    df = DataFrame(recordDictList, index=dateList)
+    df = DataFrame(recordDictList, index=datetimeList, dtype=float)
     df = df.resample(rule_mode[modeDate]).sum()
-    df = df.fillna(0)
-    # TODO: 数据类型从float64改成int
+    df.fillna(0,inplace=True)
 
-    return df
+    # 获取统计信息
+    dfStat=df.describe()
+    dfStat.drop('count', inplace=True)
+
+    return df,dfStat

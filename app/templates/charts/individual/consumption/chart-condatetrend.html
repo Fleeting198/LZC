@@ -1,18 +1,26 @@
 {% extends "charts/charts.html" %} {% block chartField %}
 
 <form id="form-ipt" class="form-inline">
-	{{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='PPPWQHXW')}}
-	{{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
-	{% for subfield in form.modeDate %}
-		{{ subfield }}{{ subfield.label }}
-		&nbsp;&nbsp;
-	{% endfor %}
-	<input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()" />
+	{{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='PPPWQHXW')}} {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }} {% for subfield in form.modeDate %} {{ subfield }}{{ subfield.label }} &nbsp;&nbsp; {% endfor %}
+	<input class="btn btn-primary" type="button" value="确认" onclick="refresh_data()" />
 </form>
 
+<!--Echarts图表-->
 <div id="chartConDateTrend" class="chartField"></div>
 
+<!--DataTables表格-->
+<div id="dataTableContainer" class="formField">
+	<table id="tableConDateTrend">
+		<thead>
+			<tr>
+				<th>placeholder</th>
+			</tr>
+		</thead>
+	</table>
+</div>
+
 <script>
+	// 日期选择表单
 	var dateRangePicker = $("input[name='dateRange']");
 	dateRangePicker.daterangepicker({
 		autoUpdateInput: false,
@@ -28,9 +36,6 @@
 		$(this).val('');
 	});
 
-	// 图表初始化
-	var chartConDateTrend = echarts.init(document.getElementById('chartConDateTrend'));
-
 	// 自动缩放注册
 	window.addEventListener('resize',
 		function() {
@@ -42,7 +47,7 @@
 		title: {
 			text: '消费日期变化'
 		},
-		legend:{},
+		legend: {},
 		tooltip: {
 			trigger: 'axis',
 			formatter: function(params) {
@@ -83,27 +88,21 @@
 				formatter: '{value} 元'
 			}
 		},
-		dataZoom: [
-			{
-				type: 'inside',
-				xAxisIndex: [0],
-				start: 0,
-				end: 100
-			}, 
-			{
-				type: 'slider',
-				xAxisIndex: [0],
-				start: 0,
-				end: 100
-			}
-		],
-		series:[]
+		dataZoom: [{
+			type: 'inside',
+			xAxisIndex: [0],
+			start: 0,
+			end: 100
+		}, {
+			type: 'slider',
+			xAxisIndex: [0],
+			start: 0,
+			end: 100
+		}],
+		series: []
 	};
-	
-	// 设置默认配置
-	chartConDateTrend.setOption(optchartConDateTrend);
 
-	refresh_chart = function() {
+	refresh_data = function() {
 		if($("#userID").val() == '') {
 			showDialog("ID不可为空", json_response.errMsg);
 			return;
@@ -122,7 +121,7 @@
 				if(!json_response.errMsg) {
 					var legendLabels = json_response.legendLabels;
 					var axisLabels = json_response.axisLabels;
-					var seriesData=json_response.seriesData
+					var seriesData = json_response.seriesData
 
 					// 选项设定
 					chartConDateTrend.setOption({
@@ -153,6 +152,66 @@
 						});
 						chartConDateTrend.setOption(tmp_option, true);
 					}
+
+					// 刷新表格
+
+					// 准备表头列表
+					var form_columns = [];
+					form_columns = form_columns.concat({
+						data: "日期"
+					});
+					var tableHeadRowJQ = $("#tableConDateTrend > thead > tr");
+					tableHeadRowJQ.empty();
+					tableHeadRowJQ.append("<th>日期</th>");
+
+					for(i = 0; i < legendLabels.length; i++) {
+						form_columns = form_columns.concat({
+							data: legendLabels[i]
+						});
+						tableHeadRowJQ.append("<th>" + legendLabels[i] + "</th>");
+					}
+
+					// 准备表内容列表
+					var form_data = [];
+					for(i = 0; i < axisLabels.length; i++) {
+						var row = new Object();
+						row["日期"] = axisLabels[i];
+						for(var j = 0; j < seriesData.length; j++) {
+							var colName = seriesData[j].name;
+							var colData = seriesData[j].data;
+							
+							// 超市的值出现了异常无限小数，这里强行掐掉
+							if(parseInt(colData[i]) != colData[i]) {
+								colData[i] = colData[i].toFixed(1);
+							}
+							
+							row[colName] = colData[i];
+						}
+						form_data = form_data.concat(row);
+					}
+
+	
+					var statRows = json_response['statRows'];
+					for(i = 0; i < statRows.length; i++) {
+						statRows[i]["日期"] = statRows[i]["index"];
+						delete statRows[i]["index"];
+						for(var val in statRows[i]) {
+							// 是数字且不是整数
+							if(typeof(statRows[i][val]) == "number" && parseInt(statRows[i][val]) != statRows[i][val]) {
+								statRows[i][val] = statRows[i][val].toFixed(3);
+							}
+						}
+					}
+					
+					form_data = statRows.concat(form_data);
+
+					$("#tableConDateTrend").dataTable({
+						destroy: true,
+						columns: form_columns,
+						data: form_data,
+						ordering: false,
+					});
+
 				} else {
 					showDialog("出错了", json_response.errMsg);
 				}
@@ -163,9 +222,16 @@
 			dataType: 'json'
 		});
 	};
-	
+
+	// 图表初始化
+	var chartConDateTrend = echarts.init(document.getElementById('chartConDateTrend'));
+
+	// 设置默认配置
+	chartConDateTrend.setOption(optchartConDateTrend);
+
 	$(document).ready(function() {
-		refresh_chart();
+		$('#tableAcDateTrend').DataTable();
+		refresh_data();
 	});
 </script>
 
