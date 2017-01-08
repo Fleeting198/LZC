@@ -35,7 +35,7 @@ def GetJson_ConTimeDistri(userID, startDate, endDate):
     valList = [result.amount for result in results]
 
     from app.controllers.Pro_TimeDistr import get_time_distribution
-    data = get_time_distribution(dateList, categoryList, valList)
+    df,dfStat = get_time_distribution(dateList, categoryList, valList)
 
     # 把数据包装成Echarts需要的格式
     axisLabels = []
@@ -44,10 +44,22 @@ def GetJson_ConTimeDistri(userID, startDate, endDate):
 
     seriesData = []
     legendLabels = []
-    for colName, col in data.iteritems():
+    for colName, col in df.iteritems():
         legendLabels.append(colName)
-        data = map(lambda x: 0.0 if isnan(x) else float(x), col.tolist())
-        seriesData.append({'name': colName, 'data': data})
+        df = map(lambda x: 0.0 if isnan(x) else float(x), col.tolist())
+        seriesData.append({'name': colName, 'data': df})
 
-    json_response = {'axisLabels': axisLabels, 'legendLabels': legendLabels, 'seriesData': seriesData}
+    # 把只需要用表格显示的统计数据单独用字典列表返回
+    statRows = []
+    for dfIndex, dfRow in dfStat.iterrows():
+        dfRowDict = dfRow.to_dict()  # Series转为字典
+
+        # 把np的float64转成python的float
+        for k, v in dfRowDict.iteritems():
+            dfRowDict[k] = float(v)
+
+        dfRowDict["index"] = dfIndex  # 代表这条数据的索引，前端会用到"index" （耦合）
+        statRows.append(dfRowDict)
+
+    json_response = {'axisLabels': axisLabels, 'legendLabels': legendLabels, 'seriesData': seriesData, 'statRows': statRows}
     return json_response

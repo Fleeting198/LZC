@@ -29,4 +29,7 @@ def get_time_distribution(dateList, categoryList, valList):
         lines.append(line)
 
     df=DataFrame(lines,index=range(24))
-    return df
+    dfStat=df.describe()
+    dfStat.drop('count', inplace=True)
+
+    return df,dfStat

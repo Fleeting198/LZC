@@ -35,7 +35,11 @@ def GetJson_AcDateTrend(userID, startDate, endDate, modeDate):
     df, dfStat = get_date_trend(datetimeList, recordList, valList, modeDate)
 
     # 包装成Echarts需要的格式
-    axisLabels = map(lambda x: x.strftime('%Y-%m-%d'), df.index.tolist())  # 从dataframe 中取出作为索引的日期标签成为队列
+
+    if int(modeDate)==2:
+        axisLabels = map(lambda x: x.strftime('%Y-%m'), df.index.tolist())
+    else:
+        axisLabels = map(lambda x: x.strftime('%Y-%m-%d'), df.index.tolist())  # 从dataframe 中取出作为索引的日期标签成为队列
     seriesData = []
     legendLabels = []
 

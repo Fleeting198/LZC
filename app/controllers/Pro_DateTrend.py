@@ -2,7 +2,6 @@
 # coding: UTF-8
 
 from pandas import DataFrame
-import pandas as pd
 
 
 """
