@@ -112,7 +112,7 @@ def ac_study(userID, startDate, endDate):
 def relation(userID):
     # 好友数 关系最高好友名 关系最高好友值
 
-    from GetJson_ACRelation import GetJson_ACRelation
+    from app.controllers.mining.GetJson_ACRelation import GetJson_ACRelation
     json_ACRelation = GetJson_ACRelation(userID)
 
     num_relations = json_ACRelation['num_total']

@@ -42,25 +42,20 @@ class Form_ConTimeDistr(Form):
                                                   Length(min=8, max=8, message=lstr.warn_userIDLength)])
     dateRange = StringField(lstr.dateRange, validators=[Optional()])
 
-# class Form_Expenditure(Form):
-#     userID = StringField(lstr.userID, validators=[DataRequired(message=lstr.warn_userIDFill),
-#                                                   Length(min=8, max=8, message=lstr.warn_userIDLength)])
-#     dateRange = StringField(lstr.dateRange, validators=[Optional()])
-#     modeDate = RadioField(lstr.modeDate, choices=[('0', lstr.opts_modeDate[0]), ('1', lstr.opts_modeDate[1]),
-#                                                   ('2', lstr.opts_modeDate[2]), ('3', lstr.opts_modeDate[3]), ],
-#                           default='2')
-#     modeTime = RadioField(lstr.modeTime, choices=[('0', lstr.opts_modeTime[0]), ('1', lstr.opts_modeTime[1]),
-#                                                   ('2', lstr.opts_modeTime[2])], default='0')
+
+class Form_Relation(Form):
+    userID = StringField(lstr.userID, validators=[DataRequired(message=lstr.warn_userIDFill),
+                                                  Length(min=8, max=8, message=lstr.warn_userIDLength)])
+
+class Form_PovertyJudge(Form):
+    userID = StringField(lstr.userID, validators=[DataRequired(message=lstr.warn_userIDFill),
+                                                  Length(min=8, max=8, message=lstr.warn_userIDLength)])
 
 
 
-# class Form_Acperiodcate(Form):
-#     userID = StringField(lstr.userID, validators=[DataRequired(message=lstr.warn_userIDFill),
-#                                                   Length(min=8, max=8, message=lstr.warn_userIDLength)])
-#     dateRange = StringField(lstr.dateRange, validators=[Optional()])
-#     modeDate = RadioField(lstr.modeDate,
-#                       choices=[('0', lstr.opts_modeDate[0]), ('1', lstr.opts_modeDate[1]), ('2', lstr.opts_modeDate[2]),
-#                                ('3', lstr.opts_modeDate[3]), ], default='2')
+
+
+
 
 class Form_Acvalid(Form):
     userID = StringField(lstr.userID, validators=[DataRequired(message=lstr.warn_userIDFill),
@@ -74,10 +69,6 @@ class Form_Conability(Form):
 class Form_Penalty(Form):
     userID = StringField(lstr.userID, validators=[DataRequired(message=lstr.warn_userIDFill),
                                                   Length(min=8, max=8, message=lstr.warn_userIDLength)])
-
-
-
-
 
 class Form_Conwatertime(Form):
     modeTime = RadioField(lstr.modeTime, choices=[('0', lstr.opts_modeTime[0]), ('1', lstr.opts_modeTime[1]),
@@ -103,6 +94,3 @@ class Form_Income(Form):
     modeTime = RadioField(lstr.modeTime, choices=[('0', lstr.opts_modeTime[0]), ('1', lstr.opts_modeTime[1]),
                                                   ('2', lstr.opts_modeTime[2])], default='0')
 
-class Form_Relation(Form):
-    userID = StringField(lstr.userID, validators=[DataRequired(message=lstr.warn_userIDFill),
-                                                  Length(min=8, max=8, message=lstr.warn_userIDLength)])

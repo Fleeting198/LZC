@@ -27,8 +27,13 @@ def get_date_trend(datetimeList, categoryList, valList, modeDate):
         recordDictList.append({categoryList[i]: valList[i]})
 
     df = DataFrame(recordDictList, index=datetimeList, dtype=float)
-    df = df.resample(rule_mode[modeDate]).sum()
     df.fillna(0,inplace=True)
+
+    # 先按天统计再预测
+    df = df.resample("D").sum()
+
+    df = df.resample(rule_mode[modeDate]).sum()
+    print df
 
     # 获取统计信息
     dfStat=df.describe()

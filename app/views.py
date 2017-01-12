@@ -9,8 +9,6 @@ from app import helpers
 from app.forms import *
 from app.models import *
 
-import logging
-
 
 # 主页
 @app.route('/')
@@ -54,6 +52,7 @@ def show_summary(user_id):
 @app.route('/charts')
 def show_charts():
     return render_template('charts/charts.html')
+
 
 
 # ========================
@@ -414,7 +413,6 @@ def show_chart_schaccategory():
 
 @app.route('/charts/schaccategory/getData')
 def refresh_chart_schaccategory():
-
     from app.controllers.school.GetJson_SchAcCategory import GetJson_SchAcCategory
     json_response = GetJson_SchAcCategory()
 
@@ -435,6 +433,55 @@ def refresh_chart_schaccategory():
 
 
 
+# ========================
+# 人际关系
+# ========================
+@app.route('/charts/relation')
+def show_chart_relation():
+    form = Form_Relation()
+    return render_template('charts/mining/chart-relation.html', form=form)
+
+
+@app.route('/charts/relation/getData', methods=['GET'])
+def refresh_chart_relation():
+    form = Form_Relation()
+    form.userID.data = request.args.get('userID')
+
+    if not form.validate():
+        return jsonify(errMsg=form.errors['userID'])
+
+    userID = form.userID.data
+    from app.controllers.mining.GetJson_ACRelation import GetJson_ACRelation
+    json_response = GetJson_ACRelation(userID)
+
+    return jsonify(json_response)
+
+
+# ========================
+# 贫困判定
+# ========================
+@app.route('/charts/povertyjudge')
+def show_chart_povertyjudge():
+    form = Form_PovertyJudge()
+    return render_template('charts/mining/chart-povertyjudge.html', form=form)
+
+
+@app.route('/charts/povertyjudge/getData')
+def refresh_chart_povertyjudge():
+    form= Form_PovertyJudge()
+    form.userID.data = request.args.get('userID')
+
+    if not form.validate():
+        return jsonify(errMsg=form.errors['userID'])
+    if not check_user_id(form.userID.data):
+        return jsonify(errMsg=lstr.warn_userIDNon)
+
+    userID = form.userID.data
+
+    from app.controllers.mining.GetJson_PovertyJudge import GetJson_PovertyJudge
+    json_response = GetJson_PovertyJudge(userID)
+
+    return jsonify(json_response)
 
 
 
@@ -495,9 +542,7 @@ def refresh_chart_foodIncome():
 
 @app.route('/charts/number')
 def show_chart_number():
-    # return render_template('charts/chart-number.html')
-    return render_template('charts/chart-numberBar.html')
-
+    return render_template('charts/school/chart-numberBar.html')
 
 @app.route('/charts/number/getData', methods=['GET'])
 def refresh_chart_number():
@@ -635,24 +680,7 @@ def refresh_chart_penalty():
     return jsonify(json_response)
 
 
-@app.route('/charts/relation')
-def show_chart_relation():
-    form = Form_Relation()
-    return render_template('charts/chart-relation.html', form=form)
 
-
-@app.route('/charts/relation/getData', methods=['GET'])
-def refresh_chart_relation():
-    form = Form_Relation()
-    form.userID.data = request.args.get('userID')
-
-    if not form.validate():
-        return jsonify(errMsg=form.errors['userID'])
-
-    userID = form.userID.data
-    from controllers.GetJson_ACRelation import GetJson_ACRelation
-    json_response = GetJson_ACRelation(userID)
-    return jsonify(json_response)
 
 
 # =====================================
@@ -757,7 +785,7 @@ def refresh_summary_acperiodcate():
 def refresh_summary_relation():
     userID = request.args.get('userID')
 
-    from controllers.GetJson_ACRelation import GetJson_ACRelation
+    from app.controllers.mining.GetJson_ACRelation import GetJson_ACRelation
     json_response = GetJson_ACRelation(userID)
     return jsonify(json_response)
 

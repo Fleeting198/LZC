@@ -1,0 +1,76 @@
+{% extends "charts/charts.html" %} {% block chartField %}
+
+<form id="form-ipt" class="form-inline">
+	{{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='XQXXQQTQ') }}
+	<input class="btn btn-primary" type="button" value="确认" onclick="refresh_data()" />
+</form>
+
+<div id="chartRelation" class="chartField_full"></div>
+
+<script>
+
+	var optionChartRelation = {
+		title: {
+			text: '人际关系',
+		},
+		tooltip: {
+			trigger: 'item',
+		},
+		series: [{
+			type: 'graph',
+			layout: 'force',
+			force: {
+				edgeLength: 200,
+				repulsion: 100,
+			},
+			roam: true,
+			draggable: true,
+			label: {
+				emphasis: {
+					show: false,
+				}
+			}
+		}]
+	};
+
+	refresh_data = function() {
+		chartRelation.showLoading();
+		$.ajax('/charts/relation/getData?' + $("#form-ipt").serialize(), {
+			type: 'GET',
+			success: function(json_response) {
+				chartRelation.hideLoading();
+
+				if(!json_response.errMsg) {
+					var nodes = json_response['nodes'];
+					var links = json_response['links'];
+					// var num_total=json_response['num_total'];
+
+					chartRelation.setOption({
+						series: [{
+							data: nodes,
+							links: links,
+						}]
+					});
+
+				} else {
+					showDialog("出错了", json_response.errMsg);
+				}
+			},
+			error: function() {
+				showDialog("出错了", "出现意外情况");
+			},
+			dataType: 'json'
+		});
+	};
+
+	var chartRelation = echarts.init(document.getElementById('chartRelation'));
+	chartRelation.setOption(optionChartRelation);
+	window.addEventListener('resize', function() {
+		chartRelation.resize();
+	});
+
+	$(document).ready(function() {
+		refresh_data();
+	});
+</script>
+{% endblock %}

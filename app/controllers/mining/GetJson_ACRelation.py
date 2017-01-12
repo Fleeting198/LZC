@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: UTF-8 -*-
+# coding: UTF-8
 
 from app.models import *
 
@@ -11,10 +11,10 @@ def GetJson_ACRelation(userID):
         return {'num_total': 0, 'nodes': [], 'links': []}
 
     max_val = list_relation[0][1] if list_relation[0][1] > 1 else 2  # 获得最大关系值
-    source = str(userID)
+    source = userID
 
     # symbolSize max and min
-    max_size = 30
+    max_size = 50
     min_size = 10
 
     # node 属性计算
@@ -22,7 +22,7 @@ def GetJson_ACRelation(userID):
     symbolSize_source = (min_size * max_val - max_size + (max_size - min_size) * (max_val + 10)) / (max_val - 1)
 
     # 初始化节点和边队列
-    nodes = [{'name': source, 'value': value_source, 'symbolSize':symbolSize_source/2.0 }]
+    nodes = [{'name': source, 'value': value_source, 'symbolSize':symbolSize_source*3 }]
     nodes[0]['symbolSize'] = min(max_size, nodes[0]['symbolSize'])
     links = []
 
@@ -47,24 +47,15 @@ def GetJson_ACRelation(userID):
             k = item[0]; v = item[1]
             symbolSize_source = (min_size * max_val - max_size + (max_size - min_size) * v) / (max_val - 1)
 
-            # Deprecated
-            # # 对关系值大的一定数量个node 加默认显示的标签
-            # if i < int(max_concern*0.5) and v > min_val:    # 默认显示标签的前 x% 个node并且关系值筛选。
-            #     node = {'name': k, 'value': v,
-            #             'label':{'normal':{'show':'false', 'position': 'right',
-            #                                'formatter': '{b}', 'textStyle': {'color': '#000'}}},
-            #             'symbolSize': (min_size * max_val - max_size + (max_size - min_size) * v) / (max_val - 1)}
-            # else:
-            #     node = {'name': k, 'value': v,
-            #             'symbolSize': (min_size * max_val - max_size + (max_size - min_size) * v) / (max_val - 1)}
-
             node = {'name': k, 'value': v, 'symbolSize': symbolSize_source/2.0}
             nodes.append(node)
 
             link = {'source': index_of_name(source), 'target': index_of_name(k), 'weight': v}
-
             # link = {'source': index_of_name(source), 'target': index_of_name(k)}
             links.append(link)
+        else:
+            break
+
 
     # print 'Round1: count_nodes=%d, count_links=%d' % (len(nodes), len(links))
     # print nodes
@@ -112,8 +103,10 @@ def query_list_relation(userID):
     # Query
     strQuery = acr_friendlist.query.filter(acr_friendlist.user_id == userID)
     results = strQuery.first()
+
     if results is None:  # 若查不到直接返回空队列
         return []
+
     dict_relation = results.str_relation_to_dict()
 
     # 删掉关系中心在关系中的记录

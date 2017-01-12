@@ -6,7 +6,7 @@
 </form>
 
 <!--Echarts图表-->
-<div id="chartAcTimeDistr" class="chartField"></div>
+<div id="chartAcTimeDistr" class="chartField_half"></div>
 
 <!--DataTables表格-->
 <div id="dataTableContainer" class="formField">
@@ -34,12 +34,6 @@
 	dateRangePicker.on('cancel.daterangepicker', function(ev, picker) {
 		$(this).val('');
 	});
-
-	// 自动缩放注册
-	window.addEventListener('resize',
-		function() {
-			chartAcTimeDistr.resize();
-		});
 
 	// 默认Echarts配置
 	var optchartAcTimeDistr = {
@@ -221,9 +215,13 @@
 
 	// 图表初始化
 	var chartAcTimeDistr = echarts.init(document.getElementById('chartAcTimeDistr'));
-
 	// 设置默认配置
 	chartAcTimeDistr.setOption(optchartAcTimeDistr);
+	// 自动缩放注册
+	window.addEventListener('resize',
+		function() {
+			chartAcTimeDistr.resize();
+		});
 
 	$(document).ready(function() {
 		$('#tableAcTimeDistr').DataTable();

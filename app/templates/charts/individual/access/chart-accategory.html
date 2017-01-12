@@ -6,7 +6,7 @@
 </form>
 
 <!--Echarts图表-->
-<div id="chartACCategory" class="chartField"></div>
+<div id="chartACCategory" class="chartField_half"></div>
 
 <!--DataTables表格-->
 <div id="dataTableContainer" class="formField">
@@ -35,10 +35,6 @@
 	});
 	dateRangePicker.on('cancel.daterangepicker', function(ev, picker) {
 		$(this).val('');
-	});
-
-	window.addEventListener('resize', function() {
-		chartACCategory.resize();
 	});
 
 	var optChartACCategory = {
@@ -107,8 +103,6 @@
 					var form_columns= [{data:"类型"},{data:"次数"},{data:"比例"}];
 					var form_data=[];
 					
-//					console.log(seriesData);
-					
 					var i,sum=0;
 					for (i=0;i<seriesData.length;i++){
 						sum+=seriesData[i]["value"];
@@ -139,6 +133,9 @@
 	// 图表初始化
 	var chartACCategory = echarts.init(document.getElementById('chartACCategory'));
 	chartACCategory.setOption(optChartACCategory);
+	window.addEventListener('resize', function() {
+		chartACCategory.resize();
+	});
 
 	$(document).ready(function() {
 		$('#tableACCategory').DataTable();

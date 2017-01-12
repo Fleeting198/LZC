@@ -3,6 +3,7 @@
 
 from app import db
 
+
 class device(db.Model):
     """刷卡机：设备号，地点序号(外键：设备地点表 序号)
     """
@@ -19,29 +20,19 @@ class device(db.Model):
 class individual(db.Model):
     """个体：工号，角色[老师，学生，其他]，年级[只有学生描述年级]
     """
-    user_id = db.Column(db.String(8), primary_key=True)
-    role = db.Column(db.String(3))
-    grade = db.Column(db.String(2))
+    user_id = db.Column(db.String(8), primary_key=True)  # 工号
+    role = db.Column(db.String(3))  # 角色
+    grade = db.Column(db.String(2))  # 年级
+
+    # 用于贫困判定的字段
+    con_sum_vals = db.Column(db.Float)  # 消费总金额
+    con_sum_times = db.Column(db.Integer)  # 消费总次数
+    index_vals = db.Column(db.Float)
+    index_times = db.Column(db.Float)
+    index_per = db.Column(db.Float)
 
     acrecs = db.relationship('acrec', backref=db.backref('individual'))  # 此工号所有门禁记录
     consumptions = db.relationship('consumption', backref=db.backref('individual'))  # 此工号所有消费记录
-
-    def __init__(self, user_id, role, grade):
-        self.set_user_id(user_id)
-        self.set_role(role)
-        self.set_grade(grade)
-
-    def set_user_id(self, user_id):
-        self.user_id = user_id
-
-    def set_role(self, role):
-        self.role = role
-
-    def set_grade(self, grade):
-        if self.role == '老师' or '其他':
-            self.grade = self.role
-        else:
-            self.grade = grade
 
 
 class dev_loc(db.Model):
@@ -54,11 +45,6 @@ class dev_loc(db.Model):
 
     devices = db.relationship('device', backref=db.backref('dev_loc'))  # 属于这个地点的所有设备
 
-    def __init__(self, node_id, node_des, category):
-        self.node_id = node_id
-        self.node_des = node_des
-        self.category = category
-
 
 class ac_loc(db.Model):
     """门禁地点：地点序号(自增)，地点描述。
@@ -70,10 +56,6 @@ class ac_loc(db.Model):
 
     acrecs = db.relationship('acrec', backref=db.backref('ac_loc'))  # 属于这个地点的所有门禁记录
 
-    def __init__(self, node_id, category):
-        self.node_id=node_id
-        self.category=category
-
 
 class acrec(db.Model):
     """门禁记录：工号(外键：个体 工号)，日期时间，合法，地点序号(外键：门禁地点 序号)。
@@ -82,12 +64,6 @@ class acrec(db.Model):
     ac_datetime = db.Column(db.DateTime, primary_key=True)
     legal = db.Column(db.Integer)
     node_id = db.Column(db.Integer, db.ForeignKey('ac_loc.node_id'))
-
-    def __init__(self, user_id, node_id, ac_datetime, legal):
-        self.user_id = user_id
-        self.ac_datetime = ac_datetime
-        self.legal = legal
-        self.node_id = node_id
 
     # legal 为1 合法，否则非法。
     def is_legal(self):
@@ -102,22 +78,12 @@ class consumption(db.Model):
     dev_id = db.Column(db.String(10), db.ForeignKey('device.dev_id'))
     amount = db.Column(db.DECIMAL(5, 2))
 
-    def __init__(self, user_id, dev_id, con_datetime, amount):
-        self.user_id = user_id
-        self.dev_id = dev_id
-        self.con_datetime = con_datetime
-        self.amount = amount
-
 
 class acr_friendlist(db.Model):
     """来自门禁表的人际关系字典
     """
     user_id = db.Column(db.String(8), db.ForeignKey('individual.user_id'), primary_key=True)
     str_relation = db.Column(db.String)
-
-    def __init__(self, user_id, str_relation):
-        self.user_id = user_id
-        self.str_relation = str_relation
 
     def str_relation_to_dict(self):
         dict_relation = eval(self.str_relation)
@@ -131,6 +97,7 @@ class conability(db.Model):
     amount_avg = db.Column(db.DECIMAL())
     role = db.Column(db.String(3))
 
+
 class conability_line(db.Model):
     """月消费能力统计：月平均消费金额(取整),人数,角色[老师，学生]
     """
@@ -138,11 +105,13 @@ class conability_line(db.Model):
     num = db.Column(db.Integer())
     role = db.Column(db.String(3))
 
+
 class penalty(db.Model):
     """个体滞纳金缴纳情况：工号,缴纳总额
     """
     user_id = db.Column(db.String(8), primary_key=True)
     amount = db.Column(db.DECIMAL())
+
 
 class penalty_line(db.Model):
     """滞纳金缴纳情况统计：缴纳总额(取整),人数
@@ -151,29 +120,42 @@ class penalty_line(db.Model):
     num = db.Column(db.Integer())
 
 
-#  用于查询食物和用水消费时间分布的现成表
+# 用于查询食物和用水消费时间分布的现成表
 class con_food_1440i(db.Model):
     con_time = db.Column(db.Time, primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
+
+
 class con_food_12m(db.Model):
     con_axis = db.Column(db.Integer, primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
+
+
 class con_food_7d(db.Model):
     con_axis = db.Column(db.Integer, primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
+
+
 class con_food_24h(db.Model):
     con_axis = db.Column(db.Integer, primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
 
+
 class con_water_1440i(db.Model):
     con_time = db.Column(db.Time, primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
+
+
 class con_water_12m(db.Model):
     con_axis = db.Column(db.Integer(), primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
+
+
 class con_water_7d(db.Model):
     con_axis = db.Column(db.Integer(), primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
+
+
 class con_water_24h(db.Model):
     con_axis = db.Column(db.Integer(), primary_key=True)
     sum_amount = db.Column(db.DECIMAL())

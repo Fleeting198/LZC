@@ -1,104 +1,115 @@
-{% extends "charts/charts.html" %}
-{% block chartField %}
+{% extends "charts/charts.html" %} {% block chartField %}
 
-    <form id="form-ipt" class="form-inline" >
-        {{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='NIHHXTXQ')}}
-        {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
-        <input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()"/>
-    </form>
+<form id="form-ipt" class="form-inline">
+	{{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='NIHHXTXQ')}} {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
+	<input class="btn btn-primary" type="button" value="确认" onclick="refresh_chart()" />
+</form>
 
-    <div id="chartACValid" class="chartField"></div>
+<div id="chartACValid" class="chartField_half"></div>
 
-    <script>
-        var dateRangePicker = $("input[name='dateRange']");
-        dateRangePicker.daterangepicker({
-            autoUpdateInput: false,
-            locale: {
-                format: 'YYYY-MM-DD',
-                cancelLabel: 'Clear'
-            }
-        });
-        dateRangePicker.on('apply.daterangepicker', function (ev, picker) {
-            $(this).val(picker.startDate.format('YYYY-MM-DD')+' ~ '+picker.endDate.format('YYYY-MM-DD'));
-        });
-        dateRangePicker.on('cancel.daterangepicker', function (ev, picker) {
-            $(this).val('');
-        });
+<script>
+	var dateRangePicker = $("input[name='dateRange']");
+	dateRangePicker.daterangepicker({
+		autoUpdateInput: false,
+		locale: {
+			format: 'YYYY-MM-DD',
+			cancelLabel: 'Clear'
+		}
+	});
+	dateRangePicker.on('apply.daterangepicker', function(ev, picker) {
+		$(this).val(picker.startDate.format('YYYY-MM-DD') + ' ~ ' + picker.endDate.format('YYYY-MM-DD'));
+	});
+	dateRangePicker.on('cancel.daterangepicker', function(ev, picker) {
+		$(this).val('');
+	});
 
-        // 图表初始化。
-        var chartACValid = echarts.init(document.getElementById('chartACValid'));
-        window.addEventListener('resize', function () {
-            chartACValid.resize();
-        });
+	var optionChartACValid = {
+		title: {
+			text: '门禁合法比例'
+		},
+		tooltip: {
+			trigger: 'item',
+			formatter: "{b} <br/>{c} ({d}%)"
+		},
+		toolbox: {
+			show: true,
+			feature: {
+				mark: {
+					show: true
+				},
+				dataView: {
+					show: true,
+					readOnly: false
+				},
+				restore: {
+					show: true
+				},
+				saveAsImage: {
+					show: true
+				}
+			}
+		},
+		legend: {
+			show: true,
+			orient: 'vertical',
+			left: 'left',
+			top: '30%',
+			data: []
+		},
+		series: [{
+			name: '访问合法',
+			type: 'pie',
+			radius: '50%',
+			center: ['45%', '45%'],
+			data: []
+		}]
+	};
 
-        var optionChartACValid = {
-            title: {
-                text: '门禁合法比例'
-            },
-            tooltip: {
-                trigger: 'item',
-                formatter: "{b} <br/>{c} ({d}%)"
-            },
-            toolbox: {
-                show: true,
-                feature: {
-                    mark: {show: true},
-                    dataView: {show: true, readOnly: false},
-                    restore: {show: true},
-                    saveAsImage: {show: true}
-                }
-            },
-            legend: {
-                show: true,
-                orient: 'vertical',
-                left: 'left',
-                top: '30%',
-                data: []
-            },
-            series: [{
-                name: '访问合法',
-                type: 'pie',
-                radius: '50%',
-                center: ['45%', '45%'],
-                data: []
-            }]
-        };
+	refresh_chart = function() {
+		if($("#userID").val() == '') return;
 
-        chartACValid.setOption(optionChartACValid);
+		chartACValid.showLoading();
+		$.ajax('/charts/acvalid/getData?' + $("#form-ipt").serialize(), {
+			type: 'GET',
+			success: function(json_response) {
+				chartACValid.hideLoading();
+				chartACValid.setOption(optionChartACValid);
 
-        refresh_chart = function () {
-            if ($("#userID").val() == '') return;
+				if(!json_response.errMsg) {
+					var titles;
+					var seriesData;
+					titles = json_response.titles;
+					seriesData = json_response.seriesData;
 
-            chartACValid.showLoading();
-            $.ajax('/charts/acvalid/getData?' + $("#form-ipt").serialize(),{
-                type: 'GET',
-                success: function (json_response) {
-                    chartACValid.hideLoading();
-                    chartACValid.setOption(optionChartACValid);
+					chartACValid.setOption({
+						legend: {
+							data: titles
+						},
+						series: [{
+							data: seriesData
+						}]
+					});
+				} else {
+					showDialog("出错了", json_response.errMsg);
+				}
+			},
+			error: function() {
+				showDialog("出错了", "出现意外情况");
+			},
+			dataType: 'json'
+		});
+	};
+	// 图表初始化。
+	var chartACValid = echarts.init(document.getElementById('chartACValid'));
+	chartACValid.setOption(optionChartACValid);
 
-                    if (!json_response.errMsg) {
-                        var titles;
-                        var seriesData;
-                        titles = json_response.titles;
-                        seriesData = json_response.seriesData;
+	window.addEventListener('resize', function() {
+		chartACValid.resize();
+	});
 
-                        chartACValid.setOption({
-                            legend: {data: titles},
-                            series: [{data: seriesData}]
-                        });
-                    } else {
-                        showDialog("出错了", json_response.errMsg);
-                    }
-                },
-                error: function () {
-                    showDialog("出错了", "出现意外情况");
-                },
-                dataType: 'json'
-            });
-        };
-        $(document).ready(function () {
-            refresh_chart();
-        });
-    </script>
+	$(document).ready(function() {
+		refresh_chart();
+	});
+</script>
 
 {% endblock %}

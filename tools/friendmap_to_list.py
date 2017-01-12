@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 from MysqlClient import MysqlClient
-import json, types, os, sys
+import sys
 
 # 选出acr_friendmap, con_friendmap 中数据处理
 # dict 合并

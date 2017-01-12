@@ -3,7 +3,6 @@
 
 from app.models import *
 from sqlalchemy import and_
-from numpy import isnan
 
 """门禁时间分布，每天24小时的平均门禁分类次数"""
 
@@ -31,7 +30,7 @@ def GetJson_AcTimeDistri(userID, startDate, endDate):
     valList = [1] * len(categoryList)
 
     from app.controllers.Pro_TimeDistr import get_time_distribution
-    df,dfStat = get_time_distribution(dateList, categoryList, valList)
+    df, dfStat = get_time_distribution(dateList, categoryList, valList)
 
     # 把数据包装成Echarts需要的格式
     axisLabels = []
@@ -57,5 +56,6 @@ def GetJson_AcTimeDistri(userID, startDate, endDate):
         dfRowDict["index"] = dfIndex  # 代表这条数据的索引，前端会用到"index" （耦合）
         statRows.append(dfRowDict)
 
-    json_response = {'axisLabels': axisLabels, 'legendLabels': legendLabels, 'seriesData': seriesData,'statRows': statRows}
+    json_response = {'axisLabels': axisLabels, 'legendLabels': legendLabels, 'seriesData': seriesData,
+                     'statRows': statRows}
     return json_response

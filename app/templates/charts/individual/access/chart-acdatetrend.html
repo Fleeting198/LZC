@@ -6,7 +6,7 @@
 </form>
 
 <!--Echarts图表-->
-<div id="chartAcDateTrend" class="chartField"></div>
+<div id="chartAcDateTrend" class="chartField_half"></div>
 
 <!--DataTables表格-->
 <div id="dataTableContainer" class="formField">
@@ -35,12 +35,6 @@
 	dateRangePicker.on('cancel.daterangepicker', function(ev, picker) {
 		$(this).val('');
 	});
-
-	// 自动缩放注册
-	window.addEventListener('resize',
-		function() {
-			chartAcDateTrend.resize();
-		});
 
 	// 默认Echarts配置
 	var optChartAcDateTrend = {
@@ -223,6 +217,12 @@
 
 	// 设置图表默认配置
 	chartAcDateTrend.setOption(optChartAcDateTrend);
+
+	// 自动缩放注册
+	window.addEventListener('resize',
+		function() {
+			chartAcDateTrend.resize();
+		});
 
 	$(document).ready(function() {
 		$('#tableAcDateTrend').DataTable();
