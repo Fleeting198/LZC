@@ -19,21 +19,26 @@ def show_index():
 @app.route('/check_user_id')
 def show_check_user_id():
     userID = request.args.get('userID')
-    strQuery = db.session.query(individual.user_id,individual.role,individual.grade).filter(individual.user_id==userID)
-    return jsonify(has_user=True if len(strQuery.all())==1 else False)
+    strQuery = db.session.query(individual.user_id, individual.role, individual.grade).filter(
+        individual.user_id == userID)
+    return jsonify(has_user=True if len(strQuery.all()) == 1 else False)
+
 
 def check_user_id(userID):
     strQuery = individual.query.filter(individual.user_id == userID)
     return True if len(strQuery.all()) == 1 else False
 
+
 def check_dev_id(devID):
-    strQuery = device.query.filter(devID = devID)
+    strQuery = device.query.filter(devID=devID)
     return True if len(strQuery.all()) == 1 else False
+
 
 # 访问 Summary 页面的默认工号
 @app.route('/summary')
 def show_summary_default():
     return redirect('/summary/PPPWQHXW')
+
 
 # 按工号 user_id 获取信息，刷新页面
 @app.route('/summary/<user_id>')
@@ -44,15 +49,15 @@ def show_summary(user_id):
     endDate = ''
 
     from controllers.GetJson_Summary import GetJson_Summary
-    vals_summary = GetJson_Summary(user_id,startDate,endDate)
+    vals_summary = GetJson_Summary(user_id, startDate, endDate)
 
-    return render_template('summarization/summarization.html', userID=userID, startDate=startDate, endDate=endDate, vals_summary=vals_summary)
+    return render_template('summarization/summarization.html', userID=userID, startDate=startDate, endDate=endDate,
+                           vals_summary=vals_summary)
 
 
 @app.route('/charts')
 def show_charts():
     return render_template('charts/charts.html')
-
 
 
 # ========================
@@ -85,18 +90,17 @@ def refresh_chart_accategory():
     if 'errMsg' not in json_response:
 
         # 翻译
-        titles=json_response['titles']
-        seriesData=json_response['seriesData']
+        titles = json_response['titles']
+        seriesData = json_response['seriesData']
 
         for datum in seriesData:
             datum['name'] = helpers.translate(datum['name'])
         titles = [helpers.translate(title) for title in titles]
 
-        json_response['titles']=titles
-        json_response['seriesData']=seriesData
+        json_response['titles'] = titles
+        json_response['seriesData'] = seriesData
 
     return jsonify(json_response)
-
 
 
 # ========================
@@ -140,8 +144,7 @@ def refresh_chart_acdatetrend():
         json_response['legendLabels'] = legendLabels
         json_response['seriesData'] = seriesData
 
-
-        statRows=  json_response['statRows']
+        statRows = json_response['statRows']
         for datum in statRows:
             datumKeys = datum.keys()
             for key in datumKeys:
@@ -153,7 +156,6 @@ def refresh_chart_acdatetrend():
         json_response['statRows'] = statRows
 
     return jsonify(json_response)
-
 
 
 # ========================
@@ -209,7 +211,6 @@ def refresh_chart_actimedistr():
     return jsonify(json_response)
 
 
-
 # ========================
 # 门禁合法
 # ========================
@@ -250,7 +251,6 @@ def refresh_chart_acvalid():
         json_response['seriesData'] = seriesData
 
     return jsonify(json_response)
-
 
 
 # ========================
@@ -308,7 +308,7 @@ def show_chart_condatetrend():
 def refresh_chart_condatetrend():
     form = Form_ConDateTrend()
     form.userID.data = request.args.get('userID')
-    form.modeDate.data=request.args.get('modeDate')
+    form.modeDate.data = request.args.get('modeDate')
     form.dateRange.data = request.args.get('dateRange')
 
     if not form.validate():
@@ -322,7 +322,7 @@ def refresh_chart_condatetrend():
     endDate = form.dateRange.data[-10:]
 
     from app.controllers.individual.consumption.GetJson_ConDateTrend import GetJson_ConDateTrend
-    json_response = GetJson_ConDateTrend(userID, startDate, endDate,modeDate)
+    json_response = GetJson_ConDateTrend(userID, startDate, endDate, modeDate)
 
     if 'errMsg' not in json_response:
         # 翻译
@@ -347,7 +347,6 @@ def refresh_chart_condatetrend():
                 datum[nkey] = val
         json_response['statRows'] = statRows
     return jsonify(json_response)
-
 
 
 # ========================
@@ -375,7 +374,7 @@ def refresh_chart_contimedistr():
     endDate = form.dateRange.data[-10:]
 
     from app.controllers.individual.consumption.GetJson_ConTimeDistri import GetJson_ConTimeDistri
-    json_response = GetJson_ConTimeDistri(userID,startDate,endDate)
+    json_response = GetJson_ConTimeDistri(userID, startDate, endDate)
     if 'errMsg' not in json_response:
         # 翻译
         legendLabels = json_response['legendLabels']
@@ -402,35 +401,164 @@ def refresh_chart_contimedistr():
     return jsonify(json_response)
 
 
+# ========================
+# 图书借阅违规缴费记录
+# ========================
+@app.route('/charts/penalty')
+def show_chart_penalty():
+    form = Form_Penalty()
+    return render_template('charts/individual/consumption/chart-penalty.html', form=form)
+
+
+@app.route('/charts/penalty/getData', methods=['GET'])
+def refresh_chart_penalty():
+    form = Form_Penalty()
+    form.userID.data = request.args.get('userID')
+
+    if not form.validate():
+        return jsonify(errMsg=form.errors['userID'])
+
+    userID = form.userID.data
+
+    from controllers.GetJson_Penalty import GetJson_Penalty
+    json_response = GetJson_Penalty(userID)
+    return jsonify(json_response)
+
 
 # ========================
 # 学校门禁类型比例
 # ========================
 @app.route('/charts/schaccategory')
 def show_chart_schaccategory():
-    return render_template('charts/school/chart-schaccategory.html')
+    return render_template('charts/school/access/chart-schaccategory.html')
 
 
 @app.route('/charts/schaccategory/getData')
 def refresh_chart_schaccategory():
-    from app.controllers.school.GetJson_SchAcCategory import GetJson_SchAcCategory
+    from app.controllers.school.access.GetJson_SchAcCategory import GetJson_SchAcCategory
     json_response = GetJson_SchAcCategory()
 
     if 'errMsg' not in json_response:
 
         # 翻译
-        titles=json_response['titles']
-        seriesData=json_response['seriesData']
+        titles = json_response['titles']
+        seriesData = json_response['seriesData']
 
         for datum in seriesData:
             datum['name'] = helpers.translate(datum['name'])
         titles = [helpers.translate(title) for title in titles]
 
-        json_response['titles']=titles
-        json_response['seriesData']=seriesData
+        json_response['titles'] = titles
+        json_response['seriesData'] = seriesData
 
     return jsonify(json_response)
 
+
+# ========================
+# 学校门禁日期变化
+# ========================
+@app.route('/charts/schacdatetrend')
+def show_chart_schacdatetrend():
+    form = Form_SchAcDateTrend()
+    return render_template('charts/school/access/chart-schacdatetrend.html', form=form)
+
+
+@app.route('/charts/schacdatetrend/getData')
+def refresh_chart_schacdatetrend():
+    form = Form_SchAcDateTrend()
+    form.modeDate.data = request.args.get('modeDate')
+
+    modeDate = form.modeDate.data
+
+    from app.controllers.school.access.GetJson_SchAcDateTrend import GetJson_SchAcDateTrend
+    json_response = GetJson_SchAcDateTrend(modeDate)
+
+    if 'errMsg' not in json_response:
+        # 翻译
+        json_origin = json_response['json_origin']
+        json_predict = json_response['json_predict']
+
+        def translate(json_response):
+            legendLabels = json_response['legendLabels']
+            seriesData = json_response['seriesData']
+
+            legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+            for datum in seriesData:
+                datum['name'] = helpers.translate(datum['name'])
+
+            json_response['legendLabels'] = legendLabels
+            json_response['seriesData'] = seriesData
+
+            statRows = json_response['statRows']
+            for datum in statRows:
+                datumKeys = datum.keys()
+                for key in datumKeys:
+                    val = datum[key]
+                    del datum[key]
+                    nkey = helpers.translate(key)
+                    val = helpers.translate(val)
+                    datum[nkey] = val
+            json_response['statRows'] = statRows
+            return json_response
+
+        json_origin = translate(json_origin)
+        json_predict = translate(json_predict)
+        json_response = {'json_origin': json_origin, 'json_predict': json_predict}
+    return jsonify(json_response)
+
+
+# ========================
+# 学校消费日期变化
+# ========================
+@app.route('/charts/schcondatetrend')
+def show_chart_schcondatetrend():
+    form = Form_SchConDateTrend()
+    return render_template('charts/school/consumption/chart-schcondatetrend.html', form=form)
+
+
+@app.route('/charts/schcondatetrend/getData')
+def refresh_chart_schcondatetrend():
+    form = Form_SchConDateTrend()
+    form.modeDate.data = request.args.get('modeDate')
+
+    modeDate = form.modeDate.data
+
+    from app.controllers.school.consumption.GetJson_SchConDateTrend import GetJson_SchConDateTrend
+    json_response = GetJson_SchConDateTrend(modeDate)
+
+    if 'errMsg' not in json_response:
+        # 翻译
+        json_origin = json_response['json_origin']
+        json_predict = json_response['json_predict']
+
+        def translate(json_response):
+            legendLabels = json_response['legendLabels']
+            seriesData = json_response['seriesData']
+
+            legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+            for datum in seriesData:
+                datum['name'] = helpers.translate(datum['name'])
+
+            json_response['legendLabels'] = legendLabels
+            json_response['seriesData'] = seriesData
+
+            statRows = json_response['statRows']
+            for datum in statRows:
+                datumKeys = datum.keys()
+                for key in datumKeys:
+                    val = datum[key]
+                    del datum[key]
+                    nkey = helpers.translate(key)
+                    val = helpers.translate(val)
+                    datum[nkey] = val
+            json_response['statRows'] = statRows
+            return json_response
+
+        json_origin = translate(json_origin)
+        json_predict = translate(json_predict)
+        json_response = {'json_origin': json_origin, 'json_predict': json_predict}
+
+    return jsonify(json_response)
 
 
 # ========================
@@ -468,7 +596,7 @@ def show_chart_povertyjudge():
 
 @app.route('/charts/povertyjudge/getData')
 def refresh_chart_povertyjudge():
-    form= Form_PovertyJudge()
+    form = Form_PovertyJudge()
     form.userID.data = request.args.get('userID')
 
     if not form.validate():
@@ -484,76 +612,27 @@ def refresh_chart_povertyjudge():
     return jsonify(json_response)
 
 
-
-
-
-@app.route('/charts/income')
-def show_chart_income():
-    form = Form_Income()
-    return render_template('charts/chart-income.html', form=form)
-
-
-@app.route('/charts/income/getData', methods=['GET'])
-def refresh_chart_income():
-    form = Form_Income()
-    form.devID.data = request.args.get('devID')
-    form.modeDate.data = request.args.get('modeDate')
-    form.modeTime.data = request.args.get('modeTime')
-    form.dateRange.data = request.args.get('dateRange')
-
-    if not form.validate():
-        return jsonify(errMsg=form.errors['devID'])
-
-    devID = form.devID.data
-    modeDate = int(form.modeDate.data)
-    modeTime = int(form.modeTime.data)
-    startDate = form.dateRange.data[:10]
-    endDate = form.dateRange.data[-10:]
-
-    from controllers.GetJson_Income import GetJson_Income
-    json_response = GetJson_Income(devID,modeDate, modeTime, startDate, endDate)
-    return jsonify(json_response)
-
-
-@app.route('/charts/foodIncome')
-def show_chart_foodIncome():
-    form = Form_FoodIncome()
-    return render_template('charts/chart-confood.html', form=form)
-
-
-@app.route('/charts/foodIncome/getData', methods=['GET'])
-def refresh_chart_foodIncome():
-    """
-    获得设备地点表中分类为“餐饮”的地点的设备的金额总数。
-    """
-    form = Form_FoodIncome()
-    form.modeTime.data = request.args.get('modeTime')
-
-    if not form.validate():
-        return jsonify(errMsg=form.errors)
-
-    modeTime = int(form.modeTime.data)
-
-    from controllers.GetJson_ConFood import GetJson_ConFood
-    json_response = GetJson_ConFood(modeTime)
-    return jsonify(json_response)
-
-
-
+# ========================
+# 人数统计
+# ========================
 @app.route('/charts/number')
 def show_chart_number():
     return render_template('charts/school/chart-numberBar.html')
+
 
 @app.route('/charts/number/getData', methods=['GET'])
 def refresh_chart_number():
     # query number of people by dividing into total & grades
     strQueryTotal = db.session.query(individual.role, func.count('*')).group_by(individual.role)
     # GradeB stands for 本科生的年级
-    strQueryGradeB = db.session.query(individual.grade, func.count('*')).filter(individual.role == u'本科生').group_by(individual.grade)
+    strQueryGradeB = db.session.query(individual.grade, func.count('*')).filter(individual.role == u'本科生').group_by(
+        individual.grade)
     # GradePg stands for 研究生的年级
-    strQueryGradePg = db.session.query(individual.grade, func.count('*')).filter(individual.role == u'研究生').group_by(individual.grade)
+    strQueryGradePg = db.session.query(individual.grade, func.count('*')).filter(individual.role == u'研究生').group_by(
+        individual.grade)
     # GradeDr stands for 博士生的年级
-    strQueryGradeDr = db.session.query(individual.grade, func.count('*')).filter(individual.role == u'博士生').group_by(individual.grade)
+    strQueryGradeDr = db.session.query(individual.grade, func.count('*')).filter(individual.role == u'博士生').group_by(
+        individual.grade)
 
     # go
     resultsTotal = strQueryTotal.all()
@@ -604,32 +683,86 @@ def refresh_chart_number():
     json_numberGradeDr = result_to_jsonString(json_numberGradeDr)
 
     # return
-    json_response = jsonify(json_numberTotal = json_numberTotal, json_numberGradeB = json_numberGradeB,
-                            json_numberGradePg = json_numberGradePg, json_numberGradeDr = json_numberGradeDr)
+    json_response = jsonify(json_numberTotal=json_numberTotal, json_numberGradeB=json_numberGradeB,
+                            json_numberGradePg=json_numberGradePg, json_numberGradeDr=json_numberGradeDr)
     return json_response
 
 
+# ========================
+# 学校宿舍用水时间分布
+# ========================
+@app.route('/charts/conwater')
+def show_chart_conWater():
+    form = Form_ConWater()
+    return render_template('charts/school/consumption/chart-conwater.html', form=form)
 
 
-
-
-@app.route('/charts/conwatertime')
-def show_chart_conWaterTime():
-    form = Form_Conwatertime()
-    return render_template('charts/chart-conwater.html', form=form)
-
-
-@app.route('/charts/conwatertime/getData', methods=['GET'])
-def refresh_chart_conWaterTime():
-    form = Form_Conwatertime()
+@app.route('/charts/conwater/getData', methods=['GET'])
+def refresh_chart_conWater():
+    form = Form_ConWater()
     form.modeTime.data = request.args.get('modeTime')
 
     if not form.validate():
         return jsonify(errMsg=form.errors)
 
     modeTime = int(form.modeTime.data)  # 赋值给变量
-    from controllers.GetJson_ConWater import GetJson_ConWaterTime
-    json_response = GetJson_ConWaterTime(modeTime)
+    from app.controllers.school.consumption.GetJson_ConWater import GetJson_ConWater
+    json_response = GetJson_ConWater(modeTime)
+    return jsonify(json_response)
+
+
+# ========================
+# 学校餐饮类型收入时间分布
+# ========================
+@app.route('/charts/confood')
+def show_chart_conFood():
+    form = Form_ConFood()
+    return render_template('charts/chart-confood.html', form=form)
+
+
+@app.route('/charts/confood/getData', methods=['GET'])
+def refresh_chart_conFood():
+    """
+    获得设备地点表中分类为“餐饮”的地点的设备的金额总数。
+    """
+    form = Form_ConFood()
+    form.modeTime.data = request.args.get('modeTime')
+
+    if not form.validate():
+        return jsonify(errMsg=form.errors)
+
+    modeTime = int(form.modeTime.data)
+
+    from app.controllers.school.consumption.GetJson_ConFood import GetJson_ConFood
+    json_response = GetJson_ConFood(modeTime)
+    return jsonify(json_response)
+
+
+@app.route('/charts/income')
+def show_chart_income():
+    form = Form_Income()
+    return render_template('charts/chart-income.html', form=form)
+
+
+@app.route('/charts/income/getData', methods=['GET'])
+def refresh_chart_income():
+    form = Form_Income()
+    form.devID.data = request.args.get('devID')
+    form.modeDate.data = request.args.get('modeDate')
+    form.modeTime.data = request.args.get('modeTime')
+    form.dateRange.data = request.args.get('dateRange')
+
+    if not form.validate():
+        return jsonify(errMsg=form.errors['devID'])
+
+    devID = form.devID.data
+    modeDate = int(form.modeDate.data)
+    modeTime = int(form.modeTime.data)
+    startDate = form.dateRange.data[:10]
+    endDate = form.dateRange.data[-10:]
+
+    from app.controllers.GetJson_Income import GetJson_Income
+    json_response = GetJson_Income(devID, modeDate, modeTime, startDate, endDate)
     return jsonify(json_response)
 
 
@@ -659,30 +792,6 @@ def show_chart_conwater():
     return render_template('charts/chart-conwatergender.html')
 
 
-@app.route('/charts/penalty')
-def show_chart_penalty():
-    form = Form_Penalty()
-    return render_template('charts/chart-penalty.html', form=form)
-
-
-@app.route('/charts/penalty/getData', methods=['GET'])
-def refresh_chart_penalty():
-    form = Form_Penalty()
-    form.userID.data = request.args.get('userID')
-
-    if not form.validate():
-        return jsonify(errMsg=form.errors['userID'])
-
-    userID = form.userID.data
-
-    from controllers.GetJson_Penalty import GetJson_Penalty
-    json_response = GetJson_Penalty(userID)
-    return jsonify(json_response)
-
-
-
-
-
 # =====================================
 # Summary 所用图表获取json返回的路由
 # =====================================
@@ -698,7 +807,6 @@ def refresh_summary_penalty():
 
 @app.route('/summary/GetJson_accategory', methods=['GET'])
 def refresh_summary_accategory():
-
     userID = request.args.get('userID')
     startDate = request.args.get('startDate')
     endDate = request.args.get('startDate')
@@ -722,7 +830,6 @@ def refresh_summary_accategory():
 
 @app.route('/summary/GetJson_concategory', methods=['GET'])
 def refresh_summary_concategory():
-
     userID = request.args.get('userID')
     startDate = request.args.get('startDate')
     endDate = request.args.get('startDate')
@@ -746,7 +853,6 @@ def refresh_summary_concategory():
 
 @app.route('/summary/GetJson_acperiodcate', methods=['GET'])
 def refresh_summary_acperiodcate():
-
     userID = request.args.get('userID')
     startDate = request.args.get('startDate')
     endDate = request.args.get('endDate')

@@ -1,0 +1,162 @@
+{% extends "charts/charts.html" %} {% block chartField %}
+
+<form id="form-ipt" class="form-inline">
+	{{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='PPPWQHXW')}}
+	<input class="btn btn-primary" type="button" value="确认" onclick="refresh_data()" />
+</form>
+
+<div id="chartPenalty" class="chartField_full"></div>
+
+<script>
+	var chartPenalty = echarts.init(document.getElementById('chartPenalty'));
+	window.addEventListener('resize', function() {
+		chartPenalty.resize();
+	});
+
+	var optionChartPenalty = {
+		title: {
+			text: '图书借阅违规缴费记录',
+		},
+		tooltip: {
+			trigger: 'axis',
+			formatter: function(params) {
+				var str_return;
+				if(params[0].name == '') {
+					str_return = '总 0 元<br/>';
+				} else {
+					str_return = '总 ' + params[0].name + ' 元<br/>';
+				}
+				str_return += params[0].seriesName + ' : ' + params[0].value + ' 人<br/>';
+				return str_return;
+			}
+		},
+		toolbox: {
+			show: true,
+			feature: {
+				mark: {
+					show: true,
+				},
+				dataView: {
+					show: true,
+					readOnly: false,
+				},
+				magicType: {
+					show: true,
+					type: ['line', 'bar'],
+				},
+				restore: {
+					show: true,
+				},
+				saveAsImage: {
+					show: true,
+				},
+			}
+		},
+		xAxis: {
+			type: 'category',
+			name: '违规缴费额',
+			boundaryGap: false,
+			data: [],
+		},
+		yAxis: {
+			type: 'value',
+			name: '人数',
+			axisLabel: {
+				formatter: '{value} 人',
+			}
+		},
+		series: [{
+			name: '人数',
+			type: 'line',
+			smooth: true,
+			stack: 'a',
+			areaStyle: {
+				normal: {}
+			},
+			data: [],
+			markPoint: {
+				data: []
+			}
+		}],
+		dataZoom: []
+	};
+
+	chartPenalty.setOption(optionChartPenalty);
+
+	refresh_data = function() {
+		if($("#userID").val() == '') {
+			showDialog("ID不可为空", json_response.errMsg);
+			return;
+		};
+
+		chartPenalty.showLoading();
+		$.ajax('/charts/penalty/getData?' + $("#form-ipt").serialize(), {
+			type: 'GET',
+			success: function(json_response) {
+				chartPenalty.hideLoading();
+
+				if(!json_response.errMsg) {
+					var userAmount = json_response['userAmount'];
+					var amount = json_response['amount'];
+					var num = json_response['num'];
+					var index_userAmount = 0;
+
+					for(var i = 0; i < amount.length; i++) {
+						if(amount[i].toString() == parseInt(userAmount).toString()) {
+							index_userAmount = i;
+							break;
+						}
+					}
+					var startPoint = (parseInt(userAmount) - 33 > 0) ? (parseInt(userAmount) - 33) : 0;
+					var endPoint = (parseInt(userAmount) + 33 > amount[amount.length - 1]) ? amount[amount.length - 1] : (parseInt(userAmount) + 33);
+
+					chartPenalty.setOption({
+						xAxis: [{
+							data: amount
+						}],
+						series: [{
+							data: num,
+							markPoint: {
+								label: {
+									normal: {
+										formatter: function() {
+											return userAmount.toString();
+										},
+										textStyle: {
+											fontSize: 10
+										}
+									}
+								},
+								data: [{
+									name: '此人',
+									coord: [index_userAmount, num[index_userAmount]]
+								}]
+							}
+						}],
+						dataZoom: [{
+							type: 'inside',
+							xAxisIndex: 0,
+							startValue: startPoint,
+							endValue: endPoint
+						}, {
+							type: 'slider',
+							startValue: startPoint,
+							endValue: endPoint
+						}]
+					});
+				} else {
+					showDialog("出错了", json_response.errMsg);
+				}
+			},
+			error: function() {
+				showDialog("出错了", "出现意外情况");
+			},
+			dataType: 'json'
+		});
+	};
+
+	$(document).ready(function() {
+		refresh_data();
+	});
+</script>
+{% endblock %}

@@ -3,7 +3,6 @@
 
 from pandas import DataFrame
 
-
 """
 日期趋势的数据处理，用于消费和门禁的处理
 """
@@ -27,16 +26,12 @@ def get_date_trend(datetimeList, categoryList, valList, modeDate):
         recordDictList.append({categoryList[i]: valList[i]})
 
     df = DataFrame(recordDictList, index=datetimeList, dtype=float)
-    df.fillna(0,inplace=True)
-
-    # 先按天统计再预测
-    df = df.resample("D").sum()
+    df.fillna(0, inplace=True)
 
     df = df.resample(rule_mode[modeDate]).sum()
-    print df
 
     # 获取统计信息
-    dfStat=df.describe()
+    dfStat = df.describe()
     dfStat.drop('count', inplace=True)
 
-    return df,dfStat
+    return df, dfStat

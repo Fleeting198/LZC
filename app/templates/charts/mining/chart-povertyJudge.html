@@ -2,7 +2,7 @@
 
 <form id="form-ipt" class="form-inline">
 	{{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='XQXXQQTQ') }}
-	<input class="btn btn-primary" type="button" value="确认" onclick="refresh_data()" />
+	<input class="btn btn-primary" type="button" value="刷新" onclick="refresh_data()" />
 </form>
 
 <div id="chartPovertyJudge" class="chartField_full"></div>
@@ -15,7 +15,12 @@
 		tooltip: {
 			trigger: 'axis',
 			formatter: function(params) {
-				return params.value[0] + ", " + params.value[1];
+				console.log(params);
+				if(params['componentType'] == 'markLine') {
+					return params['name'] + ":\n" + params['value'];
+				} else {
+					return params['value'][0] + ", " + params['value'][1];
+				}
 			},
 			showDelay: 0,
 			axisPointer: {
@@ -28,6 +33,30 @@
 			},
 			zlevel: 1
 		},
+		dataZoom: [{
+			type: 'slider',
+			show: true,
+			xAxisIndex: [0],
+			start: 1,
+			end: 50
+		}, {
+			type: 'slider',
+			show: true,
+			yAxisIndex: [0],
+			left: '93%',
+			start: 1,
+			end: 50
+		}, {
+			type: 'inside',
+			xAxisIndex: [0],
+			start: 1,
+			end: 50
+		}, {
+			type: 'inside',
+			yAxisIndex: [0],
+			start: 1,
+			end: 50
+		}],
 		toolbox: {
 			show: true,
 			feature: {
@@ -42,14 +71,6 @@
 					show: true
 				},
 			}
-		},
-		visualMap: {
-			min: 0,
-			max: 20,
-			calculable: true,
-			inRange: {
-				color: ['#50a3ba', '#eac736', '#d94e5d'],
-			},
 		},
 		xAxis: {
 			name: '总消费额（元）',
@@ -79,12 +100,26 @@
 				if(!json_response.errMsg) {
 					var vals_times_list = json_response['vals_times_list'];
 					var targetUser = json_response['targetUser'];
+					var targetName = targetUser['name'];
 
 					console.log(targetUser);
 
 					chartPovertyJudge.setOption({
 						legend: {
-							data: ["所有学生", targetUser['name']],
+							data: ["所有学生", targetName],
+						},
+						visualMap: {
+							type: 'continuous',
+							left: 'left',
+							top: '50%',
+							textGap: 30,
+							min: 0,
+							max: 20,
+							calculable: true,
+							text: ['平均消费额（元）'],
+							inRange: {
+								color: ['#50a3ba', '#eac736', '#d94e5d'],
+							},
 						},
 						series: [{
 							name: "所有学生",
@@ -92,20 +127,24 @@
 							data: vals_times_list,
 							symbolSize: 5,
 						}, {
-							name: targetUser['name'],
+							name: targetName,
 							type: "scatter",
 							data: [targetUser],
 							symbolSize: 10,
+							visualMap: false,
 							markLine: {
 								lineStyle: {
 									normal: {
 										type: 'solid',
 									}
 								},
-								data: [
-									{xAxis: targetUser['value'][0]},
-									{yAxis: targetUser['value'][1]},
-								]
+								data: [{
+									name: targetName + "的总消费额",
+									xAxis: targetUser['value'][0],
+								}, {
+									name: targetName + "的总消费次数",
+									yAxis: targetUser['value'][1],
+								}, ]
 							}
 						}],
 					})
@@ -126,7 +165,7 @@
 	var chartPovertyJudge = echarts.init(document.getElementById('chartPovertyJudge'));
 	chartPovertyJudge.setOption(optChartPovertyJudge);
 	window.addEventListener('resize', function() {
-		chartRelation.resize()
+		chartPovertyJudge.resize();
 	});
 	$(document).ready(function() {
 		refresh_data();

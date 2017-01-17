@@ -8,9 +8,11 @@ def GetJson_Income(devID, modeDate, modeTime, startDate, endDate):
     # Query.
     strQuery = db.session.query(consumption.con_datetime, consumption.amount).filter(
         consumption.dev_id == devID).order_by(consumption.con_datetime)
+
     if len(startDate) != 0:
         strQuery = strQuery.filter(and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
     results = strQuery.all()
+
     if len(results) == 0:
         return {'errMsg': u'没有找到记录。'}
 

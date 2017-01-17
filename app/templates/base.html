@@ -46,7 +46,7 @@
                             <!-- 导航按钮 -->
                             <li class="dropdown">
                                 <a href="{{ url_for('show_charts') }}" class="dropdown-toggle" data-toggle="dropdown" role="button">
-                                    所有图表
+                                    	所有图表
                                     <span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu">
@@ -61,26 +61,26 @@
 		                            {{ charts_navbtn('show_chart_accategory','门禁类型比例') }}
 									{{ charts_navbtn('show_chart_acdatetrend','门禁日期变化') }}
 									{{ charts_navbtn('show_chart_actimedistr','门禁时间分布') }}
-									{{ charts_navbtn('show_chart_acvalid','合法门禁比例') }}
+									<!--{{ charts_navbtn('show_chart_acvalid','合法门禁比例') }}-->
 
                                     <li class="dropdown-header">消费</li>
 									{{ charts_navbtn('show_chart_concategory','消费类型比例') }}
                                     {{ charts_navbtn('show_chart_condatetrend','消费日期变化') }}
                                     {{ charts_navbtn('show_chart_contimedistr','消费时间分布') }}
-
-									{{ charts_navbtn('show_chart_conability','消费能力认定') }}
 									{{ charts_navbtn('show_chart_penalty','滞纳金缴费情况') }}
+									<!--{{ charts_navbtn('show_chart_conability','消费能力认定') }}-->
 
                                     <li class="divider"></li>
 
                                     <li class="dropdown-header">学校</li>
-                                    <!-- 刷卡机在查询速度优化之前不使用 -->
                                     <!--{{ charts_navbtn('show_chart_income','刷卡机收入趋势与分布') }}-->
-                                    {{ charts_navbtn('show_chart_schaccategory','学校门禁类型比例') }}
                                     {{ charts_navbtn('show_chart_number','人数统计') }}
+                                    {{ charts_navbtn('show_chart_schaccategory','学校门禁类型比例') }}
                                     
-                                    {{ charts_navbtn('show_chart_foodIncome','餐饮消费分布') }}
-                                    {{ charts_navbtn('show_chart_conWaterTime','用水消费分布') }}
+                                    {{ charts_navbtn('show_chart_schacdatetrend','学校门禁日期变化') }}
+                                    {{ charts_navbtn('show_chart_schcondatetrend','学校消费日期变化') }}
+                                    {{ charts_navbtn('show_chart_conFood','餐饮消费时间分布') }}
+                                    {{ charts_navbtn('show_chart_conWater','用水消费时间分布') }}
 
                                     <li class="divider"></li>
 
@@ -115,19 +115,17 @@
                 </div>
             </div>
         </div>
-        <script type="text/javascript">
-            force_window_resize = function () {
-                $(window).trigger("resize");
-                $(window).resize();
-            };
-            force_window_resize();
+        <script type="text/javascript">force_window_resize = function() {
+	$(window).trigger("resize");
+	$(window).resize();
+};
+force_window_resize();
 
-            // 模态提示框显示
-            showDialog = function (title, content) {
-                document.getElementById("modal-err-title").innerText = title;
-                document.getElementById("modal-err-content").innerText = content;
-                $("#modal-err").modal('show');
-            }
-        </script>
+// 模态提示框显示
+showDialog = function(title, content) {
+	document.getElementById("modal-err-title").innerText = title;
+	document.getElementById("modal-err-content").innerText = content;
+	$("#modal-err").modal('show');
+}</script>
     </body>
 </html>

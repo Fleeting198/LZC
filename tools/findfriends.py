@@ -75,9 +75,11 @@ if __name__ == '__main__':
     # config = {'tableName' : 'consumption', 'idItem' : 'user_id', 'fixedItem' : 'dev_id', 'orderBy' : 'con_datetime', 'maxRange' : 60}
     fm = FriendMap(**config)
 
+
     @TimeCalculate
     def fn():
         return fm.calculate()
+
 
     r = fn()
     print 'It took %ss' % r[0]

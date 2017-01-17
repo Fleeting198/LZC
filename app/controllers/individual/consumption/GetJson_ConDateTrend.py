@@ -3,6 +3,7 @@
 
 from app.models import *
 from sqlalchemy import and_
+from datetime import datetime
 
 """消费类型日期变化"""
 
@@ -16,16 +17,16 @@ def GetJson_ConDateTrend(userID, startDate, endDate, modeDate):
     :param modeDate: 日期模式，决定数据按怎样的粒度合并
     :return json_response: Echarts格式字典{'axisLabels': , 'legendLabels': , 'seriesData': , 'statRows': }
     """
-    strQuery = db.session.query(consumption.con_datetime, dev_loc.category, consumption.amount).filter(
+    sql = db.session.query(consumption.con_datetime, dev_loc.category, consumption.amount).filter(
         and_(consumption.user_id == userID,
              consumption.dev_id == device.dev_id,
              device.node_id == dev_loc.node_id)).order_by(consumption.con_datetime)
 
     if startDate:
-        strQuery = strQuery.filter(
+        sql = sql.filter(
             and_(consumption.con_datetime >= startDate, consumption.con_datetime <= endDate))
 
-    results = strQuery.all()
+    results = sql.all()
 
     if not results:
         return {'errMsg': u'没有找到记录。'}
@@ -39,10 +40,14 @@ def GetJson_ConDateTrend(userID, startDate, endDate, modeDate):
     df, dfStat = get_date_trend(datetimeList, categoryList, valList, modeDate)
 
     # 把数据包装成Echarts需要的格式
+    formatStrList = ['%Y-%m-%d', '%Y-%m']
+
     if int(modeDate) == 2:
-        axisLabels = map(lambda x: x.strftime('%Y-%m'), df.index.tolist())
+        formatStr = formatStrList[1]
     else:
-        axisLabels = map(lambda x: x.strftime('%Y-%m-%d'), df.index.tolist())  # 从dataframe 中取出作为索引的日期标签成为队列
+        formatStr = formatStrList[0]
+
+    axisLabels = map(lambda x: x.strftime(formatStr), df.index.tolist())
 
     seriesData = []
     legendLabels = []

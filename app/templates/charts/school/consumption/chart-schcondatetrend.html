@@ -1,0 +1,253 @@
+{% extends "charts/charts.html" %} {% block chartField %}
+
+<form id="form-ipt" class="form-inline">
+	{% for subfield in form.modeDate %} {{ subfield }}{{ subfield.label }} &nbsp;&nbsp; {% endfor %}
+	<input class="btn btn-primary" type="button" value="刷新" onclick="refresh_data()" />
+</form>
+
+<!--Echarts图表-->
+<div id="chartSchConDateTrend" class="chartField_half"></div>
+
+<!--DataTables表格-->
+<div id="dataTableContainer" class="formField">
+	<table id="tableSchConDateTrend">
+		<thead>
+			<tr>
+				<th>placeholder</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+</div>
+
+<!--预测数据的表格-->
+<div id="dataTableContainer2" class="formField">
+	<table id="tableSchConDateTrend2">
+		<thead>
+			<tr>
+				<th>placeholder</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+</div>
+
+<script>
+	// 日期选择表单
+	var dateRangePicker = $("input[name='dateRange']");
+	dateRangePicker.daterangepicker({
+		autoUpdateInput: false,
+		locale: {
+			format: 'YYYY-MM-DD',
+			cancelLabel: 'Clear'
+		}
+	});
+	dateRangePicker.on('apply.daterangepicker', function(ev, picker) {
+		$(this).val(picker.startDate.format('YYYY-MM-DD') + ' ~ ' + picker.endDate.format('YYYY-MM-DD'));
+	});
+	dateRangePicker.on('cancel.daterangepicker', function(ev, picker) {
+		$(this).val('');
+	});
+
+	// 默认Echarts配置
+	var optchartSchConDateTrend = {
+		title: {
+			text: '学校消费日期变化'
+		},
+		legend: {},
+		tooltip: {
+			trigger: 'axis',
+			formatter: function(params) {
+				var str_return = params[0]['name'] + '<br/>';
+				for(var i = 0; i < params.length; i++) {
+					if(params[i]['value'] != 0) {
+						str_return += params[i]['seriesName'] + ' : ' + params[i]['value'].toFixed() + ' 元<br/>'
+					}
+				}
+				return str_return;
+			}
+		},
+		toolbox: {
+			show: true,
+			feature: {
+				dataView: {
+					show: true,
+					readOnly: false
+				},
+				magicType: {
+					show: true,
+					type: ['line', 'bar']
+				},
+				restore: {
+					show: true
+				},
+			}
+		},
+		xAxis: {
+			type: 'category',
+			boundaryGap: true,
+			data: []
+		},
+		yAxis: {
+			type: 'value',
+			name: '金额',
+			axisLabel: {
+				formatter: '{value} 元'
+			}
+		},
+		dataZoom: [{
+			type: 'inside',
+			xAxisIndex: [0],
+			start: 0,
+			end: 100
+		}, {
+			type: 'slider',
+			xAxisIndex: [0],
+			start: 0,
+			end: 100
+		}],
+	};
+
+	refresh_chart = function(chart, legendLabels, axisLabels, seriesData) {
+		// 以下遇到更新部分数据时新数据合并旧数据而不是覆盖的问题
+		var i; // 定义重复要使用到的变量
+		var tmp_option;
+
+		// 清空series 并以notMerge 方式更新option.
+		tmp_option = chart.getOption();
+		tmp_option.series = [];
+		chart.setOption(tmp_option, true);
+
+		for(i = 0; i < seriesData.length; i++) {
+			tmp_option = chart.getOption();
+			tmp_option.series.push({
+				name: seriesData[i].name,
+				stack: 'con',
+				type: 'bar',
+				data: seriesData[i].data
+			});
+			chart.setOption(tmp_option, true);
+		}
+		// 选项设定
+		chart.setOption({
+			legend: {
+				data: legendLabels,
+			},
+			xAxis: [{
+				data: axisLabels,
+			}]
+		});
+	}
+
+	refresh_table = function(DOMtableName, legendLabels, axisLabels, seriesData, statRows) {
+		// 准备表头列表
+		var form_columns = [];
+		form_columns = form_columns.concat({
+			data: "日期"
+		});
+		var tableHeadRowJQ = $("#" + DOMtableName + " > thead > tr");
+		tableHeadRowJQ.empty();
+		tableHeadRowJQ.append("<th>日期</th>");
+
+		for(i = 0; i < legendLabels.length; i++) {
+			form_columns = form_columns.concat({
+				data: legendLabels[i]
+			});
+			tableHeadRowJQ.append("<th>" + legendLabels[i] + "</th>");
+		}
+
+		// 准备表内容列表
+		var form_data = [];
+		for(i = 0; i < axisLabels.length; i++) {
+			var row = new Object();
+			row["日期"] = axisLabels[i];
+			for(var j = 0; j < seriesData.length; j++) {
+				var colName = seriesData[j].name;
+				var colData = seriesData[j].data;
+				if(parseInt(colData[i]) != colData[i]) {
+					colData[i] = colData[i].toFixed(1);
+				}
+				row[colName] = colData[i];
+			}
+			form_data = form_data.concat(row);
+		}
+
+		for(i = 0; i < statRows.length; i++) {
+			statRows[i]["日期"] = statRows[i]["index"];
+			delete statRows[i]["index"];
+			for(var val in statRows[i]) {
+				// 是数字且不是整数
+				if(typeof(statRows[i][val]) == "number" && parseInt(statRows[i][val]) != statRows[i][val]) {
+					statRows[i][val] = statRows[i][val].toFixed(3);
+				}
+			}
+		}
+
+		form_data = statRows.concat(form_data);
+
+		$("#" + DOMtableName).dataTable({
+			destroy: true,
+			columns: form_columns,
+			data: form_data,
+			ordering: false,
+		});
+	}
+
+	refresh_data = function() {
+		chartSchConDateTrend.showLoading();
+
+		$.ajax('/charts/schcondatetrend/getData?' + $("#form-ipt").serialize(), {
+			type: 'GET',
+			success: function(json_response) {
+				chartSchConDateTrend.hideLoading();
+				chartSchConDateTrend.setOption(optchartSchConDateTrend); // 还原图表选项
+
+				if(!json_response.errMsg) {
+					var json_origin = json_response['json_origin'];
+
+					var legendLabelsOri = json_origin['legendLabels'];
+					var axisLabelsOri = json_origin['axisLabels'];
+					var seriesDataOri = json_origin['seriesData'];
+					var statRowsOri = json_origin['statRows'];
+
+					var json_predict = json_response['json_predict'];
+
+					var legendLabelsPre = json_predict['legendLabels'];
+					var axisLabelsPre = json_predict['axisLabels'];
+					var seriesDataPre = json_predict['seriesData'];
+					var statRowsPre = json_predict['statRows'];
+
+					// Echarts图表刷新
+					refresh_chart(chartSchConDateTrend, legendLabelsOri, axisLabelsOri, seriesDataOri);
+
+					// DateTables表格刷新
+					refresh_table("tableSchConDateTrend", legendLabelsOri, axisLabelsOri, seriesDataOri, statRowsOri);
+					refresh_table("tableSchConDateTrend2", legendLabelsPre, axisLabelsPre, seriesDataPre, statRowsPre);
+				} else {
+					showDialog("出错了", json_response.errMsg);
+				}
+			},
+			error: function() {
+				showDialog("出错了", "出现意外情况");
+			},
+			dataType: 'json'
+		});
+	};
+
+	// 图表初始化
+	var chartSchConDateTrend = echarts.init(document.getElementById('chartSchConDateTrend'));
+	// 设置默认配置
+	chartSchConDateTrend.setOption(optchartSchConDateTrend);
+	// 自动缩放注册
+	window.addEventListener('resize',
+		function() {
+			chartSchConDateTrend.resize();
+		});
+
+	$(document).ready(function() {
+		$('#tableSchConDateTrend').DataTable();
+		refresh_data();
+	});
+</script>
+
+{% endblock %}

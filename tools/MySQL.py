@@ -17,7 +17,7 @@ import time
 
 
 class MySQL:
-    u'''对MySQLdb常用函数进行封装的类'''
+    '''对MySQLdb常用函数进行封装的类'''
 
     error_code = ''  # MySQL错误号码
     _instance = None  # 本类的实例

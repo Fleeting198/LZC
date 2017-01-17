@@ -2,12 +2,7 @@
 # coding: UTF-8
 
 from pandas import DataFrame
-import pandas as pd
-from decimal import Decimal
-import datetime
-import sys
-import MySQLdb
-from MysqlClient import MysqlClient, get_data_from_source
+from MysqlClient import MysqlClient
 
 """
 每条消费：日期、金额、类型，选一年数据
@@ -66,16 +61,18 @@ class PovertyJudge:
 
         sum_vals = df.loc['sum', 'sum_vals']
         sum_times = df.loc['sum', 'sum_times']
-        per_total = sum_vals / sum_times
 
         # print sum_vals,sum_times,per_total
 
         return sum_vals, sum_times
 
     def updateOne(self, userID):
-        results = self.mc.query("select con_datetime, dev_loc.category, amount "
-                                "from consumption, dev_loc, device "
-                                "where consumption.user_id = '%s' and consumption.dev_id = device.dev_id and device.node_id = dev_loc.node_id" % userID)
+        sql = "select con_datetime, dev_loc.category, amount " \
+              "from consumption, dev_loc, device " \
+              "where consumption.user_id = '%s' and " \
+              "consumption.dev_id=device.dev_id and dev_loc.node_id=device.node_id" % userID
+
+        results = self.mc.query(sql)
         if not results:
             return
 
@@ -118,7 +115,7 @@ class PovertyJudge:
 
         print self.avg_vals, self.avg_times, self.avg_per
 
-        c=0
+        c = 0
         self.mc._cursor.execute("select user_id, con_sum_vals, con_sum_times from individual")
         for row in self.mc._cursor:
             if not row:
@@ -131,8 +128,8 @@ class PovertyJudge:
             if sum_vals is None or sum_times is None or sum_vals == 0 or sum_times == 0:
                 continue
 
-            c+=1
-            print "%d / 79146"%c
+            c += 1
+            print "%d / 79146" % c
 
             sum_per = sum_vals / sum_times
 

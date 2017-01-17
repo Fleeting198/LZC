@@ -79,6 +79,31 @@ class consumption(db.Model):
     amount = db.Column(db.DECIMAL(5, 2))
 
 
+class sch_con_datetrend(db.Model):
+    id_date = db.Column(db.Date, primary_key=True)
+    discipline = db.Column(db.DECIMAL(5, 2))
+    # recharge = db.Column(db.DECIMAL(5, 2))
+    food = db.Column(db.DECIMAL(5, 2))
+    sport = db.Column(db.DECIMAL(5, 2))
+    water = db.Column(db.DECIMAL(5, 2))
+    shop = db.Column(db.DECIMAL(5, 2))
+    study = db.Column(db.DECIMAL(5, 2))
+    med = db.Column(db.DECIMAL(5, 2))
+    none = db.Column(db.DECIMAL(5, 2))
+
+
+class sch_ac_datetrend(db.Model):
+    id_date = db.Column(db.Date, primary_key=True)
+    dorm = db.Column(db.Integer)
+    sci = db.Column(db.Integer)
+    acad = db.Column(db.Integer)
+    sport = db.Column(db.Integer)
+    lib = db.Column(db.Integer)
+    med = db.Column(db.Integer)
+    admin = db.Column(db.Integer)
+    none = db.Column(db.Integer)
+
+
 class acr_friendlist(db.Model):
     """来自门禁表的人际关系字典
     """
@@ -122,7 +147,7 @@ class penalty_line(db.Model):
 
 # 用于查询食物和用水消费时间分布的现成表
 class con_food_1440i(db.Model):
-    con_time = db.Column(db.Time, primary_key=True)
+    con_axis = db.Column(db.Time, primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
 
 
@@ -142,7 +167,7 @@ class con_food_24h(db.Model):
 
 
 class con_water_1440i(db.Model):
-    con_time = db.Column(db.Time, primary_key=True)
+    con_axis = db.Column(db.Time, primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
 
 
