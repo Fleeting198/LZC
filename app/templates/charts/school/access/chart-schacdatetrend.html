@@ -58,10 +58,14 @@
 		tooltip: {
 			trigger: 'axis',
 			formatter: function(params) {
-				var str_return = params[0].name + '<br/>';
-				for(var i = 0; i < params.length; i++) {
-					if(params[i].value != 0) {
-						str_return += params[i].seriesName + ' : ' + params[i].value + ' 次<br/>'
+				if(params['componentType'] == "markArea") {
+					return "预测数据区域";
+				}
+
+				var str_return = params[0]['name'] + '<br/>';
+				for(var i = 0; i < params.length - 1; i++) {
+					if(params[i]['value'] != 0) {
+						str_return += params[i]['seriesName'] + ' : ' + params[i]['value'].toFixed() + ' 元<br/>'
 					}
 				}
 				return str_return;
@@ -109,25 +113,44 @@
 	};
 
 	refresh_chart = function(chart, legendLabels, axisLabels, seriesData) {
-		// 以下遇到更新部分数据时新数据合并旧数据而不是覆盖的问题
-		var i = 0; // 定义重复要使用到的变量
-		var tmp_option;
+		// 预测数据区域的起止X轴
+		var firstAxis;
+		for(i = axisLabels.length - 1; i >= 0; i--) {
+			if(axisLabels[i][3] == "5") {
+				firstAxis = axisLabels[i + 1];
+				break;
+			}
+		}
+		var lastAxis = axisLabels[axisLabels.length - 1];
 
 		// 清空series 并以notMerge 方式更新option.
-		tmp_option = chart.getOption();
+		var tmp_option = chart.getOption();
 		tmp_option.series = [];
-		chart.setOption(tmp_option, true);
 
-		for(i = 0; i < seriesData.length; i++) {
-			tmp_option = chart.getOption();
+		for(var i = 0; i < seriesData.length; i++) {
 			tmp_option.series.push({
 				name: seriesData[i].name,
-				stack: 'con',
+				stack: 'ac',
 				type: 'bar',
 				data: seriesData[i].data
 			});
-			chart.setOption(tmp_option, true);
 		}
+		tmp_option.series.push({
+			name: '预测数据',
+			type: 'bar',
+			stack: 'ac',
+			data: 0,
+			markArea: {
+				data: [
+					[{
+						xAxis: firstAxis,
+					}, {
+						xAxis: lastAxis,
+					}]
+				]
+			}
+		});
+		chart.setOption(tmp_option, true);
 
 		// 选项设定
 		chart.setOption({
@@ -219,14 +242,30 @@
 					var axisLabelsPre = json_predict['axisLabels'];
 					var seriesDataPre = json_predict['seriesData'];
 					var statRowsPre = json_predict['statRows'];
+					
+					var axisLablesAll = axisLabelsOri.concat(axisLabelsPre);
+					// 合并Echarts格式的seriesData
+					var seriesDataAll = [];
+					for(var i = 0; i < seriesDataOri.length; i++) {
+						for(var j = 0; j < seriesDataPre.length; j++) {
+							if(seriesDataOri[i]['name'] == seriesDataPre[j]['name']) {
+								var newList = seriesDataOri[i]['data'].concat(seriesDataPre[j]['data']);
+								newList = {
+									'name': seriesDataOri[i]['name'],
+									'data': newList
+								};
+								seriesDataAll = seriesDataAll.concat(newList);
+							}
+						}
+					}
 
 					// Echarts图表刷新
-					refresh_chart(chartSchAcDateTrend, legendLabelsOri, axisLabelsOri, seriesDataOri);
-					
+					refresh_chart(chartSchAcDateTrend, legendLabelsOri, axisLablesAll, seriesDataAll);
+
 					// DateTables表格刷新
 					refresh_table(legendLabelsOri, axisLabelsOri, seriesDataOri, statRowsOri, "tableSchConDateTrend");
 					refresh_table(legendLabelsPre, axisLabelsPre, seriesDataPre, statRowsPre, "tableSchConDateTrend2");
-					
+
 				} else {
 					showDialog("出错了", json_response.errMsg);
 				}

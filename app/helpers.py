@@ -82,32 +82,4 @@ def insertDataFrameToDBTable(df, tableName, mysqlclient):
             mysqlclient.commit()
 
 
-def packDataToEchartsForm(df, dfStat, modeDate):
-    # 把数据包装成Echarts需要的格式
-    formatStrList = ['%Y-%m-%d', '%Y-%m']
-    if modeDate == 2:
-        formatStr = formatStrList[1]
-    else:
-        formatStr = formatStrList[0]
-    axisLabels = map(lambda x: x.strftime(formatStr), df.index.tolist())
 
-    seriesData = []
-    legendLabels = []
-    for colName, col in df.iteritems():
-        legendLabels.append(colName)
-        data = map(lambda x: float(x), col.tolist())
-        seriesData.append({'name': colName, 'data': data})
-
-    # 把只需要用表格显示的统计数据单独用字典列表返回
-    statRows = []
-    for dfIndex, dfRow in dfStat.iterrows():
-        dfRowDict = dfRow.to_dict()  # Series转为字典
-
-        # 把np的float64转成python的float
-        for k, v in dfRowDict.iteritems():
-            dfRowDict[k] = float(v)
-
-        dfRowDict["index"] = dfIndex  # 代表这条数据的索引，前端会用到"index" （耦合）
-        statRows.append(dfRowDict)
-
-    return axisLabels, legendLabels, seriesData, statRows

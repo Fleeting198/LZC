@@ -16,7 +16,7 @@ class Form_AcDateTrend(Form):
     dateRange = StringField(lstr.dateRange, validators=[Optional()])
     modeDate=RadioField(lstr.modeDate,
                       choices=[('0', lstr.opts_modeDate[0]), ('1', lstr.opts_modeDate[1]), ('2', lstr.opts_modeDate[2]),
-                               ('3', lstr.opts_modeDate[3]), ], default='2')
+                               ('3', lstr.opts_modeDate[3]), ], default='1')
 
 class Form_AcTimeDistr(Form):
     userID = StringField(lstr.userID, validators=[DataRequired(message=lstr.warn_userIDFill),
@@ -35,7 +35,7 @@ class Form_ConDateTrend(Form):
     dateRange = StringField(lstr.dateRange, validators=[Optional()])
     modeDate = RadioField(lstr.modeDate,
                       choices=[('0', lstr.opts_modeDate[0]), ('1', lstr.opts_modeDate[1]), ('2', lstr.opts_modeDate[2]),
-                               ('3', lstr.opts_modeDate[3]), ], default='2')
+                               ('3', lstr.opts_modeDate[3]), ], default='1')
 
 class Form_ConTimeDistr(Form):
     userID = StringField(lstr.userID, validators=[DataRequired(message=lstr.warn_userIDFill),
@@ -46,12 +46,12 @@ class Form_ConTimeDistr(Form):
 class Form_SchAcDateTrend(Form):
     modeDate = RadioField(lstr.modeDate,
                       choices=[('0', lstr.opts_modeDate[0]), ('1', lstr.opts_modeDate[1]), ('2', lstr.opts_modeDate[2]),
-                               ('3', lstr.opts_modeDate[3]), ], default='2')
+                               ('3', lstr.opts_modeDate[3]), ], default='1')
 
 class Form_SchConDateTrend(Form):
     modeDate = RadioField(lstr.modeDate,
                       choices=[('0', lstr.opts_modeDate[0]), ('1', lstr.opts_modeDate[1]), ('2', lstr.opts_modeDate[2]),
-                               ('3', lstr.opts_modeDate[3]), ], default='2')
+                               ('3', lstr.opts_modeDate[3]), ], default='1')
 
 class Form_Relation(Form):
     userID = StringField(lstr.userID, validators=[DataRequired(message=lstr.warn_userIDFill),
