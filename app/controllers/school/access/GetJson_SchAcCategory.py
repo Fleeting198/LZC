@@ -9,11 +9,7 @@ from sqlalchemy import func
 
 def GetJson_SchAcCategory():
     strQuery = db.session.query(ac_loc.category, func.count('*')).group_by(ac_loc.category)
-
     results = strQuery.all()
-
-    if not results:
-        return {'errMsg': u'没有找到记录。'}
 
     # Process data
     from app.controllers.Pro_Cate import CategoryProcess

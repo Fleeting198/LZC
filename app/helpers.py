@@ -80,6 +80,3 @@ def insertDataFrameToDBTable(df, tableName, mysqlclient):
             mysqlclient.rollback()
         else:
             mysqlclient.commit()
-
-
-

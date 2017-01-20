@@ -2,33 +2,22 @@
 # coding: utf-8
 
 from app.models import *
-from sqlalchemy import func
 
-"""学校全部消费类型比例，消费额比例不是刷卡机比例"""
+"""学校全部消费类型比例，消费额比例 和 刷卡机比例"""
 
 
-def GetJson_SchAcCategory():
-    strQuery = db.session.query(dev_loc.category, func.count('*')).group_by(dev_loc.category)
+def GetJson_SchConCategory():
+    sql = "select category,amount,count from sch_con_category"
+    results = db.session.execute(sql).fetchall()
 
-    results = strQuery.all()
+    dataDict = {}
+    for result in results:
+        category = str(result[0])
+        amount = float(result[1])
+        count = int(result[2])
+        dataDict[category] = {'amount': amount, 'count': count}
 
-    if not results:
-        return {'errMsg': u'没有找到记录。'}
-
-    # Process data
-    from app.controllers.Pro_Cate import CategoryProcess
-    vals = CategoryProcess(results, fold=False)
-
-    # 转换到Echarts的格式
-    # seriesData = []  # [{value: , name: }, {value: , name: }, ...]
-    titles = vals.keys()
-    seriesData = []
-    for k, v in vals.iteritems():
-        seriesData.append({'value': int(v), 'name': k})
-    # 按降序排序供前端输出，但是数据处理的时候已经有序了
-    seriesData = sorted(seriesData, cmp_dictVN, reverse=True)
-
-    json_response = {'titles': titles, 'seriesData': seriesData}
+    json_response = {'titles': dataDict.keys(), 'data': dataDict}
     return json_response
 
 

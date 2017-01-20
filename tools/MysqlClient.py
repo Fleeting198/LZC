@@ -41,17 +41,17 @@ class MysqlClient:
     def __init__(self, **config):
         if not config: config = DEFAULT_CONFIG
         self._connection = MySQLdb.connect(**config)
-        self._cursor = self._connection.cursor()
+        self.cursor = self._connection.cursor() # public cursor for fetchone operate (by chenjunjie)
         self._storedDataSource = None
-        self._cursor.execute('set sql_notes = 0')  # disable warnings
+        self.cursor.execute('set sql_notes = 0')  # disable warnings
 
     def set_emergency_mode(self):
-        self._cursor.execute('set global max_allowed_packet = 1024M')
-        self._cursor.execute('set global wait_timeout = 600')
+        self.cursor.execute('set global max_allowed_packet = 1024M')
+        self.cursor.execute('set global wait_timeout = 600')
 
     def query(self, sql):
-        self._cursor.execute(sql)
-        return self._cursor.fetchall()
+        self.cursor.execute(sql)
+        return self.cursor.fetchall()
 
     def commit(self):
         self._connection.commit()
@@ -61,7 +61,7 @@ class MysqlClient:
 
     def insert_data(self, tableName, items=[]):
         items = ['"%s"' % item for item in items]
-        self._cursor.execute('insert into %s values(%s)' % (tableName, ', '.join(items)))
+        self.cursor.execute('insert into %s values(%s)' % (tableName, ', '.join(items)))
         self._connection.commit()
 
     def restruct_table(self, tableName, orderBy, restructedTableName=None):
@@ -80,7 +80,7 @@ class MysqlClient:
             if data is None: break
             insertSql = 'insert into %s values (%s)' % (
             restructedTableName, ', '.join(['%s' for i in range(len(data))]))
-            self._cursor.execute(insertSql, data)
+            self.cursor.execute(insertSql, data)
             count += 1
             totalCount += 1
             if process < totalCount * 100 / totalNum:

@@ -91,13 +91,12 @@ def refresh_chart_accategory():
 
         # 翻译
         titles = json_response['titles']
-        seriesData = json_response['seriesData']
+        titles = [helpers.translate(title) for title in titles]
+        json_response['titles'] = titles
 
+        seriesData = json_response['seriesData']
         for datum in seriesData:
             datum['name'] = helpers.translate(datum['name'])
-        titles = [helpers.translate(title) for title in titles]
-
-        json_response['titles'] = titles
         json_response['seriesData'] = seriesData
 
     return jsonify(json_response)
@@ -135,13 +134,12 @@ def refresh_chart_acdatetrend():
     if 'errMsg' not in json_response:
         # 翻译
         legendLabels = json_response['legendLabels']
-        seriesData = json_response['seriesData']
-
         legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+        json_response['legendLabels'] = legendLabels
+
+        seriesData = json_response['seriesData']
         for datum in seriesData:
             datum['name'] = helpers.translate(datum['name'])
-
-        json_response['legendLabels'] = legendLabels
         json_response['seriesData'] = seriesData
 
         statRows = json_response['statRows']
@@ -188,13 +186,12 @@ def refresh_chart_actimedistr():
     if 'errMsg' not in json_response:
         # 翻译
         legendLabels = json_response['legendLabels']
-        seriesData = json_response['seriesData']
-
         legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+        json_response['legendLabels'] = legendLabels
+
+        seriesData = json_response['seriesData']
         for datum in seriesData:
             datum['name'] = helpers.translate(datum['name'])
-
-        json_response['legendLabels'] = legendLabels
         json_response['seriesData'] = seriesData
 
         statRows = json_response['statRows']
@@ -210,47 +207,6 @@ def refresh_chart_actimedistr():
 
     return jsonify(json_response)
 
-
-# ========================
-# 门禁合法
-# ========================
-@app.route('/charts/acvalid')
-def show_chart_acvalid():
-    form = Form_Acvalid()
-    return render_template('charts/individual/access/chart-acvalid.html', form=form)
-
-
-@app.route('/charts/acvalid/getData')
-def refresh_chart_acvalid():
-    form = Form_Acvalid()
-    form.userID.data = request.args.get('userID')
-    form.dateRange.data = request.args.get('dateRange')
-
-    if not form.validate():
-        return jsonify(errMsg=form.errors['userID'])
-    if not check_user_id(form.userID.data):
-        return jsonify(errMsg=lstr.warn_userIDNon)
-
-    userID = form.userID.data
-    startDate = form.dateRange.data[:10]
-    endDate = form.dateRange.data[-10:]
-
-    from app.controllers.individual.access.GetJson_AcValid import GetJson_AcValid
-    json_response = GetJson_AcValid(userID, startDate, endDate)
-
-    if 'errMsg' not in json_response:
-        # 翻译
-        titles = json_response['titles']
-        seriesData = json_response['seriesData']
-
-        titles = map(lambda x: helpers.translate(x), titles)
-        for datum in seriesData:
-            datum['name'] = helpers.translate(datum['name'])
-
-        json_response['titles'] = titles
-        json_response['seriesData'] = seriesData
-
-    return jsonify(json_response)
 
 
 # ========================
@@ -283,13 +239,12 @@ def refresh_chart_concategory():
     if 'errMsg' not in json_response:
         # 翻译
         titles = json_response['titles']
-        seriesData = json_response['seriesData']
+        titles = [helpers.translate(title) for title in titles]
+        json_response['titles'] = titles
 
+        seriesData = json_response['seriesData']
         for datum in seriesData:
             datum['name'] = helpers.translate(datum['name'])
-        titles = [helpers.translate(title) for title in titles]
-
-        json_response['titles'] = titles
         json_response['seriesData'] = seriesData
 
     return jsonify(json_response)
@@ -327,13 +282,12 @@ def refresh_chart_condatetrend():
     if 'errMsg' not in json_response:
         # 翻译
         legendLabels = json_response['legendLabels']
-        seriesData = json_response['seriesData']
-
         legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+        json_response['legendLabels'] = legendLabels
+
+        seriesData = json_response['seriesData']
         for datum in seriesData:
             datum['name'] = helpers.translate(datum['name'])
-
-        json_response['legendLabels'] = legendLabels
         json_response['seriesData'] = seriesData
 
         statRows = json_response['statRows']
@@ -378,13 +332,12 @@ def refresh_chart_contimedistr():
     if 'errMsg' not in json_response:
         # 翻译
         legendLabels = json_response['legendLabels']
-        seriesData = json_response['seriesData']
-
         legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+        json_response['legendLabels'] = legendLabels
+
+        seriesData = json_response['seriesData']
         for datum in seriesData:
             datum['name'] = helpers.translate(datum['name'])
-
-        json_response['legendLabels'] = legendLabels
         json_response['seriesData'] = seriesData
 
         statRows = json_response['statRows']
@@ -439,16 +392,14 @@ def refresh_chart_schaccategory():
     json_response = GetJson_SchAcCategory()
 
     if 'errMsg' not in json_response:
-
         # 翻译
         titles = json_response['titles']
-        seriesData = json_response['seriesData']
+        titles = [helpers.translate(title) for title in titles]
+        json_response['titles'] = titles
 
+        seriesData = json_response['seriesData']
         for datum in seriesData:
             datum['name'] = helpers.translate(datum['name'])
-        titles = [helpers.translate(title) for title in titles]
-
-        json_response['titles'] = titles
         json_response['seriesData'] = seriesData
 
     return jsonify(json_response)
@@ -480,13 +431,12 @@ def refresh_chart_schacdatetrend():
 
         def translate(json_response):
             legendLabels = json_response['legendLabels']
-            seriesData = json_response['seriesData']
-
             legendLabels = map(lambda x: helpers.translate(x), legendLabels)
+            json_response['legendLabels'] = legendLabels
+
+            seriesData = json_response['seriesData']
             for datum in seriesData:
                 datum['name'] = helpers.translate(datum['name'])
-
-            json_response['legendLabels'] = legendLabels
             json_response['seriesData'] = seriesData
 
             statRows = json_response['statRows']
@@ -504,6 +454,35 @@ def refresh_chart_schacdatetrend():
         json_origin = translate(json_origin)
         json_predict = translate(json_predict)
         json_response = {'json_origin': json_origin, 'json_predict': json_predict}
+    return jsonify(json_response)
+
+
+# ========================
+# 学校消费类型比例
+# ========================
+@app.route('/charts/schconcategory')
+def show_chart_schconcategory():
+    return render_template('charts/school/consumption/chart-schconcategory.html')
+
+
+@app.route('/charts/schconcategory/getData')
+def refresh_chart_schconcategory():
+    from app.controllers.school.consumption.GetJson_SchConCategory import GetJson_SchConCategory
+    json_response = GetJson_SchConCategory()
+
+    if 'errMsg' not in json_response:
+        # 翻译
+        titles = json_response['titles']
+        titles = [helpers.translate(title) for title in titles]
+        json_response['titles'] = titles
+
+        data = json_response['data']
+        for k,v in data.iteritems():
+            del data[k]
+            k=helpers.translate(k)
+            data[k]=v
+        json_response['seriesData'] = data
+
     return jsonify(json_response)
 
 
@@ -712,12 +691,12 @@ def refresh_chart_conWater():
 
 
 # ========================
-# 学校餐饮类型收入时间分布
+# 学校餐饮收入时间分布
 # ========================
 @app.route('/charts/confood')
 def show_chart_conFood():
     form = Form_ConFood()
-    return render_template('charts/chart-confood.html', form=form)
+    return render_template('charts/school/consumption/chart-confood.html', form=form)
 
 
 @app.route('/charts/confood/getData', methods=['GET'])
@@ -737,7 +716,8 @@ def refresh_chart_conFood():
     json_response = GetJson_ConFood(modeTime)
     return jsonify(json_response)
 
-
+#
+# ==============================以下暂时不用
 @app.route('/charts/income')
 def show_chart_income():
     form = Form_Income()

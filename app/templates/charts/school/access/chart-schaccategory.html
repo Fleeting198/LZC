@@ -18,13 +18,6 @@
 
 
 <script>
-	// 图表初始化
-	var chartSchAcCategory = echarts.init(document.getElementById('chartSchAcCategory'));
-
-	window.addEventListener('resize', function() {
-		chartSchAcCategory.resize();
-	});
-
 	var optchartSchAcCategory = {
 		title: {
 			text: '学校门禁类型比例'
@@ -55,16 +48,12 @@
 			top: '30%',
 		},
 		series: [{
-			name: '学校门禁类型比例',
 			type: 'pie',
 		}]
 	};
-
-	chartSchAcCategory.setOption(optchartSchAcCategory);
-
-	refresh_chart = function() {
+	
+	refresh_data = function() {
 		chartSchAcCategory.showLoading();
-		
 		$.ajax('/charts/schaccategory/getData?' + $("#form-ipt").serialize(), {
 			type: 'GET',
 			success: function(json_response) {
@@ -114,11 +103,16 @@
 			dataType: 'json'
 		});
 	};
-
+	
+	// 图表初始化
+	var chartSchAcCategory = echarts.init(document.getElementById('chartSchAcCategory'));
+	chartSchAcCategory.setOption(optchartSchAcCategory);
+	window.addEventListener('resize', function() {
+		chartSchAcCategory.resize();
+	});
 	$(document).ready(function() {
-		refresh_chart();
+		refresh_data();
 		$("#tableSchAcCategory").dataTable();
 	});
-
 </script>
 {% endblock %}

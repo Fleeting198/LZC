@@ -2,6 +2,7 @@
 # coding: UTF-8
 
 from pandas import DataFrame
+
 from MysqlClient import MysqlClient
 
 """
@@ -99,9 +100,9 @@ class PovertyJudge:
             self.mc.rollback()
 
     def updateAll(self):
-        self.mc._cursor.execute("select user_id from individual")
+        self.mc.cursor.execute("select user_id from individual")
         c = 0
-        for row in self.mc._cursor:
+        for row in self.mc.cursor:
             if not row:
                 break
 
@@ -110,51 +111,68 @@ class PovertyJudge:
             self.updateOne(row[0])
 
     def updateIndicator(self):
-        if self.avg_vals == 0 or self.avg_times == 0 or self.avg_per == 0:
+        """根据全体平均值计算每个个体的指标，同时上传到数据库
+        """
+        if self.avg_vals == 0 and self.avg_times == 0 and self.avg_per == 0:
             self.getAvg()
 
-        print self.avg_vals, self.avg_times, self.avg_per
-
-        c = 0
-        self.mc._cursor.execute("select user_id, con_sum_vals, con_sum_times from individual")
-        for row in self.mc._cursor:
-            if not row:
-                break
-
-            userID = row[0]
-            sum_vals = row[1]
-            sum_times = row[2]
-
-            if sum_vals is None or sum_times is None or sum_vals == 0 or sum_times == 0:
+        print "开始更新指标"
+        # c = 0
+        self.mc.cursor.execute("select user_id, con_sum_vals, con_sum_times from individual")
+        for row in self.mc.cursor:
+            # 字段空的不统计
+            noneFlag=False
+            for elem in row:
+                if elem is None:
+                    noneFlag=True
+                    break
+            if noneFlag:
                 continue
 
-            c += 1
-            print "%d / 79146" % c
+            userID = str(row[0])
+            sum_vals = float(row[1])
+            sum_times = int(row[2])
+
+            # 有0的不统计
+            if sum_vals==0 or sum_times==0:
+                continue
+
+            # c += 1
+            # print "%d / 79146" % c
 
             sum_per = sum_vals / sum_times
 
-            index_vals = (sum_vals - self.avg_vals) / sum_vals
-            index_times = (sum_times - self.avg_times) / sum_times
-            index_per = (sum_per - self.avg_per) / sum_per
+            index_vals = (sum_vals - self.avg_vals) / self.avg_vals
+            index_times = (sum_times - self.avg_times) / float(self.avg_times)
+            index_per = (sum_per - self.avg_per) / self.avg_per
 
+            print index_per,index_times,index_vals
             try:
-                self.mc.query("update individual "
-                              "set index_vals = %f ,index_times = %f, index_per = %f "
-                              "where user_id = '%s'" % (index_vals, index_times, index_per, userID))
+                sql="update individual " \
+                    "set index_vals = %f ,index_times = %f, index_per = %f " \
+                    "where user_id = '%s'" % (index_vals, index_times, index_per, userID)
+                self.mc.query(sql)
                 self.mc.commit()
             except:
                 self.mc.rollback()
 
     def getAvg(self):
-        self.mc._cursor.execute("select con_sum_vals, con_sum_times from individual")
-        for row in self.mc._cursor:
-            if not row:
-                break
+        self.mc.cursor.execute("select con_sum_vals, con_sum_times from individual")
+        for row in self.mc.cursor:
+            # 字段空的不统计
+            noneFlag=False
+            for elem in row:
+                if elem is None:
+                    noneFlag=True
+                    break
+            if noneFlag:
+                continue
 
-            sum_vals = row[0]
-            sum_times = row[1]
+            sum_vals = float(row[0])
+            sum_times = int(row[1])
 
-            if sum_vals is None or sum_times is None:
+            # 有0的不统计
+            if sum_vals==0 or sum_times==0:
                 continue
 
             sum_per = sum_vals / sum_times
@@ -165,6 +183,10 @@ class PovertyJudge:
                 self.avg_times = (self.avg_times + sum_times) / 2
             if sum_per:
                 self.avg_per = (self.avg_per + sum_per) / 2
+
+        print self.avg_vals
+        print self.avg_times
+        print self.avg_per
 
 
 if __name__ == "__main__":
