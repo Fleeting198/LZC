@@ -1,13 +1,17 @@
-import MySQLdb, re, thread
-import json, sys
+# import MySQLdb, re, thread
+import pymysql
+import re
+import _thread
+import sys
 
-DEFAULT_CONFIG = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'passwd': 'root', 'db': 'witcampus',
+DEFAULT_CONFIG = {'host': '127.0.0.1', 'port': 3306, 'user': 'root', 'passwd': 'root', 'db': 'prjdb',
                   'charset': 'utf8'}
 MAX_NUM = int(1e5)
 
 
 def source_function(fn, *args, **kwargs):
     """ get a iter item fn and return a function to get data one at a time"""
+
     def wrapped(*args, **kwargs):
         s = fn(*args, **kwargs)
 
@@ -22,7 +26,7 @@ def source_function(fn, *args, **kwargs):
     return wrapped
 
 
-def get_data_from_source( r):
+def get_data_from_source(r):
     """ get a function returns a data one at a time and a funtion deals with it, get everything done"""
 
     def source(fn, *args, **kwargs):
@@ -40,18 +44,25 @@ def get_data_from_source( r):
 class MysqlClient:
     def __init__(self, **config):
         if not config: config = DEFAULT_CONFIG
-        self._connection = MySQLdb.connect(**config)
-        self.cursor = self._connection.cursor() # public cursor for fetchone operate (by chenjunjie)
+        self._connection = pymysql.connect(**config)
+        # self._connection = MySQLdb.connect(**config)
+        self._cursor = self._connection.cursor()  # public cursor for fetchone operate (by chenjunjie)
         self._storedDataSource = None
-        self.cursor.execute('set sql_notes = 0')  # disable warnings
+        self._cursor.execute('set sql_notes = 0')  # disable warnings
 
     def set_emergency_mode(self):
-        self.cursor.execute('set global max_allowed_packet = 1024M')
-        self.cursor.execute('set global wait_timeout = 600')
+        self._cursor.execute('set global max_allowed_packet = 1024M')
+        self._cursor.execute('set global wait_timeout = 600')
 
     def query(self, sql):
-        self.cursor.execute(sql)
-        return self.cursor.fetchall()
+        self._cursor.execute(sql)
+        return self._cursor.fetchall()
+
+    def query_one(self, sql):
+        """ return a iterator """
+        self._cursor.execute(sql)
+        for row in self._cursor:
+            yield row
 
     def commit(self):
         self._connection.commit()
@@ -59,10 +70,22 @@ class MysqlClient:
     def rollback(self):
         self._connection.rollback()
 
-    def insert_data(self, tableName, items=[]):
+    def insert_data(self, tableName, columns=list(), items=list()):
         items = ['"%s"' % item for item in items]
-        self.cursor.execute('insert into %s values(%s)' % (tableName, ', '.join(items)))
+        items = ', '.join(items)
+
+        len_columns = len(columns)
+        if len_columns > 0:
+            columns = ['"%s"' % column for column in columns]
+            columns = "(" + ",".join(columns) + ")"
+        else:
+            columns = ""
+
+        self._cursor.execute('insert into %s %s values (%s)' % (tableName, columns, items))
         self._connection.commit()
+
+    def execute_many(self, sql, dataList):
+        self._cursor.executemany(sql, dataList)
 
     def restruct_table(self, tableName, orderBy, restructedTableName=None):
         if restructedTableName is None:
@@ -79,8 +102,8 @@ class MysqlClient:
             data = s()
             if data is None: break
             insertSql = 'insert into %s values (%s)' % (
-            restructedTableName, ', '.join(['%s' for i in range(len(data))]))
-            self.cursor.execute(insertSql, data)
+                restructedTableName, ', '.join(['%s' for i in range(len(data))]))
+            self._cursor.execute(insertSql, data)
             count += 1
             totalCount += 1
             if process < totalCount * 100 / totalNum:
@@ -91,7 +114,7 @@ class MysqlClient:
                 count = 0
                 self._connection.commit()
         self._connection.commit()
-        print 'Restructuring Finished'
+        print('Restructuring Finished')
         return restructedTableName
 
     @source_function
@@ -113,10 +136,10 @@ class MysqlClient:
 
         if unitNumber == beginNumber / MAX_NUM: yield self._storedDataSource
         for i in range(beginNumber / MAX_NUM + 1, unitNumber + 1):
-            while self._storedDataSource is None: print 'Thread sucks'
+            while self._storedDataSource is None: print('Thread sucks')
             r = self._storedDataSource
             self._storedDataSource = None
-            thread.start_new_thread(get, (i,))
+            _thread.start_new_thread(get, (i,))
             yield r
 
     @source_function
@@ -144,7 +167,9 @@ if __name__ == '__main__':
 
     r = mc.data_source('select * from dev_loc order by node_id limit 300, 100')
 
+
     @get_data_from_source(r)
-    def p(data): print str(data)
+    def p(data): print(str(data))
+
 
     p()

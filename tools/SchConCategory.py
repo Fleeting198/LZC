@@ -4,7 +4,7 @@
 from tools.MysqlClient import MysqlClient
 
 
-class SchConCategory():
+class SchConCategory:
     def __init__(self):
         self.mc = MysqlClient()
 
@@ -23,9 +23,10 @@ class SchConCategory():
 
             # 这句插入不知道为什么不起作用
             self.mc.query(sql)
-            print sql
-            print category,amount,count
+            print(sql)
+            print(category, amount, count)
+
 
 if __name__ == '__main__':
-    pj=SchConCategory()
+    pj = SchConCategory()
     pj.mainFunc()

@@ -1,7 +1,7 @@
 {% extends "charts/charts.html" %} {% block chartField %}
 
 <form id="form-ipt" class="form-inline">
-	{{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='PPPWQHXW')}}
+	{{ form.userID(class="form-control", maxlength='8', placeholder='卡号', value='PPPWQHXW')}}
 	<input class="btn btn-primary" type="button" value="确认" onclick="refresh_data()" />
 </form>
 
@@ -45,9 +45,6 @@
 					type: ['line', 'bar'],
 				},
 				restore: {
-					show: true,
-				},
-				saveAsImage: {
 					show: true,
 				},
 			}

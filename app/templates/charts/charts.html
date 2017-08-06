@@ -1,17 +1,22 @@
 {% extends 'base.html' %} {% block content %}
-<div class="container-fluid" style="padding-top: 50px">
-		<div class="allnav">
-			{% block sideList %}
-			
+
+<!--这个div要水平居中-->
+<div class="container center-block" style="padding-top: 50px; width: 1200px; ">
+	
+		<div class="rightContent">
+			<div class="wrapContent">
+			{% block chartField %} {% endblock %}
+			</div>
+		</div>
+		
+		<div class="leftNav">
 			<!--宏函数，创建左侧导航列表按钮-->
             {% macro nav_side(url_fun, value) -%}
 	            {% if request.path == url_for(url_fun) %}
 				<li class="active">
 					<a href="{{ url_for(url_fun) }}">{{ value }}</a>
 				</li>
-				<script>
-					$("li.active").parent("ul").parent('li').navgoco('toggle', true | false);
-				</script>
+				<script>$("li.active").parent("ul").parent('li').navgoco('toggle', true | false);</script>
 				{% else %}
 				<li>
 					<a href="{{ url_for(url_fun) }}">{{ value }}</a>
@@ -19,92 +24,81 @@
 				{% endif %}
 			{%- endmacro %}
 			
-
-			<div class="panel-group">
-
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title">个人</h3>
-					</div>
-					<div class="panel-body">
-						<ul class="navgoco nav nav-pills nav-stacked">
-							<li>
-								<a href="#">门禁</a>
-								<ul class="nav nav-pills nav-stacked" style="padding-left: 20px">
-									{{ nav_side('show_chart_accategory','门禁类型比例') }}
-									{{ nav_side('show_chart_acdatetrend','门禁日期变化') }}
-									{{ nav_side('show_chart_actimedistr','门禁时间分布') }}
-								</ul>
-							</li>
-
-							<li>
-								<a href="#">消费</a>
-								<ul class="nav nav-pills nav-stacked" style="padding-left: 20px">
-									{{ nav_side('show_chart_concategory','消费类型比例') }}
-                                    {{ nav_side('show_chart_condatetrend','消费日期变化') }}
-                                    {{ nav_side('show_chart_contimedistr','消费时间分布') }}
-									{{ nav_side('show_chart_penalty','滞纳金缴费情况') }}
-									<!--{{ nav_side('show_chart_conability','消费能力认定') }}-->
-								</ul>
-							</li>
-						</ul>
-					</div>
-				</div>
-
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title">学校</h3>
-					</div>
-					<div class="panel-body">
-						<ul class="navgoco nav nav-pills nav-stacked">
-							<!--{{ nav_side('show_chart_income','刷卡机收入趋势与分布') }}-->
-							{{ nav_side('show_chart_number','人数统计') }}
-							{{ nav_side('show_chart_schaccategory','门禁类型比例') }}
-							{{ nav_side('show_chart_schacdatetrend','门禁日期变化') }}
-							{{ nav_side('show_chart_schconcategory','消费类型比例') }}
-							{{ nav_side('show_chart_schcondatetrend','消费日期变化') }}
-							{{ nav_side('show_chart_conFood','餐饮消费分布') }}
-                            {{ nav_side('show_chart_conWater','用水消费分布') }}
-						</ul>
-					</div>
-				</div>
-
-                <div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title">挖掘测试</h3>
-					</div>
-					<div class="panel-body">
-						<ul class="navgoco nav nav-pills nav-stacked">
-                            {{ nav_side('show_chart_relation','人际关系') }}
-                            {{ nav_side('show_chart_povertyjudge','贫困判定') }}
-						</ul>
-					</div>
-				</div>
-			</div>
-			{% endblock %}
+			<ul class="navgoco nav nav-pills nav-stacked">
+				<!--因为navgoco第一子菜单总是自己展开，所以设置了空的第一个菜单并隐藏-->
+				<li style="display: none;">
+					<a href="#">pre</a>
+					<ul class="nav nav-pills nav-stacked"></ul>
+				</li>
+				
+				<li>
+					<a href="#" style="background-color: rgb(238,238,238);">个人门禁</a>
+					<ul class="nav nav-pills nav-stacked">
+						{{ nav_side('show_chart_accategory','门禁类型比例') }}
+						{{ nav_side('show_chart_acdatetrend','门禁日期变化') }}
+						{{ nav_side('show_chart_actimedistr','门禁时间分布') }}						
+					</ul>
+				<li>
+					<a href="#" style="background-color: rgb(238,238,238);">个人消费</a>
+					<ul class="nav nav-pills nav-stacked">
+						{{ nav_side('show_chart_concategory','消费类型比例') }}
+                        {{ nav_side('show_chart_condatetrend','消费日期变化') }}
+                        {{ nav_side('show_chart_contimedistr','消费时间分布') }}
+                        {{ nav_side('show_chart_penalty','图书借阅违规费') }}
+					</ul>
+				</li>
+				<li>
+					<a href="#" style="background-color: rgb(238,238,238);">个人其他</a>
+					<ul class="nav nav-pills nav-stacked">
+						{{ nav_side('show_chart_relation','人际关系') }}
+						{{ nav_side('show_chart_conability','消费能力') }}
+                		{{ nav_side('show_chart_studyandconability','学习与消费能力') }}
+					</ul>
+				</li>
+				<li>
+					<a href="#" style="background-color: rgb(238,238,238);">学校门禁</a>
+					<ul class="nav nav-pills nav-stacked">
+						{{ nav_side('show_chart_schaccategory','门禁类型比例') }}
+						{{ nav_side('show_chart_schacdatetrend','门禁日期变化') }}	
+						{{ nav_side('show_chart_schactimedistr','门禁时间分布') }}
+					</ul>
+				</li>
+				<li>
+					<a href="#" style="background-color: rgb(238,238,238);">学校消费</a>
+					<ul class="nav nav-pills nav-stacked">
+						{{ nav_side('show_chart_schconcategory','消费类型比例') }}
+						{{ nav_side('show_chart_schcondatetrend','消费日期变化') }}
+						{{ nav_side('show_chart_schcontimedistr','消费时间分布') }}
+						{{ nav_side('show_chart_conFood','餐饮消费分布') }}
+                		{{ nav_side('show_chart_conWater','用水消费分布') }}
+					</ul>
+				</li>
+				<li>
+					<a href="#" style="background-color: rgb(238,238,238);">学校其他</a>
+					<ul class="nav nav-pills nav-stacked">
+                		{{ nav_side('show_chart_number','人数统计') }}
+					</ul>
+				</li>
+			</ul>
 		</div>
-		<div class="rightContainer">
-			{% block chartField %} {% endblock %}
-		</div>
+		
 </div>
 
-<script>
-	// 左侧导航列表配置
-	$(".navgoco").navgoco({
-		caretHtml: '<i class="fa fa-angle-right"></i>',
-		accordion: false,
-		openClass: 'open',
-		save: true,
-		cookie: {
-			name: 'navgoco',
-			expires: false,
-			path: '/'
-		},
-		slide: {
-			duration: 400,
-			easing: 'swing'
-		}
-	});
-</script>
+<script>// 左侧导航列表配置
+$(".navgoco").navgoco({
+	caretHtml: '<i class="fa fa-angle-right"></i>',
+	accordion: false,
+	openClass: 'open',
+	save: true,
+	cookie: {
+		name: 'navgoco',
+		expires: false,
+		path: '/'
+	},
+	slide: {
+		duration: 400,
+		easing: 'swing'
+	}
+});</script>
 
 {% endblock %}

@@ -1,8 +1,7 @@
 {% extends "charts/charts.html" %} {% block chartField %}
 
 <form id="form-ipt" class="form-inline">
-	{{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='PPPWQHXW') }} 
-	{{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
+	{{ form.userID(class="form-control", maxlength='8', placeholder='卡号', value='PPPWQHXW') }} {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
 	<input class="btn btn-primary" type="button" value="刷新" onclick="refresh_chart()" />
 </form>
 
@@ -15,131 +14,200 @@
 		<thead>
 			<tr>
 				<th>类型</th>
-				<th>金额（元）</th>
-				<th>比例</th>
+				<th>金额</th>
+				<th>比例-金额</th>
+				<th>次数</th>
+				<th>比例-次数</th>
 			</tr>
 		</thead>
 	</table>
 </div>
+
 <script>
-	// Init dateRange.
-	var dateRangePicker = $("input[name='dateRange']");
-	dateRangePicker.daterangepicker({
-		autoUpdateInput: false,
-		locale: {
-			format: 'YYYY-MM-DD',
-			cancelLabel: 'Clear'
-		}
-	});
-	dateRangePicker.on('apply.daterangepicker', function(ev, picker) {
-		$(this).val(picker.startDate.format('YYYY-MM-DD') + ' ~ ' + picker.endDate.format('YYYY-MM-DD'));
-	});
-	dateRangePicker.on('cancel.daterangepicker', function(ev, picker) {
-		$(this).val('');
-	});
-
-	var optionChartConCategory = {
-		title: {
-			text: '消费类型比例'
-		},
-		tooltip: {
-			trigger: 'item',
-			formatter: "{a} <br/>{b} : {c} 元 ({d}%)"
-		},
-		toolbox: {
-			show: true,
-			feature: {
-				mark: {
-					show: true
-				},
-				dataView: {
-					show: true,
-					readOnly: false
-				},
-				restore: {
-					show: true
-				},
+	$(document).ready(function() {
+		// Init dateRange.
+		var dateRangePicker = $("input[name='dateRange']");
+		dateRangePicker.daterangepicker({
+			autoUpdateInput: false,
+			locale: {
+				format: 'YYYY-MM-DD',
+				cancelLabel: 'Clear'
 			}
-		},
-		legend: {
-			show: true,
-			orient: 'vertical',
-			left: 'left',
-			top: '30%',
-		},
-		series: [{
-			name: '消费类型比例',
-			type: 'pie',
-		}]
-	};
+		});
+		dateRangePicker.on('apply.daterangepicker', function(ev, picker) {
+			$(this).val(picker.startDate.format('YYYY-MM-DD') + ' ~ ' + picker.endDate.format('YYYY-MM-DD'));
+		});
+		dateRangePicker.on('cancel.daterangepicker', function(ev, picker) {
+			$(this).val('');
+		});
 
-	refresh_chart = function() {
-		if($("#userID").val() == '') {
-			showDialog("ID不可为空", json_response.errMsg);
-			return;
-		};
-
-		chartConCategory.showLoading();
-		$.ajax('/charts/concategory/getData?' + $("#form-ipt").serialize(), {
-			type: 'GET',
-			success: function(json_response) {
-				chartConCategory.hideLoading();
-				chartConCategory.setOption(optionChartConCategory);
-
-				if(!json_response.errMsg) {
-					var titles = json_response.titles;
-					var seriesData = json_response.seriesData;
-
-					chartConCategory.setOption({
-						legend: {
-							data: titles
-						},
-						series: [{
-							data: seriesData
-						}]
-					});
-
-					// 刷新表格
-					var form_columns= [{data:"类型"},{data:"金额（元）"},{data:"比例"}];
-					var form_data=[];
-					
-					var i,sum=0;
-					for (i=0;i<seriesData.length;i++){
-						sum+=seriesData[i]["value"];
-						form_data=form_data.concat({"类型":seriesData[i]["name"],"金额（元）":seriesData[i]["value"]});
+		var optionChartConCategory = {
+			title: {
+				text: '消费类型比例',
+				subtext: '左侧金额饼图，右侧次数饼图',
+			},
+			tooltip: {
+				trigger: 'item',
+				//			formatter: "{a} <br/>{b} : {c} 元 ({d}%)"
+				formatter: function(params) {
+					if(params['seriesName'] == 'countPie') {
+						return params['name'] + " <br/>" + params['value'] + " 次 (" + params['percent'] + "%)"
+					} else if(params['seriesName'] == 'amountPie') {
+						return params['name'] + " <br/>" + params['value'] + " 元 (" + params['percent'] + "%)"
 					}
-					for (i=0;i<seriesData.length;i++){
-						form_data[i]["比例"]= (Math.round(form_data[i]["金额（元）"] / sum * 10000) / 100.00 + "%");
-					}
-					
-					$("#tableConCategory").dataTable({
-						destroy: true,
-						columns: form_columns,
-						data: form_data,
-						ordering: true,
-					});
-
-				} else {
-					showDialog("出错了", json_response.errMsg);
 				}
 			},
-			error: function() {
-				showDialog("出错了", "出现意外情况");
+			toolbox: {
+				show: true,
+				feature: {
+					mark: {
+						show: true
+					},
+					dataView: {
+						show: true,
+						readOnly: false
+					},
+					restore: {
+						show: true
+					},
+				}
 			},
-			dataType: 'json',
+			legend: {
+				show: true,
+				orient: 'vertical',
+				left: 'left',
+				top: '30%',
+			},
+			series: [{
+				type: 'pie',
+				name: 'amountPie',
+				center: ['35%', '55%'],
+			}, {
+				type: 'pie',
+				name: 'countPie',
+				center: ['70%', '55%'],
+			}]
+		};
+
+		refresh_chart = function() {
+			if($("#userID").val() == '') {
+				showDialog("ID不可为空", json_response.errMsg);
+				return;
+			};
+
+			chartConCategory.showLoading();
+			$.ajax('/charts/concategory/getData?' + $("#form-ipt").serialize(), {
+				type: 'GET',
+				success: function(json_response) {
+					chartConCategory.hideLoading();
+					chartConCategory.setOption(optionChartConCategory);
+
+					if(!json_response.errMsg) {
+						var titles = [];
+						var data = json_response['dataDict'];
+
+						for(var i in data) {
+							titles = titles.concat(i);
+						}
+
+						// data 格式
+						// {category: {'amount':amount, 'count':count}}
+
+						var dataAmount = [];
+						var dataCount = [];
+						for(var datum in data) {
+							dataAmount = dataAmount.concat({
+								'value': data[datum]['amount'],
+								'name': datum
+							});
+							dataCount = dataCount.concat({
+								'value': data[datum]['count'],
+								'name': datum
+							});
+						}
+						// 排序dataAmount和dataCount
+						mSort = function(a, b) {
+							return b['value'] - a['value'];
+						}
+						dataAmount.sort(mSort);
+						dataCount.sort(mSort);
+
+						// 刷新图表
+						chartConCategory.setOption({
+							legend: {
+								data: titles,
+							},
+							series: [{
+								name: 'amountPie',
+								data: dataAmount,
+							}, {
+								name: 'countPie',
+								data: dataCount,
+							}]
+						});
+
+						// 刷新表格
+						var form_columns = [
+							{ data: "类型" },
+							{ data: "金额" },
+							{ data: "比例-金额" },
+							{ data: "次数" },
+							{ data: "比例-次数" }
+						];
+						var form_data = [];
+
+						var i, sumAmount = 0,
+							sumCount = 0;
+						for(var datum in data) {
+							sumAmount += data[datum]["amount"];
+							sumCount += data[datum]["count"];
+
+							form_data = form_data.concat({
+								"类型": datum,
+								"金额": data[datum]["amount"],
+								"次数": data[datum]["count"]
+							});
+						}
+						for(i = 0; i < form_data.length; i++) {
+							form_data[i]["比例-金额"] = (Math.round(form_data[i]["金额"] / sumAmount * 10000) / 100.00 + "%");
+							form_data[i]["比例-次数"] = (Math.round(form_data[i]["次数"] / sumCount * 10000) / 100.00 + "%");
+						}
+
+						$("#tableConCategory").dataTable({
+							language: {
+								url: "{{ url_for('static',filename='Chinese.json') }}",
+							},
+							destroy: true,
+							columns: form_columns,
+							data: form_data,
+							ordering: true,
+							order: [
+								[1, 'desc']
+							],
+							columnDefs: [{
+								"orderable": false,
+								"targets": 0,
+							}]
+						});
+					} else {
+						showDialog("出错了", json_response.errMsg);
+					}
+				},
+				error: function() {
+					showDialog("出错了", "出现意外情况");
+				},
+				dataType: 'json',
+			});
+		};
+
+		// Init charts.
+		var chartConCategory = echarts.init(document.getElementById('chartConCategory'));
+		chartConCategory.setOption(optionChartConCategory);
+
+		window.addEventListener('resize', function() {
+			chartConCategory.resize();
 		});
-	};
 
-	// Init charts.
-	var chartConCategory = echarts.init(document.getElementById('chartConCategory'));
-	chartConCategory.setOption(optionChartConCategory);
-	
-	window.addEventListener('resize', function() {
-		chartConCategory.resize();
-	});
-
-
-	$(document).ready(function() {
 		$("#tableConCategory").dataTable();
 		refresh_chart();
 	});

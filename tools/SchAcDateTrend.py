@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: UTF-8
 
-from MysqlClient import MysqlClient
+from tools.MysqlClient import MysqlClient
 import os
 import time
 from pandas import DataFrame
@@ -22,17 +22,16 @@ class SchAc:
         df = DataFrame(columns=colList).astype(int)
 
         # 参数准备
-        startID = 0
+        startID = 1
         batchCount = 10000
         while True:
             # 查询
             sql = "select acrec.ac_datetime, ac_loc.category " \
                   "from acrec, ac_loc " \
                   "where acrec.node_id = ac_loc.node_id " \
-                  "and id >= %s limit %s " % (str(startID), str(batchCount))
+                  "and id >= %s limit %s " % (startID, batchCount)
 
             tStart = time.time()
-
             results = self.mc.query(sql)
 
             # 处理数据results
@@ -50,7 +49,7 @@ class SchAc:
             df.fillna(0, inplace=True)
             df = df.resample("D").sum()
             df.fillna(0, inplace=True)
-            print df
+            print(df)
 
             # 把最后一条之前的写入数据库，留下最后一条继续循环处理
             if df.shape[0] != 1:
@@ -64,10 +63,10 @@ class SchAc:
                 break
 
             tEnd = time.time()
-            print batchCount, " 行 ", tEnd - tStart
+            print(batchCount, " 行 ", tEnd - tStart)
 
-        print startID
-        print df
+        print(startID)
+        print(df)
 
         os.system("pause")
 

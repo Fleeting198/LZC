@@ -1,11 +1,11 @@
 {% extends "charts/charts.html" %} {% block chartField %}
 
 <!--Echarts图表-->
-<div id="chartSchAcCategory" class="chartField_half"></div>
+<div id="chartPie" class="chartField_half"></div>
 
 <!--DataTables表格-->
 <div id="dataTableContainer" class="formField">
-	<table id="tableSchAcCategory">
+	<table id="tablePie">
 		<thead>
 			<tr>
 				<th>类型</th>
@@ -16,103 +16,125 @@
 	</table>
 </div>
 
-
 <script>
-	var optchartSchAcCategory = {
-		title: {
-			text: '学校门禁类型比例'
-		},
-		tooltip: {
-			trigger: 'item',
-			formatter: "{b} <br/>{c} 个 ({d}%)"
-		},
-		toolbox: {
-			show: true,
-			feature: {
-				mark: {
-					show: true
-				},
-				dataView: {
-					show: true,
-					readOnly: false
-				},
-				restore: {
-					show: true
-				},
-			}
-		},
-		legend: {
-			show: true,
-			orient: 'vertical',
-			left: 'left',
-			top: '30%',
-		},
-		series: [{
-			type: 'pie',
-		}]
-	};
-	
-	refresh_data = function() {
-		chartSchAcCategory.showLoading();
-		$.ajax('/charts/schaccategory/getData?' + $("#form-ipt").serialize(), {
-			type: 'GET',
-			success: function(json_response) {
-				chartSchAcCategory.hideLoading();
-
-				if(!json_response.errMsg) {
-					var titles = json_response.titles;
-					var seriesData = json_response.seriesData;
-
-					// 刷新图表
-					chartSchAcCategory.setOption({
-						legend: {
-							data: titles
-						},
-						series: [{
-							data: seriesData
-						}]
-					});
-					
-					// 刷新表格
-					var form_columns= [{data:"类型"},{data:"次数"},{data:"比例"}];
-					var form_data=[];
-					
-					var i,sum=0;
-					for (i=0;i<seriesData.length;i++){
-						sum+=seriesData[i]["value"];
-						form_data=form_data.concat({"类型":seriesData[i]["name"],"次数":seriesData[i]["value"]});
-					}
-					for (i=0;i<seriesData.length;i++){
-						form_data[i]["比例"]= (Math.round(form_data[i]["次数"] / sum * 10000) / 100.00 + "%");
-					}
-					
-					$("#tableSchAcCategory").dataTable({
-						destroy: true,
-						columns: form_columns,
-						data: form_data,
-						ordering: true,
-					});
-					
-				} else {
-					showDialog("出错了", json_response.errMsg);
+	$(document).ready(function() {
+		var optchartPie = {
+			title: {
+				text: '学校门禁类型比例',
+				subtext:'各类门禁记录的次数比例',
+			},
+			tooltip: {
+				trigger: 'item',
+				formatter: "{b} <br/>{c} 次 ({d}%)"
+			},
+			toolbox: {
+				show: true,
+				feature: {
+					mark: {
+						show: true
+					},
+					dataView: {
+						show: true,
+						readOnly: false
+					},
+					restore: {
+						show: true
+					},
 				}
 			},
-			error: function() {
-				showDialog("出错了", "出现意外情况");
+			legend: {
+				show: true,
+				orient: 'vertical',
+				left: 'left',
+				top: '30%',
 			},
-			dataType: 'json'
+			series: [{
+				type: 'pie',
+				center: ['50%', '55%']
+			}]
+		};
+
+		refresh_data = function() {
+			chartPie.showLoading();
+			$.ajax('/charts/schaccategory/getData?' + $("#form-ipt").serialize(), {
+				type: 'GET',
+				success: function(json_response) {
+					chartPie.hideLoading();
+
+					if(!json_response.errMsg) {
+						var titles = [];
+						var data = json_response['data'];
+
+						for(var i in data) {
+							titles = titles.concat(data[i]['name']);
+							data[i]['value']=data[i]['count'];
+						}
+						
+						// 刷新图表
+						chartPie.setOption({
+							legend: { data: titles, },
+							series: [{
+								name: 'pieCount',
+								data: data,
+							}]
+						});
+
+						// 刷新表格
+						var form_columns = [
+							{ data: "类型" },
+							{ data: "次数" },
+							{ data: "比例" }
+						];
+						var form_data = [];
+
+						var i, sum = 0;
+						for(i = 0; i < data.length; i++) {
+							sum += data[i]["count"];
+							form_data = form_data.concat({
+								"类型": data[i]["name"],
+								"次数": data[i]["count"]
+							});
+						}
+						for(i = 0; i < data.length; i++) {
+							form_data[i]["比例"] = (Math.round(form_data[i]["次数"] / sum * 10000) / 100.00 + "%");
+						}
+
+						$("#tablePie").dataTable({
+							language: {
+								url: "{{ url_for('static',filename='Chinese.json') }}",
+							},
+							destroy: true,
+							columns: form_columns,
+							data: form_data,
+							ordering: true,
+							order: [
+								[1, 'desc']
+							],
+							columnDefs: [{
+								"orderable": false,
+								"targets": 0,
+							}],
+						});
+
+					} else {
+						showDialog("出错了", json_response.errMsg);
+					}
+				},
+				error: function() {
+					showDialog("出错了", "出现意外情况");
+				},
+				dataType: 'json'
+			});
+		};
+
+		// 图表初始化
+		var chartPie = echarts.init(document.getElementById('chartPie'));
+		chartPie.setOption(optchartPie);
+		window.addEventListener('resize', function() {
+			chartPie.resize();
 		});
-	};
-	
-	// 图表初始化
-	var chartSchAcCategory = echarts.init(document.getElementById('chartSchAcCategory'));
-	chartSchAcCategory.setOption(optchartSchAcCategory);
-	window.addEventListener('resize', function() {
-		chartSchAcCategory.resize();
-	});
-	$(document).ready(function() {
 		refresh_data();
-		$("#tableSchAcCategory").dataTable();
+		$("#tablePie").dataTable();
 	});
 </script>
 {% endblock %}

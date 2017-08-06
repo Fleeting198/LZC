@@ -4,101 +4,107 @@
         <meta charset="UTF-8">
         <meta name="description" content="基于大学生校园卡数据的分析与挖掘">
         <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-        <title>Witcampus</title>
+        <title>基于大学生校园卡数据的分析与挖掘</title>
         
-        <link href="{{ url_for('static',filename='css/font-awesome.min.css') }}" rel="stylesheet"/>
         <link href="{{ url_for('static',filename='css/bootstrap-theme.min.css') }}" rel="stylesheet"/>
+		<link href="{{ url_for('static',filename='css/bootstrap.min.css') }}" rel="stylesheet"/>
         <link href="{{ url_for('static',filename='css/daterangepicker.css') }}" rel="stylesheet"/>
-        <!--<link href="{{ url_for('static',filename='css/jquery.fullpage.min.css') }}" rel="stylesheet"/>-->
-        <link href="{{ url_for('static',filename='css/buttons.css') }}" rel="stylesheet"/>
-        <link href="{{ url_for('static',filename='css/witcampus.min.css') }}" rel="stylesheet"/>
-        <link href="{{ url_for('static',filename='css/witcampusCustom.css') }}" rel="stylesheet"/>
+        <link href="{{ url_for('static',filename='css/custom.css') }}" rel="stylesheet"/>
         <link href="{{ url_for('static',filename='css/jquery.dataTables.min.css') }}" rel="stylesheet"/>
-        <!--<link href="{{ url_for('static',filename='css/dataTables.bootstrap.min.css') }}" rel="stylesheet"/>-->
         
         <script type="text/javascript" src="{{ url_for('static',filename='js/jquery-1.12.0.min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static',filename='js/bootstrap.min.js') }}"></script>
-        <!--<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.fullpage.min.js') }}"></script>-->
         <script type="text/javascript" src="{{ url_for('static',filename='js/jquery.cookie.min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static',filename='js/jquery.navgoco.min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static',filename='js/moment.min.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static',filename='js/daterangepicker.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static',filename='js/echarts.js') }}" charset="UTF-8"></script>
+        <script type="text/javascript" src="{{ url_for('static',filename='js/echarts.min.js') }}" charset="UTF-8"></script>
         <script type="text/javascript" src="{{ url_for('static',filename='js/jquery.dataTables.min.js') }}"></script>
-        <!--<script type="text/javascript" src="{{ url_for('static',filename='js/dataTables.bootstrap.min.js') }}"></script>-->pr
     </head>
+    
     <body>
-
-        <!-- Main Navbar -->
-        <div id="header">{% block header %}
+        <!-- 顶部导航栏 -->
+        <div id="header">
             <nav class="navbar navbar-inverse navbar-fixed-top">
-                <div style="padding-left: 55px">
+                <div class="center-block" style="width:1200px;padding-left: 15px;">
                     <div class="navbar-header">
                         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </button>
-                        <a class="navbar-brand" href="{{ url_for('show_index') }}">WitCampus</a>
+                        <a class="navbar-brand" href="{{url_for('index')}}" >基于大学生校园卡数据的分析与挖掘</a>
                     </div>
                     <div id="navbar" class="navbar-collapse collapse">
                         <ul class="nav navbar-nav">
+                        	
+                        	<!--Jinja2宏函数，创建导航下拉菜单按钮-->
+                            {% macro charts_navbtn(url_fun, value) -%}
+                                <li><a href="{{ url_for(url_fun) }}">{{ value }}</a></li>
+                            {%- endmacro %}
+                        	
                             <!-- 导航按钮 -->
                             <li class="dropdown">
-                                <a href="{{ url_for('show_charts') }}" class="dropdown-toggle" data-toggle="dropdown" role="button">
-                                    	所有图表
+                                <a class="dropdown-toggle" data-toggle="dropdown" role="button" >
+									个人图表
                                     <span class="caret"></span>
                                 </a>
                                 <ul class="dropdown-menu">
-
-									<!--Jinja2宏函数，创建导航下拉菜单按钮-->
-                                    {% macro charts_navbtn(url_fun, value) -%}
-                                        <li><a href="{{ url_for(url_fun) }}">{{ value }}</a></li>
-                                    {%- endmacro %}
-
-                                    <li class="dropdown-header">个人</li>
-                                    <li class="dropdown-header">门禁</li>
+                                    <li class="dropdown-header">个人门禁</li>
 		                            {{ charts_navbtn('show_chart_accategory','门禁类型比例') }}
 									{{ charts_navbtn('show_chart_acdatetrend','门禁日期变化') }}
 									{{ charts_navbtn('show_chart_actimedistr','门禁时间分布') }}
+                                    <li class="divider"></li>
 
-                                    <li class="dropdown-header">消费</li>
+                                    <li class="dropdown-header">个人消费</li>
 									{{ charts_navbtn('show_chart_concategory','消费类型比例') }}
                                     {{ charts_navbtn('show_chart_condatetrend','消费日期变化') }}
                                     {{ charts_navbtn('show_chart_contimedistr','消费时间分布') }}
-									{{ charts_navbtn('show_chart_penalty','滞纳金缴费情况') }}
-									<!--{{ charts_navbtn('show_chart_conability','消费能力认定') }}-->
-
-                                    <li class="divider"></li>
-
-                                    <li class="dropdown-header">学校</li>
-                                    <!--{{ charts_navbtn('show_chart_income','刷卡机收入趋势与分布') }}-->
-                                    {{ charts_navbtn('show_chart_number','人数统计') }}
-                                    {{ charts_navbtn('show_chart_schaccategory','门禁类型比例') }}
-                                    {{ charts_navbtn('show_chart_schacdatetrend','门禁日期变化') }}
-                                    {{ charts_navbtn('show_chart_schconcategory','消费类型比例') }}
-                                    {{ charts_navbtn('show_chart_schcondatetrend','消费日期变化') }}
-                                    {{ charts_navbtn('show_chart_conFood','餐饮消费时间分布') }}
-                                    {{ charts_navbtn('show_chart_conWater','用水消费时间分布') }}
-
-                                    <li class="divider"></li>
-
-                                    <li class="dropdown-header">挖掘测试</li>
-                                    {{ charts_navbtn('show_chart_relation','人际关系') }}
-                                    {{ charts_navbtn('show_chart_povertyjudge','贫困判定') }}
+									{{ charts_navbtn('show_chart_penalty','图书借阅违规费') }}
+									<li class="divider"></li>
+									
+									<li class="dropdown-header">个人其他</li>
+									{{ charts_navbtn('show_chart_relation','人际关系') }}
+                                    {{ charts_navbtn('show_chart_conability','消费能力') }}
+                                    {{ charts_navbtn('show_chart_studyandconability','学习与消费能力') }}
                                 </ul>
                             </li>
-                            <li><a href="{{ url_for('show_summary_default') }}">个人成就报告</a></li>
+                            
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown" role="button" >
+									学校图表
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-header">学校门禁</li>
+                                    {{ charts_navbtn('show_chart_schaccategory','门禁类型比例') }}
+                                    {{ charts_navbtn('show_chart_schacdatetrend','门禁日期变化') }}
+                                    {{ charts_navbtn('show_chart_schactimedistr','门禁时间分布') }}
+									<li class="divider"></li>
+                                    
+                                    <li class="dropdown-header">学校消费</li>
+                                    {{ charts_navbtn('show_chart_schconcategory','消费类型比例') }}
+                                    {{ charts_navbtn('show_chart_schcondatetrend','消费日期变化') }}
+                                    {{ charts_navbtn('show_chart_schcontimedistr','消费时间分布') }}
+                                    {{ charts_navbtn('show_chart_conFood','餐饮消费时间分布') }}
+                                    {{ charts_navbtn('show_chart_conWater','用水消费时间分布') }}
+									<li class="divider"></li>
+                                    
+                                    <li class="dropdown-header">学校其他</li>
+                                    {{ charts_navbtn('show_chart_number','人数统计') }}
+                                </ul>
+                            </li>
                         </ul>
                     </div>
                 </div>
             </nav>
-        {% endblock %}</div>
+        </div>
 
-        <div>{% block content %}{% endblock %}</div>
-
+		<!-- 主内容 -->
+        {% block content %}{% endblock %}
+        
         <!-- 公用错误提示窗口 -->
-        <div id="modal-err" class="modal fade">
+        <div id="modal-err" class="modal fade" style="margin-top: 200px;">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">

@@ -1,75 +1,169 @@
 {% extends "charts/charts.html" %} {% block chartField %}
 
-<form id="form-ipt" class="form-inline">
-	{{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='XQXXQQTQ') }}
+<form id="form-ipt" class="form-inline" >
+	{{ form.userID(class="form-control", maxlength='8', placeholder='卡号', value='PPHZTXPW') }}
 	<input class="btn btn-primary" type="button" value="刷新" onclick="refresh_data()" />
 </form>
 
-<div id="chartRelation" class="chartField_full"></div>
+<!--Echarts图表-->
+<div id="chartRelation" class="chartField_full" style="float: left;position: relative;" ></div>
+
+<div class="alert alert-info" class="chartField_full" style="float: right; position: relative;margin-left: -100%;">
+<p>支持度计数(A,B) = 两人同时通过同一个门禁的次数</br>支持度(A,B) = 支持度计数(A,B) / A的总门禁记录数</br>置信度(A->B) = 支持度{A, B} / 支持度{A}</p>
+</div>
+
+
+<!--DataTables表格-->
+<div id="dataTableContainer" class="formField">
+	<table id="tableRelation">
+		<thead>
+			<tr>
+				<th>关联对象</th>
+				<th>支持度计数</th>
+				<th>支持度</th>
+				<th>置信度</th>
+			</tr>
+		</thead>
+	</table>
+</div>
 
 <script>
-
-	var optionChartRelation = {
-		title: {
-			text: '人际关系',
-		},
-		tooltip: {
-			trigger: 'item',
-		},
-		series: [{
-			type: 'graph',
-			layout: 'force',
-			force: {
-				edgeLength: 200,
-				repulsion: 100,
-			},
-			roam: true,
-			draggable: true,
-			label: {
-				emphasis: {
-					show: false,
-				}
-			}
-		}]
-	};
-
-	refresh_data = function() {
-		chartRelation.showLoading();
-		$.ajax('/charts/relation/getData?' + $("#form-ipt").serialize(), {
-			type: 'GET',
-			success: function(json_response) {
-				chartRelation.hideLoading();
-
-				if(!json_response.errMsg) {
-					var nodes = json_response['nodes'];
-					var links = json_response['links'];
-					// var num_total=json_response['num_total'];
-
-					chartRelation.setOption({
-						series: [{
-							data: nodes,
-							links: links,
-						}]
-					});
-
-				} else {
-					showDialog("出错了", json_response.errMsg);
-				}
-			},
-			error: function() {
-				showDialog("出错了", "出现意外情况");
-			},
-			dataType: 'json'
-		});
-	};
-
-	var chartRelation = echarts.init(document.getElementById('chartRelation'));
-	chartRelation.setOption(optionChartRelation);
-	window.addEventListener('resize', function() {
-		chartRelation.resize();
-	});
-
 	$(document).ready(function() {
+		var optionChartRelation = {
+			title: {
+				text: '人际关系',
+				subtext: '指针悬浮显示结点置信度，值越高关系越近',
+			},
+			tooltip: {
+				trigger: 'item',
+				formatter: function(params) {
+					var strDes = "";
+					if(params['dataType'] == 'edge') {
+						strDes = params['name'];
+					} else if(params['dataType'] == 'node') {
+						if(params['name'] == $('#userID')) {
+							strDes = '查询用户';
+						} else {
+							strDes += "对象：" + params['data']['name'];
+							strDes += "<br/>支持度计数：" + params['data']['suppCount'];
+							strDes += "<br/>支持度：" + params['data']['suppRate'].toFixed(10);
+							strDes += "<br/>置信度：" + params['data']['conf'].toFixed(10);
+						}
+					}
+					return strDes;
+				}
+			},
+			series: [{
+				type: 'graph',
+				layout: 'force',
+				force: {
+					edgeLength: [50, 400],
+					repulsion: 50,
+				},
+				roam: true,
+				draggable: true,
+				label: {
+					emphasis: {
+						show: false,
+					}
+				}
+			}]
+		};
+
+		refresh_data = function() {
+			chartRelation.showLoading();
+			$.ajax('/charts/relation/getData?' + $("#form-ipt").serialize(), {
+				type: 'GET',
+				success: function(json_response) {
+					chartRelation.hideLoading();
+
+					if(!json_response.errMsg) {
+						var nodes = json_response['nodes'];
+						var links = json_response['links'];
+						var nodeTarget = json_response['nodeTarget'];
+						var cntTransactions = json_response['cntTransactions'];
+
+						// 支持度 = 支持度计数/事务数
+						for(var i in nodes) {
+							nodes[i]['suppRate'] = nodes[i]['suppCount'] / cntTransactions;
+						}
+
+						// 单独设置查询目标用户的节点属性
+						nodeTarget['label'] = {
+							normal: {
+								show: true,
+								textStyle: {
+									color: '#000',
+								}
+							},
+							emphasis: {
+								show: true,
+								textStyle: {
+									color: '#000',
+									fontWeight: 'bold',
+								}
+							},
+						}
+						// 应用图表设置
+						chartRelation.setOption({
+							series: [{
+								data: nodes.concat(nodeTarget),
+								links: links,
+							}]
+						});
+
+						// 设置表格
+						var form_columns = [
+							{ data: "关联对象" },
+							{ data: "支持度计数" },
+							{ data: "支持度" },
+							{ data: "置信度" },
+						];
+
+						var form_data = [];
+						for(var i in nodes) {
+							form_data = form_data.concat({
+								"关联对象": nodes[i]['name'],
+								"支持度计数": nodes[i]['suppCount'],
+								"支持度": nodes[i]['suppRate'],
+								"置信度": nodes[i]['conf'],
+							});
+						}
+
+						// 应用表格设置
+						$("#tableRelation").dataTable({
+							language: {
+								url: "{{ url_for('static',filename='Chinese.json') }}",
+							},
+							destroy: true,
+							columns: form_columns,
+							data: form_data,
+							ordering: true,
+							order: [
+								[1, 'desc']
+							],
+							columnDefs: [{
+								"orderable": false,
+								"targets": 0,
+							}]
+						});
+
+					} else {
+						showDialog("出错了", json_response.errMsg);
+					}
+				},
+				error: function() {
+					showDialog("出错了", "出现意外情况");
+				},
+				dataType: 'json'
+			});
+		};
+
+		var chartRelation = echarts.init(document.getElementById('chartRelation'));
+		chartRelation.setOption(optionChartRelation);
+		window.addEventListener('resize', function() {
+			chartRelation.resize();
+		});
 		refresh_data();
 	});
 </script>

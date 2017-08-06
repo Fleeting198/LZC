@@ -5,123 +5,141 @@
 	<input class="btn btn-primary" type="button" value="刷新" onclick="refresh_data()" />
 </form>
 
-<div id="chartConWater" class="chartField_full"></div>
+<div id="chartBar" class="chartField_half"></div>
+<div id="dataTableContainer" class="formField">
+	<table id="tableBar">
+		<thead>
+			<tr>
+				<th>时间</th>
+				<th>平均消费总额（元）</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+</div>
 
 <script>
-	var optChartConWater = {
-		title: {
-			text: '学校用水消费时间分布'
-		},
-		tooltip: {
-			trigger: 'axis',
-			//			formatter: function(params) {
-			//				var str_return = params[0]['name'] + '<br/>';
-			//				for(var i = 0; i < params.length; i++) {
-			//					str_return += params[i]['seriesName'] + ' : ' + params[i]['value'].toFixed(2) + ' 元<br/>'
-			//				}
-			//				return str_return;
-			//			}
-		},
-		toolbox: {
-			show: true,
-			feature: {
-				mark: {
-					show: true
-				},
-				dataView: {
-					show: true,
-					readOnly: false
-				},
-				magicType: {
-					show: true,
-					type: ['line', 'bar']
-				},
-				restore: {
-					show: true
-				},
-			}
-		},
-		legend: {
-			data: ['消费总额']
-		},
-		xAxis: {
-			type: 'category',
-			boundaryGap: true,
-			data: []
-		},
-		yAxis: {
-			type: 'value',
-			name: '平均消费',
-			axisLabel: {
-				formatter: function(value, index) {
-					if(value > 10000) return value / 10000 + '万元';
-					else return value + '元';
-				}
-			}
-		},
-		dataZoom: [{
-			type: 'inside',
-			xAxisIndex: [0],
-			start: 0,
-			end: 100
-		}, {
-			type: 'slider',
-			xAxisIndex: [0],
-			start: 0,
-			end: 100
-		}],
-		series: [{
-			name: '消费总额',
-			type: 'bar',
-			data: [],
-			itemStyle: {
-				normal: {
-					color: '#314656',
-				}
-			}
-		}]
-	};
-
-	refresh_data = function() {
-		chartConWater.showLoading();
-
-		$.ajax('/charts/conwater/getData?' + $("#form-ipt").serialize(), {
-			type: 'GET',
-			success: function(json_response) {
-				chartConWater.hideLoading();
-
-				if(!json_response.errMsg) {
-					var axisLabels = json_response['axisLabels'];
-					var vals = json_response['vals'];
-
-					chartConWater.setOption({
-						xAxis: [{
-							data: axisLabels,
-						}],
-						series: [{
-							data: vals,
-						}],
-					});
-
-				} else {
-					showDialog("出错了", json_response.errMsg);
-				}
-			},
-			error: function() {
-				showDialog("出错了", "出现意外情况");
-			},
-			dataType: 'json'
-		});
-	};
-
-	// 图表初始化。
-	var chartConWater = echarts.init(document.getElementById('chartConWater'));
-	chartConWater.setOption(optChartConWater);
-	window.addEventListener('resize', function() {
-		chartConWater.resize();
-	});
-
 	$(document).ready(function() {
+		var optchartBar = {
+			title: {
+				text: '学校用水消费时间分布'
+			},
+			tooltip: {
+				trigger: 'axis',
+			},
+			toolbox: {
+				show: true,
+				feature: {
+					mark: {
+						show: true
+					},
+					dataView: {
+						show: true,
+						readOnly: false
+					},
+					magicType: {
+						show: true,
+						type: ['line', 'bar']
+					},
+					restore: {
+						show: true
+					},
+				}
+			},
+			legend: {
+				data: ['消费总额'],
+				top:50,
+			},
+			grid:{top:85,},
+			xAxis: {
+				type: 'category',
+				boundaryGap: true,
+				data: []
+			},
+			yAxis: {
+				type: 'value',
+				name: '平均消费（万元）',
+				axisLabel: {
+					formatter: function(value, index) {
+						if(value > 10000) return value / 10000;
+						else return value + '元';
+					}
+				}
+			},
+			series: [{
+				name: '消费总额',
+				type: 'bar',
+				data: [],
+				itemStyle: {
+					normal: {
+						color: '#314656',
+					}
+				}
+			}]
+		};
+
+		refresh_data = function() {
+			chartBar.showLoading();
+
+			$.ajax('/charts/conwater/getData?' + $("#form-ipt").serialize(), {
+				type: 'GET',
+				success: function(json_response) {
+					chartBar.hideLoading();
+
+					if(!json_response.errMsg) {
+						var axisLabels = json_response['axisLabels'];
+						var vals = json_response['vals'];
+						
+						// 刷新图表
+						chartBar.setOption({
+							xAxis: [{
+								data: axisLabels,
+							}],
+							series: [{
+								data: vals,
+							}],
+						});
+
+						// 刷新表格
+						var form_columns = [
+							{data:"日期"},
+							{data:"平均消费总量"},
+						];
+						var form_data = [];
+						for(var i in vals){
+							form_data=form_data.concat(
+								{'日期':axisLabels[i],'平均消费总量':vals[i]}
+							);
+						}
+
+						$("#tableBar").dataTable({
+							language: {
+								url: "{{ url_for('static',filename='Chinese.json') }}",
+							},
+							destroy: true,
+							columns: form_columns,
+							data: form_data,
+							ordering: true,
+						});
+
+					} else {
+						showDialog("出错了", json_response.errMsg);
+					}
+				},
+				error: function() {
+					showDialog("出错了", "出现意外情况");
+				},
+				dataType: 'json'
+			});
+		};
+
+		// 图表初始化。
+		var chartBar = echarts.init(document.getElementById('chartBar'));
+		chartBar.setOption(optchartBar);
+		window.addEventListener('resize', function() {
+			chartBar.resize();
+		});
+
 		refresh_data();
 	})
 </script>

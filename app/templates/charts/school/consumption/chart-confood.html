@@ -5,22 +5,27 @@
 	<input class="btn btn-primary" type="button" value="刷新" onclick="refresh_data()" />
 </form>
 
-<div id="chartConFood" class="chartField_full"></div>
+<div id="chartBar" class="chartField_half"></div>
+<div id="dataTableContainer" class="formField">
+	<table id="tableBar">
+		<thead>
+			<tr>
+				<th>时间</th>
+				<th>平均消费总额（元）</th>
+			</tr>
+		</thead>
+		<tbody></tbody>
+	</table>
+</div>
 
 <script>
-	var optChartConFood = {
+	$(document).ready(function() {
+		var optchartBar = {
 		title: {
 			text: '学校餐饮消费时间分布'
 		},
 		tooltip: {
 			trigger: 'axis',
-//			formatter: function(params) {
-//				var str_return = params[0]['name'] + '<br/>';
-//				for(var i = 0; i < params.length; i++) {
-//					str_return += params[i]['seriesName'] + ' : ' + params[i]['value'].toFixed(2) + ' 元<br/>'
-//				}
-//				return str_return;
-//			}
 		},
 		toolbox: {
 			show: true,
@@ -42,8 +47,10 @@
 			}
 		},
 		legend: {
-			data: ['消费总额']
+			data: ['消费总额'],
+			top:50,
 		},
+		grid:{top:85,},
 		xAxis: {
 			type: 'category',
 			boundaryGap: true,
@@ -51,25 +58,14 @@
 		},
 		yAxis: {
 			type: 'value',
-			name: '平均消费',
+			name: '平均消费（万元）',
 			axisLabel: {
 				formatter: function(value, index) {
-					if(value > 10000) return value / 10000 + '万元';
+					if(value > 10000) return value / 10000;
 					else return value + '元';
 				}
 			}
 		},
-		dataZoom: [{
-			type: 'inside',
-			xAxisIndex: [0],
-			start: 0,
-			end: 100
-		}, {
-			type: 'slider',
-			xAxisIndex: [0],
-			start: 0,
-			end: 100
-		}],
 		series: [{
 			name: '消费总额',
 			type: 'bar',
@@ -78,24 +74,47 @@
 	};
 
 	refresh_data = function() {
-		chartConFood.showLoading();
+		chartBar.showLoading();
 
 		$.ajax('/charts/confood/getData?' + $("#form-ipt").serialize(), {
 			type: 'GET',
 			success: function(json_response) {
-				chartConFood.hideLoading();
+				chartBar.hideLoading();
 
 				if(!json_response.errMsg) {
 					var axisLabels = json_response['axisLabels'];
 					var vals = json_response['vals'];
 
-					chartConFood.setOption({
+					// 刷新图表
+					chartBar.setOption({
 						xAxis: [{
 							data: axisLabels,
 						}],
 						series: [{
 							data: vals,
 						}],
+					});
+					
+					// 刷新表格
+					var form_columns = [
+						{data:"日期"},
+						{data:"平均消费总量"},
+					];
+					var form_data = [];
+					for(var i in vals){
+						form_data=form_data.concat(
+							{'日期':axisLabels[i],'平均消费总量':vals[i]}
+						);
+					}
+
+					$("#tableBar").dataTable({
+						language: {
+							url: "{{ url_for('static',filename='Chinese.json') }}",
+						},
+						destroy: true,
+						columns: form_columns,
+						data: form_data,
+						ordering: true,
 					});
 
 				} else {
@@ -110,12 +129,11 @@
 	};
 
 	// 图表初始化
-	var chartConFood = echarts.init(document.getElementById('chartConFood'));
-	chartConFood.setOption(optChartConFood);
+	var chartBar = echarts.init(document.getElementById('chartBar'));
+	chartBar.setOption(optchartBar);
 	window.addEventListener('resize', function() {
-		chartConFood.resize();
+		chartBar.resize();
 	});
-	$(document).ready(function() {
 		refresh_data();
 	})
 </script>

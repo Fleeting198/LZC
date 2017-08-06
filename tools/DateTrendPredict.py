@@ -6,89 +6,99 @@ import pandas as pd
 from tools.MysqlClient import MysqlClient
 from app.helpers import proper_ARIMA, insertDataFrameToDBTable
 from statsmodels.tsa.arima_model import ARIMA
+import logging
+
+""" 从数据库中查询时间序列数据，构造成多列dataframe，对每一列进行滚动数据预测，存入数据库
+"""
 
 
-class DateTrendPredict():
-    def __init__(self):
+class DateTrendPredict:
+    def __init__(self, datatype):
         self.mc = MysqlClient()
-        self.colListAc = [ 'med','dorm', 'acad', 'admin', 'sci', 'sport', 'lib', 'none']
-        self.colListCon = ['food', 'shop', 'discipline', 'sport', 'water', 'study', 'med', 'none']
+        self.targetTable = "sch_" + datatype + "_datetrend"
+        self.minDate = "2015-01-01"
+        self.predictLen = 60
 
-    def mainfunc(self, datatype):
-        # 查询
-        if datatype == 'con':
-            colList = self.colListCon
-        elif datatype == 'ac':
-            colList = self.colListAc
+        if datatype == 'ac':
+            self.colList = ['med', 'dorm', 'acad', 'admin', 'sci', 'sport', 'lib', 'none']
+        elif datatype == 'con':
+            self.colList = ['food', 'shop', 'discipline', 'sport', 'water', 'study', 'med', 'none']
         else:
             raise ValueError
 
-        sqlcol = ','.join(colList)
+    def DateTrendPredict(self):
+        # 构造查询语句
+        sqlcol = ','.join(self.colList)
+        sql = "select id_date, %s from %s where id_date >= '%s'" % (sqlcol, self.targetTable, self.minDate)
+        results = self.mc.query(sql)  # 实施查询
+        logging.info("Select source data from DB: %s" % sql)
 
-        sql = "select id_date," + sqlcol + " from sch_" + datatype + "_datetrend"
-        results = self.mc.query(sql)
+        df = DataFrame(columns=self.colList)  # 初始化DataFrame
 
-        df = DataFrame(columns=colList)
-
-        # 获得DataFrame
+        # 将查询结果转变为DataFrame
         for result in results:
             id_date = result[0]
-
-            # 只要2015年的数据
-            min_date = date(2015, 1, 1)
-            if id_date < min_date:
-                continue
-
-            # 数据库里时间是date，resample要datetime，combine把date和time结合起来
+            # 数据库里时间是date，resample函数要求datetime，combine把date和time结合起来
             id_date = datetime.combine(id_date, datetime.min.time())
 
             lineDict = {}
-            for i in xrange(len(colList)):
-                lineDict[colList[i]] = float(result[i + 1])
+            for i in range(len(self.colList)):
+                lineDict[self.colList[i]] = float(result[i + 1])
 
             df.loc[id_date] = lineDict
 
         # 开始预测
         # 定义预测起止日期
         startDate = df[-1:].index[0]
-        predictLen = 50
-        endDate = startDate + timedelta(predictLen)
+        endDate = startDate + timedelta(self.predictLen)
+
+        # 生成预测日期列表
         predictDateList = [startDate + timedelta(days=i) for i in range((endDate - startDate).days + 1)]
-        # startDate = startDate.strftime("%Y-%m-%d")
-        # endDate = endDate.strftime("%Y-%m-%d")
 
         allPredictionsList = []
+        # 遍历列，分别预测
         for col in df.columns:
-            print "start forecast %s" % col
-            ts = pd.Series(df[col])  # 原始时间序列
-            history = ts[:]
+            logging.info("Start forecast %s" % col)
+            history = pd.Series(df[col])[:]  # 原始时间序列
             predictions = Series(name=col)
 
-            # 省点时间，一个序列的滚动预测中参数不变
+            # 遍历预测日期列表
             hasModel = False
-            p = 0
-            q = 0
+            p, q, aic = 0, 0, 0
             for t in predictDateList:
-                if not hasModel:
-                    model_fit, p, q, bic = proper_ARIMA(history, maxLag=9, diff=2)
-                    print p, q
-                    hasModel = True
+                # 构建ARIMA模型，以history为输入
+                if hasModel:
+                    logging.info("Using existed model: p: %d, q: %d, aic: %f" % (p, q, aic))
+                    # 用第一次选出的参数构建模型
+                    # 若参数报错，重选模型
+                    try:
+                        model_fit = ARIMA(history, order=(p, 2, q)).fit(disp=0, method='css')
+                    except ValueError:
+                        # 重选模型
+                        logging.warning("Readapt ARIMA model")
+                        model_fit, p, q, aic = proper_ARIMA(history, maxLag=9, diff=2)
                 else:
-                    model_fit = ARIMA(history, order=(p, 2, q)).fit(disp=0, method='css')
+                    # 自动选取合适参数
+                    logging.info("First time adapt ARIMA model")
+                    model_fit, p, q, aic = proper_ARIMA(history, maxLag=9, diff=2)
+                    hasModel = True
 
-                output = model_fit.forecast()
-                yhat = output[0][0]
-                predictions.loc[t] = yhat
-                history.loc[t] = yhat
-            allPredictionsList.append(predictions)
+                output = model_fit.forecast()[0][0]  # 预测1天
+                history.loc[t] = output  # 添加预测结果到历史中，做滚动预测
+                predictions.loc[t] = output  # 添加预测结果
 
+            allPredictionsList.append(predictions)  # 记录该列预测结果到列表中
+
+        # 用列表构造DataFrame，包含所有预测结果
         dfPredict = pd.concat(allPredictionsList, axis=1)
-        print dfPredict
 
-        insertDataFrameToDBTable(dfPredict, "sch_" + datatype + "_datetrend", self.mc)
+        logging.info("Start insert dataframe")
+        insertDataFrameToDBTable(dfPredict, self.targetTable, self.mc)
+        logging.info("End insert dataframe")
 
 
 if __name__ == "__main__":
-    pj = DateTrendPredict()
-    # pj.mainfunc("con")
-    pj.mainfunc("ac")
+    pj = DateTrendPredict("ac")
+    pj.DateTrendPredict()
+    pj2 = DateTrendPredict("con")
+    pj2.DateTrendPredict()

@@ -1,7 +1,7 @@
 {% extends "charts/charts.html" %} {% block chartField %}
 
 <form id="form-ipt" class="form-inline">
-	{{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='PPPWQHXW') }} {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
+	{{ form.userID(class="form-control", maxlength='8', placeholder='卡号', value='PPPWQHXW') }} {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
 	<input class="btn btn-primary" type="button" value="刷新" onclick="refresh_data()" />
 </form>
 
@@ -22,122 +22,144 @@
 </div>
 
 <script>
-	var dateRangePicker = $("input[name='dateRange']");
-	dateRangePicker.daterangepicker({
-		autoUpdateInput: false,
-		locale: {
-			format: 'YYYY-MM-DD',
-			cancelLabel: 'Clear'
-		}
-	});
-	dateRangePicker.on('apply.daterangepicker', function(ev, picker) {
-		$(this).val(picker.startDate.format('YYYY-MM-DD') + ' ~ ' + picker.endDate.format('YYYY-MM-DD'));
-	});
-	dateRangePicker.on('cancel.daterangepicker', function(ev, picker) {
-		$(this).val('');
-	});
+	$(document).ready(function() {
 
-	var optChartACCategory = {
-		title: {
-			text: '门禁类型比例'
-		},
-		tooltip: {
-			trigger: 'item',
-			formatter: "{b} <br/>{c} 次 ({d}%)"
-		},
-		toolbox: {
-			show: true,
-			feature: {
-				mark: {
-					show: true
-				},
-				dataView: {
-					show: true,
-					readOnly: false
-				},
-				restore: {
-					show: true
-				},
+		var dateRangePicker = $("input[name='dateRange']");
+		dateRangePicker.daterangepicker({
+			autoUpdateInput: false,
+			locale: {
+				format: 'YYYY-MM-DD',
+				cancelLabel: 'Clear'
 			}
-		},
-		legend: {
-			show: true,
-			orient: 'vertical',
-			left: 'left',
-			top: '30%',
-		},
-		series: [{
-			name: '门禁类型比例',
-			type: 'pie',
-		}]
-	};
+		});
+		dateRangePicker.on('apply.daterangepicker', function(ev, picker) {
+			$(this).val(picker.startDate.format('YYYY-MM-DD') + ' ~ ' + picker.endDate.format('YYYY-MM-DD'));
+		});
+		dateRangePicker.on('cancel.daterangepicker', function(ev, picker) {
+			$(this).val('');
+		});
 
-	refresh_data = function() {
-		if($("#userID").val() == '') {
-			showDialog("ID不可为空", json_response.errMsg);
-			return;
-		};
-
-		chartACCategory.showLoading();
-
-		$.ajax('/charts/accategory/getData?' + $("#form-ipt").serialize(), {
-			type: 'GET',
-			success: function(json_response) {
-				chartACCategory.hideLoading();
-				
-				if(!json_response.errMsg) {
-					var titles = json_response.titles;
-					var seriesData = json_response.seriesData;
-
-					// 刷新图表
-					chartACCategory.setOption({
-						legend: {
-							data: titles
-						},
-						series: [{
-							data: seriesData
-						}]
-					});
-					
-					// 刷新表格
-					var form_columns= [{data:"类型"},{data:"次数"},{data:"比例"}];
-					var form_data=[];
-					
-					var i,sum=0;
-					for (i=0;i<seriesData.length;i++){
-						sum+=seriesData[i]["value"];
-						form_data=form_data.concat({"类型":seriesData[i]["name"],"次数":seriesData[i]["value"]});
-					}
-					for (i=0;i<seriesData.length;i++){
-						form_data[i]["比例"]= (Math.round(form_data[i]["次数"] / sum * 10000) / 100.00 + "%");
-					}
-					
-					$("#tableACCategory").dataTable({
-						destroy: true,
-						columns: form_columns,
-						data: form_data,
-						ordering: true,
-					});
-					
-				} else {
-					showDialog("出错了", json_response.errMsg);
+		var optChartACCategory = {
+			title: {
+				text: '门禁类型比例'
+			},
+			tooltip: {
+				trigger: 'item',
+				formatter: "{b} <br/>{c} 次 ({d}%)"
+			},
+			toolbox: {
+				show: true,
+				feature: {
+					mark: {
+						show: true
+					},
+					dataView: {
+						show: true,
+						readOnly: false
+					},
+					restore: {
+						show: true
+					},
 				}
 			},
-			error: function() {
-				showDialog("出错了", "出现意外情况");
+			legend: {
+				show: true,
+				orient: 'vertical',
+				left: 'left',
+				top: '30%',
 			},
-			dataType: 'json'
+			series: [{
+				name: '门禁类型比例',
+				type: 'pie',
+			}]
+		};
+
+		refresh_data = function() {
+			if($("#userID").val() == '') {
+				showDialog("ID不可为空", json_response.errMsg);
+				return;
+			};
+
+			chartACCategory.showLoading();
+
+			$.ajax('/charts/accategory/getData?' + $("#form-ipt").serialize(), {
+				type: 'GET',
+				success: function(json_response) {
+					chartACCategory.hideLoading();
+
+					if(!json_response.errMsg) {
+						var titles = [];
+						var seriesData = json_response['seriesData'];
+
+						for(var i in seriesData) {
+							titles = titles.concat(seriesData[i]['name']);
+						}
+
+						// 刷新图表
+						chartACCategory.setOption({
+							legend: {
+								data: titles,
+							},
+							series: [{
+								data: seriesData,
+							}],
+						});
+
+						// 刷新表格
+						var form_columns = [
+							{ data: "类型" },
+							{ data: "次数" },
+							{ data: "比例" }
+						];
+						var form_data = [];
+
+						var sum = 0;
+						for(var i in seriesData) {
+							sum += seriesData[i]["value"];
+							form_data = form_data.concat({
+								"类型": seriesData[i]["name"],
+								"次数": seriesData[i]["value"]
+							});
+						}
+						for(var i in seriesData) {
+							form_data[i]["比例"] = (Math.round(form_data[i]["次数"] / sum * 10000) / 100.00 + "%");
+						}
+
+						$("#tableACCategory").dataTable({
+							language: {
+								url: "{{ url_for('static',filename='Chinese.json') }}",
+							},
+							destroy: true,
+							columns: form_columns,
+							data: form_data,
+							ordering: true,
+							order: [
+								[1, 'desc']
+							],
+							columnDefs: [{
+								"orderable": false,
+								"targets": 0,
+							}]
+						});
+
+					} else {
+						showDialog("出错了", json_response.errMsg);
+					}
+				},
+				error: function() {
+					showDialog("出错了", "出现意外情况");
+				},
+				dataType: 'json'
+			});
+		};
+
+		// 图表初始化
+		var chartACCategory = echarts.init(document.getElementById('chartACCategory'));
+		chartACCategory.setOption(optChartACCategory);
+		window.addEventListener('resize', function() {
+			chartACCategory.resize();
 		});
-	};
 
-	// 图表初始化
-	var chartACCategory = echarts.init(document.getElementById('chartACCategory'));
-	chartACCategory.setOption(optChartACCategory);
-	window.addEventListener('resize', function() {
-		chartACCategory.resize();
-	});
-
-	$(document).ready(function() {
 		$('#tableACCategory').DataTable();
 		refresh_data();
 	});

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: UTF-8
 
-from MysqlClient import MysqlClient
+from tools.MysqlClient import MysqlClient
 import os
 import time
 from pandas import DataFrame
@@ -51,7 +51,7 @@ class SchAc:
             df.fillna(0, inplace=True)
             df = df.resample("D").sum()
             df.fillna(0, inplace=True)
-            print df
+            print(df)
 
             # 把最后一条之前的写入数据库，留下最后一条继续循环处理
             if df.shape[0] != 1:
@@ -66,9 +66,9 @@ class SchAc:
                 break
 
             tEnd = time.time()
-            print batchCount, " 行 ", tEnd - tStart
+            print(batchCount, " 行 ", tEnd - tStart)
 
-        print startID
+        print(startID)
 
         os.system("pause")
 

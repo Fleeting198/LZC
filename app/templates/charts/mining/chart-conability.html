@@ -1,0 +1,343 @@
+{% extends "charts/charts.html" %} {% block chartField %}
+
+<form id="form-ipt" class="form-inline">
+	{{ form.userID(class="form-control", maxlength='8', placeholder='卡号', value='XQXXQQTQ') }}
+	<input class="btn btn-primary" type="button" value="刷新" onclick="refresh_data()" />
+</form>
+
+<!--散点图，横轴消费总额，纵轴消费强度-->
+<div id="chartScatter" class="chartField_half"></div>
+<!--描述散点图簇心的表格-->
+<div id="dataTableContainer" class="formField">
+	<table id="tableScatter">
+		<thead>
+			<tr>
+				<th>簇序号</th>
+				<th>簇心横坐标</th>
+				<th>簇心纵坐标</th>
+				<th>簇大小</th>
+			</tr>
+		</thead>
+	</table>
+</div>
+
+<!--柱状图，横轴消费水平段，纵轴该段人数-->
+<div id="chartBar" class="chartField_half"></div>
+
+<script>
+	$(document).ready(function() {
+		var optchartScatter = {
+			title: {
+				text: '消费能力散点聚类',
+			},
+			tooltip: {
+				trigger: 'axis',
+				formatter: function(params) {
+					if(params['componentType'] == 'markLine') {
+						return params['name'] + ":\n" + params['value'];
+					} else {
+						return params['value'][0] + ", " + params['value'][1];
+					}
+				},
+				showDelay: 0,
+				axisPointer: {
+					show: true,
+					type: 'cross',
+					lineStyle: {
+						type: 'dashed',
+						width: 1
+					}
+				},
+				zlevel: 1
+			},
+			dataZoom: [{
+					type: 'slider',
+					xAxisIndex: [0],
+					end: 60,
+					handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+					handleSize: '80%',
+					handleStyle: {
+						color: '#fff',
+						shadowBlur: 3,
+						shadowColor: 'rgba(0, 0, 0, 0.6)',
+						shadowOffsetX: 2,
+						shadowOffsetY: 2,
+					},
+				},
+				{
+					type: 'inside',
+					xAxisIndex: [0],
+					end: 60
+				}
+			],
+			toolbox: {
+				show: true,
+				feature: {
+					mark: {
+						show: true
+					},
+					dataView: {
+						show: true,
+						readOnly: false
+					},
+					restore: {
+						show: true
+					},
+				}
+			},
+			xAxis: {
+				name: '总消费额（元）',
+				splitLine: {
+					lineStyle: {
+						type: 'dashed',
+					},
+				},
+			},
+			yAxis: {
+				name: '消费强度/平均每次（元）',
+				splitLine: {
+					lineStyle: {
+						type: 'dashed',
+					},
+				},
+			},
+		};
+
+		var optchartBar = {
+			title: {
+				text: '月平均消费水平定位',
+			},
+			tooltip: {
+				trigger: 'axis',
+				formatter: function(params) {
+					if(params['componentType'] == "markPoint") {
+						return params['name'];
+					} else {
+						var str_return;
+						if(params[0].name == '') {
+							str_return = '月均 0 元<br/>';
+						} else {
+							str_return = '月均 ' + params[0].name + ' 元<br/>';
+						}
+						str_return += '人数比例: ' + params[0].value + ' %<br/>';
+						return str_return;
+					}
+
+				}
+			},
+			toolbox: {
+				show: true,
+				feature: {
+					mark: {
+						show: true
+					},
+					dataView: {
+						show: true,
+						readOnly: false
+					},
+					magicType: {
+						show: true,
+						type: ['line', 'bar']
+					},
+					restore: {
+						show: true
+					},
+				}
+			},
+			dataZoom: [{
+				type: 'inside',
+			}, {
+				type: 'slider',
+			}],
+			xAxis: {
+				name: '平均月消费水平',
+				data: [],
+			},
+			yAxis: {
+				name: '人数比例（%）',
+			},
+		};
+
+		refresh_data = function() {
+			chartScatter.showLoading();
+			chartBar.showLoading();
+			$.ajax('/charts/conability/getData?' + $("#form-ipt").serialize(), {
+				type: 'GET',
+				success: function(json_response) {
+					chartScatter.hideLoading();
+					chartBar.hideLoading();
+					if(!json_response.errMsg) {
+						var scatterConAbility = json_response['scatterConAbility'];
+						var users = scatterConAbility['users'];
+						var targetUser = scatterConAbility['targetUser'];
+						var targetName = targetUser['name'];
+						var targetValue = targetUser['value'];
+						
+						var clustersSize=[];
+						
+						// 每个聚类加入
+						var seriesList = [];
+						var legendList = [targetName];
+						for(var i = 0; i < users.length; i++) {
+							var centroid = users[i]['centroid'];
+							var points = users[i]['points'];
+							clustersSize=clustersSize.concat(points.length); // 记录每个簇的样本点数量
+							
+							legendList = legendList.concat("簇" + (i + 1));
+							seriesList = seriesList.concat({
+								name: "簇" + (i + 1),
+								type: "scatter",
+								symbolSize: 5,
+								data: points,
+								markPoint: {
+									symbol: 'diamond',
+									symbolSize: 35,
+									silent: true,
+									label: {
+										normal: { show: false, },
+										emphasis: { show: false, }
+									},
+									itemStyle: {
+										normal: {
+											borderColor: '#fff',
+											borderWidth: 2,
+										},
+									},
+									data: [{
+										coord: [centroid[0], centroid[1]],
+									}],
+								},
+							})
+						}
+
+						// 加上目标用户的
+						seriesList = seriesList.concat({
+							name: targetName,
+							type: "scatter",
+							data: [targetUser],
+							visualMap: false,
+							markLine: {
+								lineStyle: {
+									normal: {
+										type: 'solid',
+									}
+								},
+								data: [{
+									name: targetName + "的总消费额",
+									xAxis: targetUser['value'][0],
+								}, {
+									name: targetName + "的总消费次数",
+									yAxis: targetUser['value'][1],
+								}]
+							}
+						});
+
+						// 散点图应用设置
+						chartScatter.setOption({
+							legend: { data: legendList, },
+							series: seriesList,
+						});
+						
+						// 处理散点图表格
+						var form_columns = [
+							{ data: "簇序号" },
+							{ data: "簇心横坐标" },
+							{ data: "簇心纵坐标" },
+							{data:"簇大小"},
+						];
+
+						var form_data = [];
+
+						// 添加簇心信息
+						for(var i = 0; i < users.length; i++) {
+							var centroid = users[i]['centroid'];
+							form_data = form_data.concat({
+								"簇序号": i + 1,
+								"簇心横坐标": centroid[0],
+								"簇心纵坐标": centroid[1],
+								"簇大小":clustersSize[i],
+							});
+						}
+
+						// 应用表格设置
+						$("#tableScatter").dataTable({
+							language: {
+								url: "{{ url_for('static',filename='Chinese.json') }}",
+							},
+							destroy: true,
+							columns: form_columns,
+							data: form_data,
+							ordering: true,
+						});
+						
+						// 处理柱状图图表
+						var barConAbility = json_response['barConAbility'];
+						users = barConAbility['users'];
+						var axisLabels = users['axisLabels'];
+						var vals = users['vals'];
+
+						targetUser = barConAbility['targetUser'];
+						var targetPerMonthKey = targetUser['targetPerMonthKey'];
+						var perMonth = targetValue[0] / 12;
+						var numSection = targetUser['numSection'];
+
+						chartBar.setOption({
+							xAxis: [{
+								data: axisLabels,
+							}],
+							series: [{
+								name: "所有学生",
+								type: 'bar',
+								data: vals,
+								markPoint: {
+									label: {
+										normal: {
+											formatter: function() {
+												return perMonth.toFixed(1);
+											},
+											textStyle: {
+												fontSize: 10,
+											}
+										},
+										emphasis: {
+											formatter: function() {
+												return perMonth.toFixed(1);
+											},
+											textStyle: {
+												fontSize: 10,
+											}
+										},
+									},
+									data: [{
+										name: targetName + "：" + perMonth.toFixed(2) + "元",
+										coord: [targetPerMonthKey, numSection],
+									}],
+								},
+							}],
+						});
+					} else {
+						showDialog("出错了", json_response.errMsg);
+					}
+				},
+				error: function() {
+					showDialog("出错了", "出现意外情况");
+				},
+				dataType: 'json'
+			});
+
+		};
+
+		// 图表初始化
+		var chartScatter = echarts.init(document.getElementById('chartScatter'));
+		var chartBar = echarts.init(document.getElementById('chartBar'));
+		chartScatter.setOption(optchartScatter);
+		chartBar.setOption(optchartBar);
+		window.addEventListener('resize', function() {
+			chartScatter.resize();
+			chartBar.resize();
+		});
+
+		refresh_data();
+	});
+</script>
+{% endblock %}

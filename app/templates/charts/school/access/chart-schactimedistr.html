@@ -1,0 +1,229 @@
+{% extends "charts/charts.html" %} {% block chartField %}
+
+<!--Echarts图表-->
+<div id="chartBar" class="chartField_half"></div>
+
+<!--DataTables表格-->
+<div id="dataTableContainer" class="formField">
+	<table id="tableAcTimeDistr">
+		<thead>
+			<tr>
+				<th>placeholder</th>
+			</tr>
+		</thead>
+	</table>
+</div>
+
+<script>
+	$(document).ready(function() {
+		// 默认Echarts配置
+		var optChart = {
+			title: {
+				text: '学校门禁时间分布'
+			},
+			legend: {top:50,},
+			grid:{top:85,},
+			tooltip: {
+				trigger: 'axis',
+				formatter: function(params) {
+					var str_return = params[0].name + '<br/>';
+					for(var i = 0; i < params.length; i++) {
+						if(params[i].value != 0) {
+							str_return += params[i].seriesName + ' : ' + params[i].value.toFixed(2) + '<br/>'
+						}
+					}
+					return str_return;
+				}
+			},
+			toolbox: {
+				show: true,
+				feature: {
+					dataView: {
+						show: true,
+						readOnly: false
+					},
+					magicType: {
+						show: true,
+						type: ['line', 'bar']
+					},
+					restore: {
+						show: true
+					},
+				}
+			},
+			xAxis: {
+				type: 'category',
+				boundaryGap: true,
+				data: []
+			},
+			yAxis: {
+				type: 'value',
+				name: '平均每天次数',
+			},
+			dataZoom: [{
+				type: 'inside',
+				xAxisIndex: [0],
+				start: 0,
+				end: 100,
+			}, {
+				type: 'slider',
+				xAxisIndex: [0],
+				start: 0,
+				end: 100,
+				handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+				handleSize: '80%',
+				handleStyle: {
+					color: '#fff',
+					shadowBlur: 3,
+					shadowColor: 'rgba(0, 0, 0, 0.6)',
+					shadowOffsetX: 2,
+					shadowOffsetY: 2,
+				},
+			}],
+		};
+
+		refresh_chart = function() {
+			if($("#userID").val() == '') {
+				showDialog("ID不可为空", json_response.errMsg);
+				return;
+			};
+
+			chartBar.showLoading();
+
+			$.ajax('/charts/schactimedistr/getData', {
+				type: 'GET',
+				success: function(json_response) {
+					chartBar.hideLoading();
+
+					// 还原图表选项
+					chartBar.setOption(optChart);
+
+					if(!json_response.errMsg) {
+						var legendLabels = [];
+						var axisLabels = json_response.axisLabels;
+						var seriesData = json_response.seriesData
+						
+						for(var i in seriesData){
+							legendLabels=legendLabels.concat(seriesData[i]['name']);
+						}
+
+						// 以下遇到更新部分数据时新数据合并旧数据而不是覆盖的问题
+						var tmp_option;
+
+						// 清空series 并以notMerge 方式更新option.
+						tmp_option = chartBar.getOption();
+						tmp_option.series = [];
+						chartBar.setOption(tmp_option, true);
+
+						for(var i in seriesData) {
+							tmp_option = chartBar.getOption();
+							tmp_option.series.push({
+								name: seriesData[i].name,
+								stack: 'ac',
+								type: 'bar',
+								data: seriesData[i].data
+							});
+							chartBar.setOption(tmp_option, true);
+						}
+						// 配置设定
+						chartBar.setOption({
+							legend: {
+								data: legendLabels
+							},
+							xAxis: [{
+								data: axisLabels
+							}]
+						});
+
+						// 刷新表格
+
+						// 准备表头列表
+						var form_columns = [];
+						form_columns = form_columns.concat({
+							data: "日期"
+						});
+						var tableHeadRowJQ = $("#tableAcTimeDistr > thead > tr");
+						tableHeadRowJQ.empty();
+						tableHeadRowJQ.append("<th>日期</th>");
+
+						for(i = 0; i < legendLabels.length; i++) {
+							form_columns = form_columns.concat({
+								data: legendLabels[i]
+							});
+							tableHeadRowJQ.append("<th>" + legendLabels[i] + "</th>");
+						}
+
+						// 准备表内容列表
+						var form_data = [];
+						for(i = 0; i < axisLabels.length; i++) {
+							var row = new Object();
+							row["日期"] = axisLabels[i];
+							for(var j = 0; j < seriesData.length; j++) {
+								var colName = seriesData[j].name;
+								var colData = seriesData[j].data;
+
+								if(parseInt(colData[i]) != colData[i]) {
+									colData[i] = colData[i].toFixed(1);
+								}
+
+								row[colName] = colData[i];
+							}
+							form_data = form_data.concat(row);
+						}
+
+						var statRows = json_response['statRows'];
+						for(var i in statRows) {
+							statRows[i]["日期"] = statRows[i]["index"];
+							delete statRows[i]["index"];
+							for(var val in statRows[i]) {
+								// 是数字且不是整数
+								if(typeof(statRows[i][val]) == "number" && parseInt(statRows[i][val]) != statRows[i][val]) {
+									statRows[i][val] = statRows[i][val].toFixed(3);
+								}
+							}
+						}
+
+						form_data = statRows.concat(form_data);
+
+						$("#tableAcTimeDistr").dataTable({
+							language: {
+								url: "{{ url_for('static',filename='Chinese.json') }}",
+							},
+							destroy: true,
+							columns: form_columns,
+							data: form_data,
+							ordering: true,
+							order: [],
+							columnDefs: [{
+								"orderable": false,
+								"targets": 0,
+							}]
+						});
+
+					} else {
+						showDialog("出错了", json_response.errMsg);
+					}
+				},
+				error: function() {
+					showDialog("出错了", "出现意外情况");
+				},
+				dataType: 'json'
+			});
+		};
+
+		// 图表初始化
+		var chartBar = echarts.init(document.getElementById('chartBar'));
+		// 设置默认配置
+		chartBar.setOption(optChart);
+		// 自动缩放注册
+		window.addEventListener('resize',
+			function() {
+				chartBar.resize();
+			});
+
+		$('#tableAcTimeDistr').DataTable();
+		refresh_chart();
+	});
+</script>
+
+{% endblock %}

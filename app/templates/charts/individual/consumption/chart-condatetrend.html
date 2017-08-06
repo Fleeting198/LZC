@@ -1,11 +1,7 @@
 {% extends "charts/charts.html" %} {% block chartField %}
 
 <form id="form-ipt" class="form-inline">
-	{{ form.userID(class="form-control", maxlength='8', placeholder='工号', value='PPPWQHXW')}} 
-	{{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }}
-	{% for subfield in form.modeDate %} 
-		{{ subfield }}{{ subfield.label }} &nbsp;&nbsp; 
-	{% endfor %}
+	{{ form.userID(class="form-control", maxlength='8', placeholder='卡号', value='PPPWQHXW')}} {{ form.dateRange(class="form-control",size='23',placeholder='日期范围') }} {{ form.modeDate.label }} {% for subfield in form.modeDate %} {{ subfield }}{{ subfield.label }} &nbsp;&nbsp; {% endfor %}
 	<input class="btn btn-primary" type="button" value="刷新" onclick="refresh_data()" />
 </form>
 
@@ -20,217 +16,231 @@
 				<th>placeholder</th>
 			</tr>
 		</thead>
-	<tbody></tbody>
+		<tbody></tbody>
 	</table>
 </div>
 
 <script>
-	// 日期选择表单
-	var dateRangePicker = $("input[name='dateRange']");
-	dateRangePicker.daterangepicker({
-		autoUpdateInput: false,
-		locale: {
-			format: 'YYYY-MM-DD',
-			cancelLabel: 'Clear'
-		}
-	});
-	dateRangePicker.on('apply.daterangepicker', function(ev, picker) {
-		$(this).val(picker.startDate.format('YYYY-MM-DD') + ' ~ ' + picker.endDate.format('YYYY-MM-DD'));
-	});
-	dateRangePicker.on('cancel.daterangepicker', function(ev, picker) {
-		$(this).val('');
-	});
+	$(document).ready(function() {
+		// 日期选择表单
+		var dateRangePicker = $("input[name='dateRange']");
+		dateRangePicker.daterangepicker({
+			autoUpdateInput: false,
+			locale: {
+				format: 'YYYY-MM-DD',
+				cancelLabel: 'Clear'
+			}
+		});
+		dateRangePicker.on('apply.daterangepicker', function(ev, picker) {
+			$(this).val(picker.startDate.format('YYYY-MM-DD') + ' ~ ' + picker.endDate.format('YYYY-MM-DD'));
+		});
+		dateRangePicker.on('cancel.daterangepicker', function(ev, picker) {
+			$(this).val('');
+		});
 
-	// 默认Echarts配置
-	var optchartConDateTrend = {
-		title: {
-			text: '消费日期变化'
-		},
-		legend: {},
-		tooltip: {
-			trigger: 'axis',
-			formatter: function(params) {
-				var str_return = params[0].name + '<br/>';
-				for(var i = 0; i < params.length; i++) {
-					if(params[i].value != 0) {
-						str_return += params[i].seriesName + ' : ' + params[i].value + ' 元<br/>'
+		// 默认Echarts配置
+		var optchartConDateTrend = {
+			title: {
+				text: '消费日期变化'
+			},
+			legend: { top: 50, },
+			grid: { top: 85, },
+			tooltip: {
+				trigger: 'axis',
+				formatter: function(params) {
+					var str_return = params[0].name + '<br/>';
+					for(var i = 0; i < params.length; i++) {
+						if(params[i].value != 0) {
+							str_return += params[i].seriesName + ' : ' + params[i].value + ' 元<br/>'
+						}
 					}
+					return str_return;
 				}
-				return str_return;
-			}
-		},
-		toolbox: {
-			show: true,
-			feature: {
-				dataView: {
-					show: true,
-					readOnly: false
+			},
+			toolbox: {
+				show: true,
+				feature: {
+					dataView: {
+						show: true,
+						readOnly: false
+					},
+					magicType: {
+						show: true,
+						type: ['line', 'bar']
+					},
+					restore: {
+						show: true
+					},
+				}
+			},
+			xAxis: {
+				type: 'category',
+				boundaryGap: true,
+				data: [],
+			},
+			yAxis: {
+				type: 'value',
+				name: '金额（元）',
+			},
+			dataZoom: [{
+				type: 'inside',
+				xAxisIndex: [0],
+				start: 0,
+				end: 100,
+			}, {
+				type: 'slider',
+				xAxisIndex: [0],
+				start: 0,
+				end: 100,
+				handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+				handleSize: '80%',
+				handleStyle: {
+					color: '#fff',
+					shadowBlur: 3,
+					shadowColor: 'rgba(0, 0, 0, 0.6)',
+					shadowOffsetX: 2,
+					shadowOffsetY: 2,
 				},
-				magicType: {
-					show: true,
-					type: ['line', 'bar']
-				},
-				restore: {
-					show: true
-				},
-			}
-		},
-		xAxis: {
-			type: 'category',
-			boundaryGap: true,
-			data: []
-		},
-		yAxis: {
-			type: 'value',
-			name: '金额',
-			axisLabel: {
-				formatter: '{value} 元'
-			}
-		},
-		dataZoom: [{
-			type: 'inside',
-			xAxisIndex: [0],
-			start: 0,
-			end: 100
-		}, {
-			type: 'slider',
-			xAxisIndex: [0],
-			start: 0,
-			end: 100
-		}],
-	};
-
-	refresh_data = function() {
-		if($("#userID").val() == '') {
-			showDialog("ID不可为空", json_response.errMsg);
-			return;
+			}],
 		};
 
-		chartConDateTrend.showLoading();
+		refresh_data = function() {
+			if($("#userID").val() == '') {
+				showDialog("ID不可为空", json_response.errMsg);
+				return;
+			};
 
-		$.ajax('/charts/condatetrend/getData?' + $("#form-ipt").serialize(), {
-			type: 'GET',
-			success: function(json_response) {
-				chartConDateTrend.hideLoading();
+			chartConDateTrend.showLoading();
 
-				// 还原图表选项
-				chartConDateTrend.setOption(optchartConDateTrend);
+			$.ajax('/charts/condatetrend/getData?' + $("#form-ipt").serialize(), {
+				type: 'GET',
+				success: function(json_response) {
+					chartConDateTrend.hideLoading();
 
-				if(!json_response.errMsg) {
-					var legendLabels = json_response.legendLabels;
-					var axisLabels = json_response.axisLabels;
-					var seriesData = json_response.seriesData
+					// 还原图表选项
+					chartConDateTrend.setOption(optchartConDateTrend);
 
-					// 选项设定
-					chartConDateTrend.setOption({
-						legend: {
-							data: legendLabels
-						},
-						xAxis: [{
-							data: axisLabels
-						}]
-					});
+					if(!json_response.errMsg) {
+						var legendLabels = [];
+						var axisLabels = json_response.axisLabels;
+						var seriesData = json_response.seriesData;
+						for(var i in seriesData) {
+							legendLabels = legendLabels.concat(seriesData[i]['name']);
+						}
 
-					// 以下遇到更新部分数据时新数据合并旧数据而不是覆盖的问题
-					var i = 0; // 定义重复要使用到的变量
-					var tmp_option;
+						// 以下遇到更新部分数据时新数据合并旧数据而不是覆盖的问题
+						var tmp_option;
 
-					// 清空series 并以notMerge 方式更新option.
-					tmp_option = chartConDateTrend.getOption();
-					tmp_option.series = [];
-					chartConDateTrend.setOption(tmp_option, true);
-
-					for(i = 0; i < seriesData.length; i++) {
+						// 清空series 并以notMerge 方式更新option.
 						tmp_option = chartConDateTrend.getOption();
-						tmp_option.series.push({
-							name: seriesData[i].name,
-							stack: 'con',
-							type: 'bar',
-							data: seriesData[i].data
-						});
+						tmp_option.series = [];
 						chartConDateTrend.setOption(tmp_option, true);
-					}
 
-					// 刷新表格
-
-					// 准备表头列表
-					var form_columns = [];
-					form_columns = form_columns.concat({
-						data: "日期"
-					});
-					var tableHeadRowJQ = $("#tableConDateTrend > thead > tr");
-					tableHeadRowJQ.empty();
-					tableHeadRowJQ.append("<th>日期</th>");
-
-					for(i = 0; i < legendLabels.length; i++) {
-						form_columns = form_columns.concat({
-							data: legendLabels[i]
+						for(var i in seriesData) {
+							tmp_option = chartConDateTrend.getOption();
+							tmp_option.series.push({
+								name: seriesData[i].name,
+								stack: 'con',
+								type: 'bar',
+								data: seriesData[i].data
+							});
+							chartConDateTrend.setOption(tmp_option, true);
+						}
+						// 选项设定
+						chartConDateTrend.setOption({
+							legend: {
+								data: legendLabels
+							},
+							xAxis: [{
+								data: axisLabels
+							}]
 						});
-						tableHeadRowJQ.append("<th>" + legendLabels[i] + "</th>");
-					}
 
-					// 准备表内容列表
-					var form_data = [];
-					for(i = 0; i < axisLabels.length; i++) {
-						var row = new Object();
-						row["日期"] = axisLabels[i];
-						for(var j = 0; j < seriesData.length; j++) {
-							var colName = seriesData[j].name;
-							var colData = seriesData[j].data;
-							
-							// 超市的值出现了异常无限小数，这里强行掐掉
-							if(parseInt(colData[i]) != colData[i]) {
-								colData[i] = colData[i].toFixed(1);
-							}
-							
-							row[colName] = colData[i];
+						// 刷新表格
+						// 准备表头列表
+						var form_columns = [];
+						form_columns = form_columns.concat({
+							data: "日期"
+						});
+						var tableHeadRowJQ = $("#tableConDateTrend > thead > tr");
+						tableHeadRowJQ.empty();
+						tableHeadRowJQ.append("<th>日期</th>");
+
+						for(var i in legendLabels) {
+							form_columns = form_columns.concat({
+								data: legendLabels[i]
+							});
+							tableHeadRowJQ.append("<th>" + legendLabels[i] + "</th>");
 						}
-						form_data = form_data.concat(row);
-					}
 
-					var statRows = json_response['statRows'];
-					for(i = 0; i < statRows.length; i++) {
-						statRows[i]["日期"] = statRows[i]["index"];
-						delete statRows[i]["index"];
-						for(var val in statRows[i]) {
-							// 是数字且不是整数
-							if(typeof(statRows[i][val]) == "number" && parseInt(statRows[i][val]) != statRows[i][val]) {
-								statRows[i][val] = statRows[i][val].toFixed(3);
+						// 准备表内容列表
+						var form_data = [];
+						for(i = 0; i < axisLabels.length; i++) {
+							var row = new Object();
+							row["日期"] = axisLabels[i];
+							for(var j = 0; j < seriesData.length; j++) {
+								var colName = seriesData[j].name;
+								var colData = seriesData[j].data;
+
+								// 超市的值出现了异常无限小数，这里强行掐掉
+								if(parseInt(colData[i]) != colData[i]) {
+									colData[i] = colData[i].toFixed(1);
+								}
+
+								row[colName] = colData[i];
+							}
+							form_data = form_data.concat(row);
+						}
+
+						var statRows = json_response['statRows'];
+						for(var i in statRows) {
+							statRows[i]["日期"] = statRows[i]["index"];
+							delete statRows[i]["index"];
+							for(var val in statRows[i]) {
+								// 是数字且不是整数
+								if(typeof(statRows[i][val]) == "number" && parseInt(statRows[i][val]) != statRows[i][val]) {
+									statRows[i][val] = statRows[i][val].toFixed(3);
+								}
 							}
 						}
+
+						form_data = statRows.concat(form_data);
+
+						$("#tableConDateTrend").dataTable({
+							language: {
+								url: "{{ url_for('static',filename='Chinese.json') }}",
+							},
+							destroy: true,
+							columns: form_columns,
+							data: form_data,
+							ordering: true,
+							order: [],
+							columnDefs: [{
+								"orderable": false,
+								"targets": 0,
+							}]
+						});
+
+					} else {
+						showDialog("出错了", json_response.errMsg);
 					}
-					
-					form_data = statRows.concat(form_data);
-					
-					$("#tableConDateTrend").dataTable({
-						destroy: true,
-						columns: form_columns,
-						data: form_data,
-						ordering: false,
-					});
+				},
+				error: function() {
+					showDialog("出错了", "出现意外情况");
+				},
+				dataType: 'json'
+			});
+		};
 
-				} else {
-					showDialog("出错了", json_response.errMsg);
-				}
-			},
-			error: function() {
-				showDialog("出错了", "出现意外情况");
-			},
-			dataType: 'json'
-		});
-	};
-
-	// 图表初始化
-	var chartConDateTrend = echarts.init(document.getElementById('chartConDateTrend'));
-	// 设置默认配置
-	chartConDateTrend.setOption(optchartConDateTrend);
-	// 自动缩放注册
-	window.addEventListener('resize',
-		function() {
-			chartConDateTrend.resize();
-		});
-
-	$(document).ready(function() {
+		// 图表初始化
+		var chartConDateTrend = echarts.init(document.getElementById('chartConDateTrend'));
+		// 设置默认配置
+		chartConDateTrend.setOption(optchartConDateTrend);
+		// 自动缩放注册
+		window.addEventListener('resize',
+			function() {
+				chartConDateTrend.resize();
+			});
 		$('#tableConDateTrend').DataTable();
 		refresh_data();
 	});

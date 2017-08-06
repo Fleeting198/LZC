@@ -12,27 +12,16 @@ class device(db.Model):
 
     consumptions = db.relationship('consumption', backref=db.backref('device'))  # 设备所有消费记录
 
-    def __init__(self, dev_id, node_id):
-        self.dev_id = dev_id
-        self.node_id = node_id
-
 
 class individual(db.Model):
-    """个体：工号，角色[老师，学生，其他]，年级[只有学生描述年级]
+    """个体：卡号，角色[老师，学生，其他]，年级[只有学生描述年级]
     """
-    user_id = db.Column(db.String(8), primary_key=True)  # 工号
+    user_id = db.Column(db.String(8), primary_key=True)  # 卡号
     role = db.Column(db.String(3))  # 角色
     grade = db.Column(db.String(2))  # 年级
 
-    # 用于贫困判定的字段
-    con_sum_vals = db.Column(db.Float)  # 消费总金额
-    con_sum_times = db.Column(db.Integer)  # 消费总次数
-    index_vals = db.Column(db.Float)
-    index_times = db.Column(db.Float)
-    index_per = db.Column(db.Float)
-
-    acrecs = db.relationship('acrec', backref=db.backref('individual'))  # 此工号所有门禁记录
-    consumptions = db.relationship('consumption', backref=db.backref('individual'))  # 此工号所有消费记录
+    acrecs = db.relationship('acrec', backref=db.backref('individual'))  # 此卡号所有门禁记录
+    consumptions = db.relationship('consumption', backref=db.backref('individual'))  # 此卡号所有消费记录
 
 
 class dev_loc(db.Model):
@@ -58,7 +47,7 @@ class ac_loc(db.Model):
 
 
 class acrec(db.Model):
-    """门禁记录：工号(外键：个体 工号)，日期时间，合法，地点序号(外键：门禁地点 序号)。
+    """门禁记录：卡号(外键：个体 卡号)，日期时间，合法，地点序号(外键：门禁地点 序号)。
     """
     user_id = db.Column(db.String(8), db.ForeignKey('individual.user_id'), primary_key=True)
     ac_datetime = db.Column(db.DateTime, primary_key=True)
@@ -71,7 +60,7 @@ class acrec(db.Model):
 
 
 class consumption(db.Model):
-    """消费记录：工号(外键：个体 工号)，日期时间，设备号(外键：设备 设备号)，金额
+    """消费记录：卡号(外键：个体 卡号)，日期时间，设备号(外键：设备 设备号)，金额
     """
     user_id = db.Column(db.String(8), db.ForeignKey('individual.user_id'), primary_key=True)
     con_datetime = db.Column(db.DateTime, primary_key=True)
@@ -104,19 +93,41 @@ class sch_ac_datetrend(db.Model):
     none = db.Column(db.Integer)
 
 
-class acr_friendlist(db.Model):
-    """来自门禁表的人际关系字典
-    """
-    user_id = db.Column(db.String(8), db.ForeignKey('individual.user_id'), primary_key=True)
-    str_relation = db.Column(db.String)
+class sch_con_timedistr(db.Model):
+    id_time = db.Column(db.Date, primary_key=True)
+    discipline = db.Column(db.DECIMAL(5, 2))
+    # recharge = db.Column(db.DECIMAL(5, 2))
+    food = db.Column(db.DECIMAL(5, 2))
+    sport = db.Column(db.DECIMAL(5, 2))
+    water = db.Column(db.DECIMAL(5, 2))
+    shop = db.Column(db.DECIMAL(5, 2))
+    study = db.Column(db.DECIMAL(5, 2))
+    med = db.Column(db.DECIMAL(5, 2))
+    none = db.Column(db.DECIMAL(5, 2))
 
-    def str_relation_to_dict(self):
-        dict_relation = eval(self.str_relation)
-        return dict_relation
+
+class sch_ac_timedistr(db.Model):
+    id_time = db.Column(db.Integer, primary_key=True)
+    dorm = db.Column(db.Integer)
+    sci = db.Column(db.Integer)
+    acad = db.Column(db.Integer)
+    sport = db.Column(db.Integer)
+    lib = db.Column(db.Integer)
+    med = db.Column(db.Integer)
+    admin = db.Column(db.Integer)
+    none = db.Column(db.Integer)
+
+
+class ac_relation_confdata(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    left_user_id = db.Column(db.String)
+    right_user_id = db.Column(db.String)
+    suppCount = db.Column(db.Integer)
+    confRate = db.Column(db.Float)
 
 
 class conability(db.Model):
-    """个人月消费能力：工号,月平均消费金额(保留2位小数),角色[老师，学生]
+    """个人月消费能力：卡号,月平均消费金额(保留2位小数),角色[老师，学生]
     """
     user_id = db.Column(db.String(8), primary_key=True)
     amount_avg = db.Column(db.DECIMAL())
@@ -129,13 +140,6 @@ class conability_line(db.Model):
     amount = db.Column(db.Integer(), primary_key=True)
     num = db.Column(db.Integer())
     role = db.Column(db.String(3))
-
-
-class penalty(db.Model):
-    """个体滞纳金缴纳情况：工号,缴纳总额
-    """
-    user_id = db.Column(db.String(8), primary_key=True)
-    amount = db.Column(db.DECIMAL())
 
 
 class penalty_line(db.Model):
@@ -152,17 +156,17 @@ class con_food_1440i(db.Model):
 
 
 class con_food_12m(db.Model):
-    con_axis = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
 
 
 class con_food_7d(db.Model):
-    con_axis = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
 
 
 class con_food_24h(db.Model):
-    con_axis = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
 
 
@@ -172,35 +176,32 @@ class con_water_1440i(db.Model):
 
 
 class con_water_12m(db.Model):
-    con_axis = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
 
 
 class con_water_7d(db.Model):
-    con_axis = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
 
 
 class con_water_24h(db.Model):
-    con_axis = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer(), primary_key=True)
     sum_amount = db.Column(db.DECIMAL())
 
 
-# 用以查询图书馆、科研、教学楼访问次数的现成表
-class ac_count(db.Model):
-    user_id = db.Column(db.Integer(), primary_key=True)
+class ac_study(db.Model):
+    user_id = db.Column(db.String(8), primary_key=True)
     count_acad = db.Column(db.Integer())
     count_lib = db.Column(db.Integer())
     count_sci = db.Column(db.Integer())
 
-    def __init__(self, user_id, count_acad, count_lib, count_sci):
-        self.user_id = user_id
-        self.count_acad = count_acad
-        self.count_lib = count_lib
-        self.count_sci = count_sci
+    def count_study(self):
+        return self.count_lib + self.count_sci + self.count_acad
 
-    def get_sum(self):
-        return self.count_acad + self.count_sci + self.count_lib
 
-    def get_sum_per_month(self):
-        return self.get_sum() / 12.0
+class con_statistics(db.Model):
+    user_id = db.Column(db.String(8), primary_key=True)
+    total_vals = db.Column(db.Float)  # 消费总金额
+    total_times = db.Column(db.Integer)  # 消费总次数
+    per = db.Column(db.Float)
